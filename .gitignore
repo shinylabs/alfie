@@ -1,0 +1,13 @@
+.DS_Store
+Thumbs.db
+settings.py
+*.pyc
+*.sql
+*.log
+*.psd
+*.pdf
+*.swp
+*.swo
+*.swn
+mykeys.txt
+myaccts.txt
