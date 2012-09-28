@@ -1,0 +1,24 @@
+html {
+    background: #fff;
+}
+body {
+    margin: 0 auto;
+    width: 640px;
+    font-size: 0.65em;
+    font-family: "Myriad Pro";
+}
+h1, h2, h3 {
+    font-family: "Myriad Pro", "Trebuchet MS", serif;
+    font-weight: normal;
+    text-transform: lowercase;
+}
+form {
+    text-align: right;
+}
+textarea {
+    width: 100%;
+    background: #E0E8E9;
+}
+pre, .source {
+    font: 0.85em/140% "courier";
+}

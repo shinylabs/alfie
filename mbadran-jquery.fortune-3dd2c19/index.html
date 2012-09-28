@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>jQuery.fortune: jQuery Plugin, Random Fortune Generator</title>
+
+        <link rel="stylesheet" href="css/tripoli.simple.css" type="text/css" media="all" />
+        <link rel="stylesheet" href="css/screen.css" type="text/css" media="screen" />
+    </head>
+
+    <body>
+
+        <div class="content">
+
+            <h1>jQuery.fortune</h1>
+
+            <p><a href="./contentions/">Demo</a></p>
+            <p><a href="http://github.com/mbadran/jquery.fortune/tarball/gh-pages">Download</a></p>
+
+            <hr />
+
+            <h2>So what am I doing here?</h2>
+
+            <p>jQuery.fortune is a <a href="http://jquery.com">jQuery</a> plugin that generates random fortune cookies. The intention behind it is to replace backend fortune scripts. There's no need for those anymore.</p>
+
+            <p>The following data formats are supported:</p>
+
+            <ol>
+                <li>Plain text &mdash; configurable cookie delimiter.</li>
+                <li>JSON &mdash; configurable file format.</li>
+                <li>XML &mdash; configurable file format (but undocumented).</li>
+                <li><span style="text-decoration: line-through;">.DAT (binary fortune format)</span> &mdash; unsupported for obvious reasons.</li>
+            </ol>
+
+            <h2>OK, I'm sold. How do I use it?</h2>
+
+            <p>Assuming a <span class="source">my-cookie-element</span> in your HTML page, call the plugin like this:</p>
+  
+            <pre>$("#my-cookie-element").fortune();</pre>
+
+            <p>Then, in the same directory, create a file called <span class="source">cookies.txt</span> that looks like this:</p>
+
+            <pre>
+Happy? Happy in Paraguay.
+%
+What do you say we make apple juice and fax it to each other?
+%
+You and me in Japan. Watch me dance.</pre>
+
+            <p><span class="source">my-cookie-element</span> will be populated with a random cookie from <span class="source">cookies.txt</span>.</p>
+
+            <h3>That's it? What if I want to get fancy?</h3>
+
+            <p>To use another file, specify a different delimiter, and enable a simple animation, call the plugin like this:</p>
+
+            <pre>$("#my-cookie-element").fortune({file: "./my_cookies.txt", delimiter: "#####", animate: true});</pre>
+
+            <h3>Even more fancy?</h3>
+
+            <p>You can use a JSON (or XML) fortune file, but you <em>must</em> supply its path and the name of the cookies node/object, like this:</p>
+
+            <pre>$("#my-cookie-element").fortune({file: "./my_cookies.json", cookieNode: "cookies"});</pre>
+
+            <p>In this example, <span class="source">my_cookies.json</span> should look like this:</p>
+
+            <pre>
+{
+   "cookies":
+   [
+       "Happy? Happy in Paraguay.",
+       "What do you say we make apple juice and fax it to each other?",
+       "You and me in Japan. Watch me dance."
+   ]
+}</pre>
+
+            <h3>But what's the advantage over text files?</h3>
+
+            <p>Ah! With JSON (or XML), you can specify metadata for each cookie (<span class="source">theIndex</span>, <span class="source">theContent</span>, <span class="source">theSource</span>, and <span class="source">theDate</span>). These attributes are optional: you can specify some, none, or all of them. If you want to do this, call the plugin like this:</p>
+
+            <pre>$("#my-cookie-element").fortune({file: "./my_cookies.json", cookieNode: "cookies",
+    metaNodes: {theIndex: "index", theContent: "content", theSource: "source", theDate: "date"});</pre>
+
+            <p>In this example, <span class="source">my_cookies.json</span> should look like this:</p>
+
+            <pre>
+{
+    "cookies":
+    [
+        {
+            "index": 1,
+            "content": "Happy? Happy in Paraguay!",
+            "source": "Worf, Son of Mogh",
+            "date": "29/01/2010"
+        },
+        {
+            "index": 2,
+            "content": "What do you say we make apple juice and fax it to each other?",
+            "source": "Worf, Son of Mogh",
+            "date": "31/01/2010"
+        },
+        {
+            "index": 3,
+            "content": "You and me in Japan. Watch me dance.",
+            "source": "Captain Jean-Luc Picard",
+            "date": "31/01/2010"
+        }
+    ]
+}</pre>
+
+            <p>When using metadata, <span class="source">my-cookie-element</span> in your HTML should have children <em>with corresponding class names</em>, like this:</p>
+
+            <pre>
+&lt;div id="my-cookie-element"&gt;
+    &lt;div class="index"&gt;&amp;nbsp;&lt;/div&gt;
+    &lt;div class="content"&gt;&amp;nbsp;&lt;/div&gt;
+    &lt;div class="source"&gt;&amp;nbsp;&lt;/div&gt;
+    &lt;div class="date"&gt;&amp;nbsp;&lt;/div&gt;
+&lt;/div&gt;</pre>
+
+            <h3>What about XML?</h3>
+
+            <p>XML works similar to JSON, but it's a bloated format that you should avoid. I'm supporting it for completeness, but I won't document it. It should be trivial to figure out, in any case.</p>
+
+            <p>Finally, for a live example, check out <a href="./contentions/">the demo</a>.</p>
+
+            <h2>Who do I blame for this?</h2>
+        
+            <p><a href="http://disentangled.net/">Mohammed Badran</a>. Credit to <a href="http://3nhanced.com/javascript/random-content-generator-a-jquery-plugin-featuring-chuck-norris/">Random Content Generator</a> for the inspiration. Note that I've done minimal testing and error handling, so use at your own risk etc.</p>
+
+            <p>Questions? Comments? Write me at mebadran at gmail dot com.</p>
+    
+        </div>
+
+    </body>
+</html>

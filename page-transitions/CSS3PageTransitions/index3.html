@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]> <html class="ie ie6 no-js" lang="en"> <![endif]-->
+<!--[if IE 7 ]>    <html class="ie ie7 no-js" lang="en"> <![endif]-->
+<!--[if IE 8 ]>    <html class="ie ie8 no-js" lang="en"> <![endif]-->
+<!--[if IE 9 ]>    <html class="ie ie9 no-js" lang="en"> <![endif]-->
+<!--[if gt IE 9]><!--><html class="no-js" lang="en"><!--<![endif]-->
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+		<title>Page Transitions with CSS3</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+		<meta name="description" content="" />
+		<meta name="keywords" content="" />
+		<meta name="author" content="Your name" />
+		<link rel="shortcut icon" href="../favicon.ico"> 
+		<link rel="stylesheet" type="text/css" href="css/demo.css" />
+		<link rel="stylesheet" type="text/css" href="css/style3.css" />
+		<link href='http://fonts.googleapis.com/css?family=Electrolize' rel='stylesheet' type='text/css' />
+	</head>
+	<body>
+		<!-- Codrops top bar -->
+		<div class="codrops-top">
+			<a href="http://tympanus.net/Development/Arctext/">
+				<strong>&laquo; Previous Demo: </strong>Arctext.js – Curving Text with CSS3 and jQuery
+			</a>
+			<span class="right">
+				<a href="http://tympanus.net/codrops/2012/01/30/page-transitions-with-css3/">
+					<strong>Back to the Codrops Article</strong>
+				</a>
+			</span>
+			<div class="clr"></div>
+		</div><!--/ Codrops top bar -->
+				
+		<!-- Home -->
+		<div id="home" class="content">
+			<h2>Home</h2>
+			<p>So you want a single page website, uh? Well, if you follow this tutorial you will be able to create a very nifty one-pager. Check out the rest of the sections on this page so you can see for yourself what am I talking about.</p>
+			<p>This page consists of different panels that will slide or appear when clicking on the respective link.</p>
+			<p>With the general sibling selector we can change the color of the "selected" panel link.</p>
+		</div>
+		<!-- /Home -->
+		
+		<!-- Portfolio -->
+		<div id="portfolio" class="panel">
+			<div class="content">
+				<h2>Portfolio</h2>
+				<p>Some really nice portfolio shots:</p>
+				<ul id="works">
+					<li><a href="http://dribbble.com/shots/394177-Sheriff-Woody"><img src="images/portfolio_01.jpeg" width="250"></a></li>
+					<li><a href="http://dribbble.com/shots/392403-Spaceman"><img src="images/portfolio_02.jpeg" width="250"></a></li>
+					<li><a href="http://dribbble.com/shots/388799-Harvey-Birdman"><img src="images/portfolio_03.jpeg" width="250"></a></li>
+				</ul>
+				<p class="footnote">Dribbble shots by <a href="http://dribbble.com/stuntman">Matt Kaufenberg</a>.</p>
+			</div>
+		</div>
+		<!-- /Portfolio -->
+		
+		<!-- About -->
+		<div id="about" class="panel">
+			<div class="content">
+				<h2>About</h2>
+				<p>It is a paradisematic country, in which roasted parts of sentences fly into your mouth.</p>
+				<p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.</p>
+				<p>The Big Oxmox advised her not to do so, because there were thousands of bad Commas, wild Question Marks and devious Semikoli, but the Little Blind Text didn’t listen.</p>
+				<p>She packed her seven versalia, put her initial into the belt and made herself on the way.</p>
+			</div>
+		</div>
+		<!-- /About -->
+		
+		<!-- Contact -->
+		<div id="contact" class="panel">
+			<div class="content">
+				<h2>Contact</h2>
+				<p>When she reached the first hills of the Italic Mountains, she had a last view back on the skyline of her hometown Bookmarksgrove, the headline of Alphabet Village and the subline of her own road, the Line Lane.</p>
+				<p>Pityful a rethoric question ran over her cheek, then she continued her way. On her way she met a copy.</p>
+				<form id="form">
+					<p><label>Your Name</label><input type="text" /></p>
+					<p><label>Your Email</label><input type="text" /></p>
+					<p><label>Your Message</label><textarea></textarea></p>
+				</form>
+			</div>
+		</div>
+		<!-- /Contact -->
+		
+		<!-- Header with Navigation -->
+		<div id="header">
+			<h1>Page Transitions with CSS3</h1>
+			<ul id="navigation">
+				<li><a id="link-home" href="#home">Home</a></li>
+				<li><a id="link-portfolio" href="#portfolio">Portfolio</a></li>
+				<li><a id="link-about" href="#about">About Me</a></li>
+				<li><a id="link-contact" href="#contact">Contact</a></li>
+			</ul>
+			<!-- Demo Nav -->
+			<nav id="codrops-demos">
+				<a href="index.html#home">Demo 1</a>
+				<a href="index2.html#home">Demo 2</a>
+				<a class="current-demo" href="#home">Demo 3</a>
+			</nav>
+		</div>
+
+	</body>
+</html>
