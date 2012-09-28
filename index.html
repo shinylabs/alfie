@@ -1,372 +1,314 @@
 <!DOCTYPE html>
 
+<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="en"> <!--<![endif]-->
+<head>
+	<meta charset="utf-8" />
 
-<!-- 
+	<!-- Set the viewport width to device width for mobile -->
+	<meta name="viewport" content="width=device-width" />
 
----------------------------------------------------------------------------------------------
+	<title>Try 6 exotic instant noodles pack shipped free by LuckyRamenCat</title>
+  
+	<!-- Included CSS Files -->
+	<link rel="stylesheet" href="assets/css/foundation.css">
+	<link rel="stylesheet" href="assets/css/app.css">
+	<link rel="stylesheet" href="assets/css/orbit-1.2.3.css">
 
-                                                             
-				 __            _       _____                   _____     _   
-				|  |   _ _ ___| |_ _ _| __  |___ _____ ___ ___|     |___| |_ 
-				|  |__| | |  _| '_| | |    -| .'|     | -_|   |   --| .'|  _|
-				|_____|___|___|_,_|_  |__|__|__,|_|_|_|___|_|_|_____|__,|_|  
-				                  |___|                                      
-							
-									Lucky Ramen Cat!
-
----------------------------------------------------------------------------------------------
-
--->
+	<!--[if lt IE 9]>
+		<link rel="stylesheet" href="stylesheets/ie.css">
+	<![endif]-->
 
 
+	<!-- IE Fix for HTML5 Tags -->
+	<!--[if lt IE 9]>
+		<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
 
-<!--[if lt IE 7 ]> <html class="ie ie6 no-js" lang="en"> <![endif]-->
-<!--[if IE 7 ]>    <html class="ie ie7 no-js" lang="en"> <![endif]-->
-<!--[if IE 8 ]>    <html class="ie ie8 no-js" lang="en"> <![endif]-->
-<!--[if IE 9 ]>    <html class="ie ie9 no-js" lang="en"> <![endif]-->
-<!--[if gt IE 9]><!--><html class="no-js" lang="en"><!--<![endif]-->
-	<head>
-		<!-- CHARTBEAT -->	
-		<script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+	<!-- FONTSQUIRREL -->
+	<link rel="stylesheet" href="assets/fonts/Bebas-fontfacekit/stylesheet.css" type="text/css" charset="utf-8">
 
-		<meta charset="UTF-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
-		<title>LuckyRamenCat is a monthly nifty delivery club, try exotic ramen from around the world. Everybody loves ramen!</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-		<meta name="description" content="LuckyRamenCat delivers exotic instant ramen for you to try every month. Starting at $12 with free shipping. Start slurping now! Because everybody loves ramen!" />
-		<meta name="keywords" content="instant ramen, lucky, subscription, awesome, love" />
-		<meta name="author" content="LuckyRamenCat" />
+	<style>
 
-		<!-- ICON -->
-		<link rel="shortcut icon" href="favicon.png">
-		
-		<!-- FONTSQUIRREL -->
-		<link rel="stylesheet" href="Bebas-fontfacekit/stylesheet.css" type="text/css" charset="utf-8">
-
-		<!-- Included CSS Files -->
-		<link rel="stylesheet" href="css/foundation.css">
-		<link rel="stylesheet" href="css/app.css">
-		<link rel="stylesheet" href="css/demo.css">
-		<link rel="stylesheet" href="css/style.css">
-		<link rel="stylesheet" href="css/reveal.css">
-
-		<!-- Included JavaScript Files -->
-		<script src="javascripts/jquery.min.js" type="text/javascript"></script>
-		<script src="javascripts/foundation.js" type="text/javascript"></script>
-		<script src="javascripts/app.js" type="text/javascript"></script>
-		<script src="javascripts/jquery.reveal.js" type="text/javascript"></script>
-
-		<!--[if lt IE 9]>
-			<link rel="stylesheet" href="stylesheets/ie.css">
-		<![endif]-->
+	body { 
+		/* HATTIP: http://css-tricks.com/perfect-full-page-background-image/ */
+		background: url(assets/img/cloud-bg-green.png) no-repeat center center fixed;
+		-webkit-background-size: cover;
+		-moz-background-size: cover;
+		-o-background-size: cover;
+		background-size: cover;
+	}
 	
-		<!-- IE Fix for HTML5 Tags -->
-		<!--[if lt IE 9]>
-			<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-		<![endif]-->
-	</head>
+	#header {
+		margin-top: 50px;
+	}
 
-	<body>
-		<div id="header">
-			<a href="#home"><h1>LuckyRamenCat</h1></a>
-		</div><!--/header-->
+	#tealbg {
+		background: url(assets/img/circle-bg-teal.png) no-repeat;				
+		position: absolute;
+		top: -100px;
+		right: 150px;
+		width: 640px;
+		height: 430px;
+		z-index: -99;
+	}
 
-		<!-- HOME SLICE -->
-		<div id="home" class="content">
-
-			<div class="row" style="min-height:250px;">
-				<div class="nine columns offset-by-three">
-					<h2>Everybody <span class="replaced"><span id="hearts">loves</span></span> ramen</h2>
-					<h3>Try exotic instant ramen noodle every month</h3>
-					<h3>From all over the world right to your door</h3>
-
-					<!-- CALL TO ACTION -->
-					<a class="catbutton" href="#order">Start slurping for <span class="price">$12</span></a>
-					<a class="watwatwat" href="#about">Wait, wait, tell me more first</a>
-				</div>
-			</div><!-- .row -->
-
-			<div class="row">
-				<div class="four columns">
-					<center><a href="#order"><img src="images/catimage1.png"></a></center>
-				</div>
-				<div class="four columns">
-					<center><a href="#order"><img src="images/catimage2.png"></a></center>
-				</div>
-				<div class="four columns">
-					<!-- <a href="http://www.youtube.com/watch?v=CdEBgZ5Y46U"> -->
-					<center><a href="http://www.youtube.com/watch?v=CdEBgZ5Y46U"><img src="images/catimage3.png"></a></center>
-				</div>				
-			</div><!-- .row -->
-			
-			<div class="row">
-				<div class="twelve columns">
-					<div id="footer">
-						<ul>
-						<li><a href="#home">Home</a></li>
-						<li><a href="#order">Order</a></li>
-						<li><a href="#about">About</a></li>
-						<li><a href="#contact">Contact</a></li>
-						<li><a href="tel:1-435-200-5825">435.200.LUCK</a></li>
-						</ul>
-					</div>
-				</div>
-			</div>
-			
-		</div><!--/home -->
-
-
-		<!-- ORDER SHEET -->
-		<div id="order" class="section">
-			<div class="content">
-
-			<div class="row" style="min-height:150px;">
-				<div class="nine columns offset-by-three">
-					<h2>So you want in?</h2>
-					<h3>Get started meow so you can slurp soon</h3>
-				</div>
-			</div><!-- .row -->
-
-			<div class="row">
-				<div class="nine columns offset-by-three">
-
-					<!-- CUSTOMER FORM -->
-					<div id="message"></div>
+	h1.headlines {
+		font: 60px/68px 'BebasRegular', Arial, sans-serif; 
+		letter-spacing: -2px;
+		word-spacing: 5px;
+		color: #555555;
+		text-align: center;
+	}
 	
-					<center>				
-					<form action="" method="POST" id="form">
-						<table>
-							<tr>
-								<td></td>
-								<td></td>
-								<td></td>
-							</tr>
+	h2.taglines {
+		font: 30px/35px 'BebasRegular', Arial, sans-serif; 
+		letter-spacing: -1px;
+		word-spacing: 3px;
+		color: #555555;
+		text-align: center;
+	}
 	
-							<tr>
-								<td><input type="radio" name="pack" value="small">Small - $7</td>
-								<td><input type="radio" name="pack" value="medium">Medium - $12</td>
-								<td><input type="radio" name="pack" value="large">Large - $18</td>
-							</tr>
-						</table>
+	.box1 {
+		background: #199fe6; 
+		height: 300px !important;
+	    -moz-border-radius: 20px;
+	    -webkit-border-radius: 20px;
+	    -khtml-border-radius: 20px;
+	    border-radius: 20px;
 	
-						<table>
-							<tr>
-								<td><input type="text" name="name" id="name" placeholder="Name" /></td>
-								<td><input type="text" name="email" id="email" placeholder="Email" /></td>
-							</tr>
-							<tr>
-								<td><input type="text" name="street" id="street" placeholder="Street" /></td>
-								<td><input type="text" name="zip" id="zip" placeholder="Zip code" /></td>
-							</tr>
-							<tr>
-								<td><input type="text" name="city" id="city" placeholder="City" /></td>
-								<td><input type="text" name="state" id="state" placeholder="State" /></td>
-							</tr>
-						</table>
-						<a href="#payment" class="nice medium round green button">Okay, next</a>
-					</form>
-					</center>
-
-				</div>
-			</div><!-- .row -->
-				
-			</div>
-		</div><!-- /order -->
-
-		
-		<!-- PAYMENT SHEET -->		
-		<div id="payment" class="section">
-			<div class="content">
-			
-			<div class="row" style="min-height:150px;">
-				<div class="nine columns offset-by-three">
-					<h2>How to pay</h2>
-					<h3>Bust out your credit card</h3>
-				</div>
-			</div><!-- .row -->
-
-			<div class="row">
-				<div class="nine columns offset-by-three">
-
-					<!-- STRIPE.COM FORM -->
-					<div id="message"></div>
-					
-					<center><img src="images/creditcard.jpg"></center>
-					
-					<center>
-					<form action="" method="POST" id="form">
-						<table>
-							<tr>
-								<td><input type="text" placeholder="Card number" /></td>
-								<td><input type="text" placeholder="CVC" /></td>
-							</tr>
-							<tr>
-								<td><input type="text" placeholder="Expiration date" /></td>
-								<td><input type="text" placeholder="Expiration year" /></td>
-							</tr>
-						</table>
-						<a href="#thx" class="nice medium round green button">Now what?</a>
-					</form>
-					</center>
+		/* HATTIP: http://stackoverflow.com/questions/2196614/is-there-a-reason-why-inner-padding-adds-to-the-size-of-an-element */
+		box-sizing: border-box;
+		ms-box-sizing: border-box;
+		webkit-box-sizing: border-box;
+		moz-box-sizing: border-box;
+		padding: 10px;
+	}
 	
-				</div>
-			</div><!-- .row -->
+	.box2 {
+ 		background: #e6c719; 
+		height: 300px !important;
+	    -moz-border-radius: 20px;
+	    -webkit-border-radius: 20px;
+	    -khtml-border-radius: 20px;
+	    border-radius: 20px;
 
-			</div>
-		</div><!-- /payment -->
-
-
-		<!-- THX MAN -->
-		<div id="thx" class="section">
-			<div class="content">
-			
-			<div class="row" style="min-height:150px;">
-				<div class="nine columns offset-by-three">
-					<h2>Domo aricato, Mr. Roboto</h2>
-					<h3>8 is your lucky number btdubs, it means great fortune</h3>				
-				</div>
-			</div><!-- .row -->
-			
-			<div class="row">
-				<div class="nine columns offset-by-three">
-				
-					<center>
-					<p>1. Sign up √</p>
-					<p>2. Welcome letter √</p>
-					<p>3. Shipment notice</p>
-					<p>4. Slurp and enjoy</p>
-					</center>
+		box-sizing: border-box;
+		ms-box-sizing: border-box;
+		webkit-box-sizing: border-box;
+		moz-box-sizing: border-box;
+		padding: 10px;
+	}
 	
-					<br><br>
-					<center><img src="images/thx.jpg"></center>
+	.box3 {
+		background: #c619e6; 
+		height: 300px !important;
+	    -moz-border-radius: 20px;
+	    -webkit-border-radius: 20px;
+	    -khtml-border-radius: 20px;
+	    border-radius: 20px;
 
-				</div>
-			</div><!-- .row -->
-
-			</div>
-		</div><!-- /thx -->
-		
-		
-		<!-- WAT IS ALL THIS -->
-		<div id="about" class="section">
-			<div class="content">
-			
-			<div class="row" style="min-height:150px;">
-				<div class="nine columns offset-by-three">
-					<h2>About page</h2>
-					<h3>subheadline</h3>
-				</div>
-			</div><!-- .row -->
-
-			<div class="row">
-				<div class="nine columns offset-by-three">
-					<p>Lucky Ramen Cat is a monthly nifty delivery club.</p>
-					<p>Each month you get a package of instant ramen packs and nifty things to discover.</p>
-					<p>Leave notes, give feedback on the ramen, and show us how you slurp.</p>
-					<br><br>
-
-					<h3>This is the promise</h3>
-					<p>1. Cancel any time</p>
-					<p>2. Packages ship third Monday every month</p>
-					<p>3. Jump in by third Friday every month</p>
-					<p>4. No refunds, yet</p>
-					<p>5. We bring the fresh</p>
-					</ol>
-					<br><br>
-
-					<!-- CALL TO ACTION -->
-					<a class="catbutton" href="#order">Start slurping for <span class="price">$12</span></a>
-				</div>
-			</div><!-- .row -->
-
-			</div>
-		</div><!-- /about -->
-		
-
-		<!-- CONTACT SHEET -->
-		<div id="contact" class="section">
-			<div class="content">
-			
-			<div class="row" style="min-height:150px;">
-				<div class="nine columns offset-by-three">
-					<h2>Get in touch</h2>
-					<h3>We'll reply, soon as we find the mouse</h3>
-				</div>
-			</div><!-- .row -->
-			
-			<div class="row">
-				<div class="nine columns offset-by-three">
-
-					<!-- FORMSTACK EMBED -->
-					<script type="text/javascript" src="http://www.formstack.com/forms/js.php?1200602-NJcaXUGKyj-v2"></script>
-					<noscript><a href="http://www.formstack.com/forms/?1200602-NJcaXUGKyj" title="Online Form">Online Form - Contact form</a></noscript>
-
-				</div>
-			</div><!-- .row -->
-
-			</div>
-		</div><!-- /about -->
-
-	<!-- CHARTBEAT -->	
-	<script type="text/javascript">
-	var _sf_async_config={uid:34742,domain:"luckyramencat.com"};
-	(function(){
-	  function loadChartbeat() {
-	    window._sf_endpt=(new Date()).getTime();
-	    var e = document.createElement('script');
-	    e.setAttribute('language', 'javascript');
-	    e.setAttribute('type', 'text/javascript');
-	    e.setAttribute('src',
-	       (("https:" == document.location.protocol) ? "https://a248.e.akamai.net/chartbeat.download.akamai.com/102508/" : "http://static.chartbeat.com/") +
-	       "js/chartbeat.js");
-	    document.body.appendChild(e);
-	  }
-	  var oldonload = window.onload;
-	  window.onload = (typeof window.onload != 'function') ?
-	     loadChartbeat : function() { oldonload(); loadChartbeat(); };
-	})();
+		box-sizing: border-box;
+		ms-box-sizing: border-box;
+		webkit-box-sizing: border-box;
+		moz-box-sizing: border-box;
+		padding: 10px;
+	}
 	
+	.order-form {
+		background: #eee;
+		width: 638px;
+		height: 300px;
+	}
+	
+	.customer-form {
+		background: blue;
+		width: 638px;
+		height: 300px;
+	}
+	
+	.payment-form {
+		background: green;		
+		width: 638px;
+		height: 300px;
+	}
+	
+	.cart-form {	
+		background: orange;
+		height: 250px;
+		padding: 25px;
+	}	
+	</style>
+
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>          
+	<script type="text/javascript" src="assets/js/jquery.easing.1.3.js"></script>
+	<script type="text/javascript" src="assets/js/jquery.orbit-1.2.3.js"></script>
+	<script type="text/javascript" src="assets/js/jquery.countdown.js"></script>
+	<script type="text/javascript">                                         
+	$(document).ready(function() {
+
+		$("#slider").easySlider({
+			auto: true, 
+			continuous: true,
+			numeric: true
+		});
+
+	});
 	</script>
 
-	</body>
+	<script type="text/javascript" charset="utf-8">
+	// Javascript
+	$(function() {
+	  var d, h, m, s;
+	  $('div#clock').countdown(new Date(2012, 3, 1), function(event) {
+	    var timeFormat = "%d day(s) %h:%m:%s"
+	        $this = $(this);
+	    switch(event.type) {
+	      case "days":
+	        d = event.value;
+	        break;
+	      case "hours":
+	        h = event.value;
+	        break;
+	      case "minutes":
+	        m = event.value;
+	        break;
+	      case "seconds":
+	        s = event.value;
+	        break;
+	      case "finished":
+	        $this.fadeTo('slow', 0.5);
+	        break;
+	    }
+	    // Assemble time format
+	    if(d > 0) {
+	      timeFormat = timeFormat.replace(/\%d/, d);
+	      timeFormat = timeFormat.replace(/\(s\)/, Number(d) == 1 ? '' : 's');
+	    } else {
+	      timeFormat = timeFormat.replace(/%d day\(s\)/, '');
+	    }
+	    timeFormat = timeFormat.replace(/\%h/, h);
+	    timeFormat = timeFormat.replace(/\%m/, m);
+	    timeFormat = timeFormat.replace(/\%s/, s);
+	    // Display
+	    $this.html(timeFormat);
+	  });
+	});
+	</script>	
+</head>
+
+<body>
+
+	<div class="container">
+		<div id="tealbg"></div>
+		
+		<div class="row" id="header">
+			<div class="four columns">
+				<div id="logo"><img src="assets/img/luckyramencat.png" align="center"></div>
+			</div>
+			<div class="eight columns">
+				<h1 class="headlines">Konichiwa, love ramen? Today your lucky day!</h1>
+				<h2 class="taglines">Discover and try 6 exotic instant noodle packs delivered to your door with free shipping</h2>
+			</div>
+		</div><!-- row -->
+
+		<div class="row">
+			<ul class="block-grid three-up">
+				<li class="box1"></li>
+				<li class="box2"></li>
+				<li class="box3"></li>
+			</ul>
+		</div><!-- row -->
+
+		<div class="row">
+			<div class="twelve columns">
+				
+				<div class="row">
+					<div class="eight columns">
+						
+						<div id="slider">
+						<!-- ORDER FORM -->
+						<div class="order-form">
+							<h1>Options</h1>
+
+							<ul>
+							<li>Monthly: $13</li>
+
+							<li>Bi-annual: $75</li>
+
+							<li>Annual: $143</li>
+							</ul>
+						</div>
+				
+						<!-- CUSTOMER FORM -->
+						<div class="customer-form">
+						<form action="" method="POST" id="payment-form">
+						    <div class="form-row">
+						        <label>Name</label>
+						        <input type="text" size="20" autocomplete="off" class="card-number"/>
+						    </div>
+						    <div class="form-row">
+						        <label>Street</label>
+						        <input type="text" size="4" autocomplete="off" class="card-cvc"/>
+						    </div>
+						    <div class="form-row">
+						        <label>Zip Code</label>
+						        <input type="text" size="4" autocomplete="off" class="card-cvc"/>
+						    </div>
+						</form>
+						</div>
+				
+						<!-- STRIPE.COM FORM -->
+						<div class="payment-form">
+						<form action="" method="POST" id="payment-form">
+						    <div class="form-row">
+						        <label>Card Number</label>
+						        <input type="text" size="20" autocomplete="off" class="card-number"/>
+						    </div>
+						    <div class="form-row">
+						        <label>CVC</label>
+						        <input type="text" size="4" autocomplete="off" class="card-cvc"/>
+						    </div>
+						    <div class="form-row">
+						        <label>Expiration (MM/YYYY)</label>
+						        <input type="text" size="2" class="card-expiry-month"/>
+						        <span> / </span>
+						        <input type="text" size="4" class="card-expiry-year"/>
+						    </div>
+						    <button type="submit" class="submit-button">Submit Payment</button>
+						</form>
+						</div>
+						
+						</div><!-- slides -->
+					</div>
+					<div class="four columns">				
+						<!-- CART FORM -->
+						<div class="cart-form">
+							<div id="clock"></div>
+						</div>
+					</div>
+				</div><!-- row -->
+				
+			</div>
+		</div><!-- row -->
+
+		<div class="row" style="display: none;">
+			<div class="twelve columns" style="background-color: #ccc; height: 300px;">
+				<h1>About</h1>
+				<p>LuckyRamenCat is a monthly nifty delivery club giving you a taste of instant noodles eaten and slurped by billions of people around the world.</p>				
+			</div>
+		</div><!-- row -->
+		
+	</div><!-- container -->
+
+	<!-- Included JS Files -->
+	<script src="javascripts/jquery.min.js"></script>
+	<script src="javascripts/modernizr.foundation.js"></script>
+	<script src="javascripts/foundation.js"></script>
+	<script src="javascripts/app.js"></script>
+
+</body>
 </html>
-
-
-<!-- TODOs
-
-WEBSITE
-1. Forms auto populate City and State based on zip code √
-2. Auto detect credit card based on initial 4 digits
-3. Relative LRC logo √
-4. Lucky number generator
-5. Implement Stripe.com
-6. Content for order page 
-7. Content for thank you page √
-8. Welcome email
-
-LOGISTICS
-1. Print stickers (stickermule)
-2. Print tshirts (Rook?)
-3. Print thank you letters (SFCB)
-4. Assemble packages (inkodye)
-5. Signup for FedEx shipping account
-
-RESEARCH
-1. Compile ramen distributors list
-2. Compile marketing/blogger outreach list
-3. Compile alpha tester list
-4. Compile feedback list
-
-SOFT LAUNCH: March 23rd 2012
-HARD LAUNCH: April 1st 2012
-
-V2
-1. Create Lucky tumblr blog
-2. Create Neko mailing list
-3. Include Twitter mentions
-4. Include Facebook commenting
-5. Create mobile app
-6. User manager/dashboard
-7. Admin manager/dashboard
-
--->
