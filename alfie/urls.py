@@ -16,7 +16,8 @@ urlpatterns = patterns('',
 )
 
 urlpatterns += patterns('',
-	url(r'^$', TemplateView.as_view(template_name="index.html"), name="index"),
+	url(r'^', include('alfie.apps.sales.urls')),
+	#url(r'^$', TemplateView.as_view(template_name="index.html"), name="index"),
 )
 
 if settings.DEBUG:
