@@ -1,40 +1,49 @@
 {% extends 'base.html' %}
 
 {% block content %}
-	<div class="row" style="min-height:250px;">
-		<div class="nine columns offset-by-three">
-			<h2>Everybody <span class="replaced"><span id="hearts">loves</span></span> ramen</h2>
-			<h3>Try exotic instant ramen noodle every month</h3>
-			<h3>From all over the world right to your door</h3>
+	<div class="row">
+		<div class="twelve columns">
+			<div class="row">
+				<div class="four columns">
+				</div>
+				<div class="eight columns">
+					<h2>Everybody <span class="replaced"><span id="hearts">loves</span></span> ramen!</h2>
+					<p class="subheadline">Then be curious, be adventurous and join the club</p>
+					<p class="subheadline">Get exotic instant ramen noodles every month</p>
+					<!-- <p class="subheadline">From all over the world right to your door</p> -->
 
-			<!-- CALL TO ACTION -->
-			<p><a class="catbutton" href="#order">Start slurping for <span class="price">$12</span></a></p>
-			<p><a class="watwatwat" href="#about">Wait, wait, tell me more first</a></p>
+					<!-- CALL TO ACTION -->
+					<a id="catbutton" class="large round button" href="#order">Start slurping for <span class="price">$12</span></a>
+					<a id="watwatwat" class="" href="#about">Wait, wait, tell me more first</a>
+				</div>
+			</div><!-- row -->
 		</div>
 	</div><!-- row -->
 
 	<div class="row">
 		<div class="four columns">
-			<a href="#order"><img src="img/catimage1.png" alt="Unique selections"></a>
+			<a href="#order"><img src="static/img/catimage1.png" alt="Unique selections"></a>
 		</div>
 		<div class="four columns">
-			<a href="#order"><img src="img/catimage2.png" alt="Free delivery"></a>
+			<a href="#order"><img src="static/img/catimage2.png" alt="Free delivery"></a>
 		</div>
 		<div class="four columns">
-			<a href="http://www.youtube.com/watch?v=CdEBgZ5Y46U"><img src="img/catimage3.png" alt="Instant happy"></a>
+			<a href="http://www.youtube.com/watch?v=CdEBgZ5Y46U"><img src="static/img/catimage3.png" alt="Instant happy"></a>
 		</div>				
 	</div><!-- row -->
 {% endblock %}
 
 
 {% block footer %}
+<div class="row">
 	<div class="twelve columns">
-			<ul>
-			<li><a href="#home">Home</a></li>
-			<li><a href="#order">Order</a></li>
-			<li><a href="#about">About</a></li>
-			<li><a href="#contact">Contact</a></li>
-			<li><a href="tel:1-435-200-5825">435.200.LUCK</a></li>
+			<ul class="footer-nav">
+				<li><a href="#home">Home</a></li>
+				<li><a href="#order">Order</a></li>
+				<li><a href="#about">About</a></li>
+				<li><a href="#contact">Contact</a></li>
+				<li><a href="tel:1-435-200-5825">435.200.LUCK</a></li>
 			</ul>
-	</div><!-- row -->
+	</div>
+</div><!-- row -->
 {% endblock %}
