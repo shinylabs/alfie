@@ -37,17 +37,17 @@
             <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
         <![endif]-->
 
-		<header>
+		<div id="header">
 			<a href="/"><h1>LuckyRamenCat</h1></a>
-		</header>
+		</div><!--/header-->
 
-		<section id="page">
+		<div id="home" class="content">
 			{% block content %}{% endblock %}
-		</section><!--#home -->
+		</div><!--#home -->
 
-		<footer>
+		<div id="footer">
 			{% block footer %}{% endblock %}
-		</footer>
+		</div><!-- #footer -->
 
 	<!-- JavaScript at the bottom for fast page loading -->
 	<!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->

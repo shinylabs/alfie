@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+
+THIS IS AN ORDER FORM
+
+<form action="" method="post">{% csrf_token %}
+    {{ form.non_field_errors }}
+
+    {% for field in form.level %}
+        {{ field }}
+    {% endfor %}
+
+<br>
+  <input type="submit" value="{% trans "Next"%}" />
+</form>
+{% endblock %}

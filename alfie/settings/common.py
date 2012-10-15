@@ -196,9 +196,16 @@ THIRD_PARTY_APPS = (
 
     # Asynchronous task queue:
     'djcelery',
+
+    # Django Userena:
+    'userena',
+    'guardian',
+    'easy_thumbnails',
 )
 
 LOCAL_APPS = (
+    'alfie.apps.users',
+    'alfie.apps.orders',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -257,3 +264,27 @@ COMPRESS_JS_FILTERS = [
     'compressor.filters.template.TemplateFilter',
 ]
 ########## END COMPRESSION CONFIGURATION
+
+
+########## USERENA CONFIGURATION
+# See: http://docs.django-userena.org/en/latest/installation.html
+AUTHENTICATION_BACKENDS = (
+    'userena.backends.UserenaAuthenticationBackend',
+    'guardian.backends.ObjectPermissionBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+# For Django guardian
+ANONYMOUS_USER_ID = -1
+
+LOGIN_REDIRECT_URL = '/accounts/%(username)s/'
+LOGIN_URL = '/accounts/signin/'
+LOGOUT_URL = '/accounts/signout/'
+
+AUTH_PROFILE_MODULE = 'users.SubscriberProfile'
+
+USERENA_ACTIVATION_REQUIRED = False
+USERENA_DISABLE_PROFILE_LIST = True
+USERENA_DEFAULT_PRIVACY = 'closed'
+USERENA_WITHOUT_USERNAMES = False
+########## END USERENA CONFIGURATION
