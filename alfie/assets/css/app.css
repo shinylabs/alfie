@@ -13,6 +13,15 @@
    Shared Styles
 ----------------------------------------- */
 
+html, body {
+	height:100%;
+}
+
+body {
+	width: 100%;
+	background:;
+	overflow: auto;
+}
 
 /* -----------------------------------------
    Page Name 1
