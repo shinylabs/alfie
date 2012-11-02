@@ -33,3 +33,12 @@ def paydata(request):
     else:
         form = SubDataForm() # An unbound form
     return render_to_response('users/pay_form.html', {'form': form,}, context_instance=RequestContext(request))
+
+
+"""
+
+LOGIN FLOW
+
+index -> login -> view profile -> edit profile, cancel, upgrade, history
+
+"""

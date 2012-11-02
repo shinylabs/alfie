@@ -36,8 +36,13 @@ class SubscriberData(models.Model):
     hot_level = models.CharField(_("spice level"), max_length=255, blank=True, null=True)
     allergy = models.CharField(_("allergy"), max_length=255, blank=True, null=True)
 
-    # RECORDS
-    cancel_ts = models.DateTimeField(blank=True, null=True, editable=False)
-    deactivate_ts = models.DateTimeField(blank=True, null=True, editable=False)
+    # HOUSEKEEPING
+    subscribed = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    cancelled = models.DateTimeField(blank=True, null=True, editable=False)
+    killed = models.DateTimeField(blank=True, null=True, editable=False) # keep for 90 days
 
-	# PAYMENT
+	# PAYMENT INFO
+    last_4_digits = models.CharField(max_length=4)
+    stripe_id = models.CharField(max_length=255)
