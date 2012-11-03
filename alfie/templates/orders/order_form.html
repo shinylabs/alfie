@@ -3,18 +3,67 @@
 
 {% block content %}
 
-<form action="" method="post">{% csrf_token %}
-    {{ form.non_field_errors }}
+{% if choice %}
+	You chose {{ choice }}! Now sign up!
 
+<form action="" method="post">
+  {% csrf_token %}
+  <fieldset>
+    <legend>{% trans "Signup" %}</legend>
+    {{ form.non_field_errors }}
+    {% for field in form %}
+    {{ field.errors }}
+    {% comment %} Displaying checkboxes differently {% endcomment %}
+    {% if field.name == 'tos' %}
+    <p class="checkbox">
+    <label for="id_{{ field.name }}">{{ field }} {{ field.label }}</label>
+    </p>
+    {% else %}
+    <p>
+    {{ field.label_tag }} 
+    {{ field }}
+    </p>
+    {% endif %}
+    {% endfor %}
+  </fieldset>
+  <input type="submit" class="radius button" value="{% trans "Signup"%}" />
+</form>
+
+{% else %}
+
+<form action="" method="post">{% csrf_token %}
+    {{ orderform.non_field_errors }}
     <table>
     	<tr>
-    		<td><img src="{{ STATIC_URL }}img/box1.png"><br>{{ form.menu.0 }}</td>
-    		<td><img src="{{ STATIC_URL }}img/box2.png"><br>{{ form.menu.1 }}</td>
-    		<td><img src="{{ STATIC_URL }}img/box3.png"><br>{{ form.menu.2 }}</td>
+    		<td><img src="{{ STATIC_URL }}img/box1.png"><br>{{ orderform.menu.0 }}</td>
+    		<td><img src="{{ STATIC_URL }}img/box2.png"><br>{{ orderform.menu.1 }}</td>
+    		<td><img src="{{ STATIC_URL }}img/box3.png"><br>{{ orderform.menu.2 }}</td>
     	</tr>
     </table>
-
-<br>
   <input type="submit" class="radius button" value="{% trans "Next"%}" />
 </form>
+
+<form action="" method="post">{% csrf_token %}
+  <fieldset>
+    <legend>{% trans "Signup" %}</legend>
+    {{ signupform.non_field_errors }}
+    {% for field in signupform %}
+    {{ field.errors }}
+    {% comment %} Displaying checkboxes differently {% endcomment %}
+    {% if field.name == 'tos' %}
+    <p class="checkbox">
+    <label for="id_{{ field.name }}">{{ field }} {{ field.label }}</label>
+    </p>
+    {% else %}
+    <p>
+    {{ field.label_tag }} 
+    {{ field }}
+    </p>
+    {% endif %}
+    {% endfor %}
+  </fieldset>
+  <input type="submit" class="radius button" value="{% trans "Signup"%}" />
+</form>
+
+{% endif %}
 {% endblock %}
