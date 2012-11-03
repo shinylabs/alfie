@@ -3,16 +3,18 @@
 
 {% block content %}
 
-THIS IS AN ORDER FORM
-
 <form action="" method="post">{% csrf_token %}
     {{ form.non_field_errors }}
 
-    {% for field in form.level %}
-        {{ field }}
-    {% endfor %}
+    <table>
+    	<tr>
+    		<td><img src="{{ STATIC_URL }}img/box1.png"><br>{{ form.menu.0 }}</td>
+    		<td><img src="{{ STATIC_URL }}img/box2.png"><br>{{ form.menu.1 }}</td>
+    		<td><img src="{{ STATIC_URL }}img/box3.png"><br>{{ form.menu.2 }}</td>
+    	</tr>
+    </table>
 
 <br>
-  <input type="submit" value="{% trans "Next"%}" />
+  <input type="submit" class="radius button" value="{% trans "Next"%}" />
 </form>
 {% endblock %}

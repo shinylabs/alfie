@@ -5,9 +5,9 @@ import datetime
 
 # https://docs.djangoproject.com/en/dev/topics/auth/
 
-class OrderChoice(models.Model):
-    size = models.CharField(max_length=128, blank=True, null=True)
+class Menu(models.Model):
     name = models.CharField(max_length=128, blank=True, null=True)
+    size = models.CharField(max_length=128, blank=True, null=True)
     price = models.DecimalField(max_digits=7, decimal_places=2)
     notes = models.TextField(max_length=255, blank=True, null=True)
 
@@ -15,7 +15,8 @@ class OrderChoice(models.Model):
 		return self.name
 
 class Order(models.Model):
-    plan = models.ForeignKey(OrderChoice)
+    # rename to choice
+    plan = models.ForeignKey(Menu)
     user = models.ForeignKey(User, blank=True, null=True)
     # pack = models.ForeignKey(Ramen)
     month = models.CharField(max_length=2, blank=True, null=True)
