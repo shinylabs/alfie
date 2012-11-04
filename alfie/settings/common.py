@@ -281,7 +281,7 @@ LOGIN_REDIRECT_URL = '/accounts/%(username)s/'
 LOGIN_URL = '/accounts/signin/'
 LOGOUT_URL = '/accounts/signout/'
 
-AUTH_PROFILE_MODULE = 'users.SubscriberProfile'
+AUTH_PROFILE_MODULE = 'users.UserProfile'
 
 USERENA_ACTIVATION_REQUIRED = False
 USERENA_DISABLE_PROFILE_LIST = True

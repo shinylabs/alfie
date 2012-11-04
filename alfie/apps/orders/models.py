@@ -27,3 +27,10 @@ class Order(models.Model):
     last_payment_attempt = models.DateTimeField(blank=True, null=True, editable=False)
     order_timestamp = models.DateTimeField(blank=True, null=True, editable=False) # auto_now_add=True, 
     ship_timestamp = models.DateTimeField(blank=True, null=True, editable=False)
+
+    # Payment info
+    last_4_digits = models.CharField(max_length=4)
+    stripe_id = models.CharField(max_length=255)
+
+    def __unicode__(self):
+        return u'%s' % (self.id)

@@ -27,7 +27,7 @@ urlpatterns += patterns('',
 
 # Third party apps
 urlpatterns += patterns('',
-	url(r'^accounts/signup/$', 'userena.views.signup', {'signup_form': SignupFormExtra}),
+	url(r'^accounts/signup/$', 'userena.views.signup', {'signup_form': SignupFormExtra, 'success_url': '/pay/'}),
 	# url(r'^accounts/user name/signup/complete/$', 'userena.views.signup', {'signup_form': SignupFormExtra}),
 	url(r'^accounts/', include('userena.urls')),
 )

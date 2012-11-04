@@ -55,8 +55,13 @@
               <dt>{% trans "About me" %}</dt>
               <dd>{{ profile.about_me }}</dd>
             {% endif %}
+            <dt><strong>Shipping Address</strong></dt>
+            <dd>{{ profile.ship_address_1 }} {{ profile.ship_address_2 }},<br>
+                {{ profile.ship_city }}, {{ profile.ship_state }} {{ profile.ship_zip_code }} 
+            </dd>
           {% endblock %}
         </dl>
+
 
       {% endblock %}
     </div><!-- four columns-->
