@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block stripe %}
+<script src="https://js.stripe.com/v1/" type="text/javascript"></script>
+    <script type="text/javascript">
+        //<![CDATA[
+        Stripe.publishableKey = '{{ publishable }}';
+        //]]>
+    </script>
+{% endblock %}
+
+{% block content %}
+<h1>Pay this order</h1>
+<form id="user_form" accept-charset="UTF-8" action="" class="form-stacked"  method="post">
+    {% csrf_token %}    
+    <div id="change-card" class="clearfix"{% if not form.last_4_digits.value %} style="display: none"{% endif %}>
+              Card
+              <div class="input">
+                Using card ending with {{ form.last_4_digits.value }}
+                (<a href="#">change</a>)
+              </div>
+            </div>      
+            
+    {% include "stripes/cardform.html" %}
+</form>
+{% endblock %}
