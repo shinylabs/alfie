@@ -11,3 +11,9 @@ class OrderForm(forms.ModelForm):
 	)
 	class Meta:
 		model = Order
+
+class SignupForm(forms.ModelForm):
+	pass
+
+class PaymentForm(forms.ModelForm):
+	pass

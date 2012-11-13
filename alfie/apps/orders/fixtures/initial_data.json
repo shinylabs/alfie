@@ -1,0 +1,32 @@
+[
+{
+	"model": "orders.menu",
+	"pk": 1,
+	"fields": {
+		"name": "tinybox",
+		"size": "4",
+		"price": "11.99",
+		"notes": "For people that want to try"
+	}
+},
+{
+	"model": "orders.menu",
+	"pk": 2,
+	"fields": {
+		"name": "bigbox",
+		"size": "8",
+		"price": "21.99",
+		"notes": "For the ramen fanatic"
+	}
+},
+{
+	"model": "orders.menu",
+	"pk": 3,
+	"fields": {
+		"name": "sumobox",
+		"size": "16",
+		"price": "31.99",
+		"notes": "If you just want to mainline"
+	}
+}
+]

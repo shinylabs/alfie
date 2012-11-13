@@ -5,23 +5,61 @@
 <script src="https://js.stripe.com/v1/" type="text/javascript"></script>
     <script type="text/javascript">
         //<![CDATA[
-        Stripe.publishableKey = '{{ publishable }}';
+        Stripe.publishableKey = 'pk_test_XvJjqRsdrKg45axxSDyb2Hs0';
         //]]>
     </script>
 {% endblock %}
 
 {% block content %}
-<h1>Pay this order</h1>
 <form id="user_form" accept-charset="UTF-8" action="" class="form-stacked"  method="post">
     {% csrf_token %}    
-    <div id="change-card" class="clearfix"{% if not form.last_4_digits.value %} style="display: none"{% endif %}>
+    <fieldset>
+      <legend>{% trans "Payment" %}</legend>
+        <div id="change-card" class="clearfix"{% if not form.last_4_digits.value %} style="display: none"{% endif %}>
               Card
               <div class="input">
                 Using card ending with {{ form.last_4_digits.value }}
                 (<a href="#">change</a>)
               </div>
             </div>      
-            
-    {% include "stripes/cardform.html" %}
+
+  <input type="hidden" name="last_4_digits" id="last_4_digits" value="{{ form.last_4_digits.value }}">
+  <input type="hidden" name="stripe_token" id="stripe_token" value="{{ form.stripe_token.value }}">
+
+<noscript>
+  &lt;p&gt;
+    This form requires Javascript to use
+  &lt;/p&gt;
+</noscript>
+
+<div id="credit-card"{% if form.last_4_digits.value %} style="display: none"{% endif %}>
+  <div id="credit-card-errors" style="display:none">
+    <div class="alert-message block-message error" id="stripe-error-message"></div>
+  </div>
+  
+  <!-- these fields have no names, so they are not submitted to django -->
+  <div class="clearfix">
+    <label for="credit_card_number">Credit card number</label>
+    <div class="input">
+      <input class="field" id="credit_card_number" type="text">
+    </div>
+  </div>
+  
+    <label for="expiry_date">Expiry date</label>
+    <ul class="block-grid two-up">
+    <li><input class="small" id="expiry_month" type="text" placeholder="Month"></li>
+    <li><input class="small" id="expiry_year" type="text" placeholder="Year"></li>
+    </ul>
+
+<div class="clearfix">
+    <label for="cvv">Security code (CVV)</label>
+    <div class="input">
+      <input class="small" id="cvv" type="text">
+    </div>
+  </div>
+  
+  </fieldset>
+
+  <input class="radius button" id="user_submit" name="commit" type="submit" value="Send payment">
 </form>
 {% endblock %}

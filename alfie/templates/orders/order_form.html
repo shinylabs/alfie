@@ -39,31 +39,15 @@
     		<td><img src="{{ STATIC_URL }}img/box2.png"><br>{{ orderform.menu.1 }}</td>
     		<td><img src="{{ STATIC_URL }}img/box3.png"><br>{{ orderform.menu.2 }}</td>
     	</tr>
+        <tr>
+            <td>Product listing<br><br>Price: $11.99/mo</td>
+            <td>Product listing<br><br>Price: $21.99/mo</td>
+            <td>Product listing<br><br>Price: $31.99/mo</td>
+        </tr>
     </table>
   <input type="submit" class="radius button" value="{% trans "Next"%}" />
 </form>
 
-<form action="" method="post">{% csrf_token %}
-  <fieldset>
-    <legend>{% trans "Signup" %}</legend>
-    {{ signupform.non_field_errors }}
-    {% for field in signupform %}
-    {{ field.errors }}
-    {% comment %} Displaying checkboxes differently {% endcomment %}
-    {% if field.name == 'tos' %}
-    <p class="checkbox">
-    <label for="id_{{ field.name }}">{{ field }} {{ field.label }}</label>
-    </p>
-    {% else %}
-    <p>
-    {{ field.label_tag }} 
-    {{ field }}
-    </p>
-    {% endif %}
-    {% endfor %}
-  </fieldset>
-  <input type="submit" class="radius button" value="{% trans "Signup"%}" />
-</form>
 
 {% endif %}
 {% endblock %}

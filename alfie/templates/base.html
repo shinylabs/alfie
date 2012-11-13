@@ -45,7 +45,7 @@
 				<div class="ten columns">
 					<h1><a href="/"><img src="{{ STATIC_URL }}img/luckyramencat_logo.png" width="75">LuckyRamenCat</a></h1>
 				</div>
-				<div class="two columns">
+				<div class="two columns"><br><br>
 					<a href="/accounts/signup">Sign up</a> | <a href="/accounts/signin">Sign in</a>
 				</div>
 			</div>
@@ -54,14 +54,21 @@
 		<section class="page">
 			<div class="row">
 				<div class="twelve columns">
-					{% block content %}{% endblock %}
+					{% block content %}
+					{% endblock %}
 				</div>
 			</div>
-		</section><!--#home -->
+		</section>
 
 		<footer>
-			{% block footer %}{% endblock %}
+			<div class="row">
+				<div class="twelve columns">
+					{% block footer %}
+					{% endblock %}
+				</div>
+			</div>
 		</footer>
+
 
 	<!-- JavaScript at the bottom for fast page loading -->
 	<!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
@@ -93,5 +100,7 @@
 	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 	  })();
 	</script>
+
 </body>
 </html>
+<!-- That concludes our broadcast -->

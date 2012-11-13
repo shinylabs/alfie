@@ -20,8 +20,8 @@ urlpatterns = patterns('',
 # Local apps
 urlpatterns += patterns('',
 	url(r'^', include('alfie.apps.front.urls')),
-	url(r'^', include('alfie.apps.users.urls')),
 	url(r'^', include('alfie.apps.orders.urls')),
+	url(r'^', include('alfie.apps.users.urls')),
 	#url(r'^', include('alfie.apps.stripes.urls')),
 	#url(r'^$', TemplateView.as_view(template_name="index.html"), name="index"),
 )

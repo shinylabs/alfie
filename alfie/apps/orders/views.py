@@ -47,4 +47,18 @@ ORDER FLOW
 
 index -> order form / register form / shipping form / payment form / preferences form -> success page -> success email
 
+
+/order
+	input: menu selection
+	redirect -> /register
+/register
+	input: username, email, password, name, address
+	redirect -> /pay
+/pay
+	input: card card info to stripe, last 4 digit, stripe_id
+	redirect -> /username/preferences
+/accounts/username/preferences
+	input: profile selection
+/accounts/username/refer
+	output: discount code
 """

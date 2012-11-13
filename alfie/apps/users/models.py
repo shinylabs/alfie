@@ -10,7 +10,13 @@ import datetime
 # https://docs.djangoproject.com/en/dev/topics/auth/
 
 class UserProfile(UserenaBaseProfile):
-    # Extends User model, fields=email, password, firstname, lastname
+    """
+    Creates a UserProfile object keyed to a User object that defines user profile information.
+
+    """
+
+    # Keyed to User object
+    # fields=email, password, firstname, lastname
     user = models.OneToOneField(User, unique=True, verbose_name=_('user'), related_name='my_profile')
 
     # shipping address
@@ -21,11 +27,11 @@ class UserProfile(UserenaBaseProfile):
     ship_zip_code = models.CharField(_("Zip code"), max_length=5, blank=True, null=True)
 	
     # Plan choice
-    plan = models.CharField(_("plan level"), max_length=255, blank=True, null=True)
+    choice = models.CharField(_("plan level"), max_length=255, blank=True, null=True)
 
     # Preferences
-    spice = models.CharField(_("spice level"), max_length=255, blank=True, null=True)
-    allergy = models.CharField(_("allergy"), max_length=255, blank=True, null=True)
+    # spice = models.CharField(_("spice level"), max_length=255, blank=True, null=True)
+    # allergy = models.CharField(_("allergy"), max_length=255, blank=True, null=True)
 
     # Housekeeping
     subscribed = models.BooleanField(default=False)
