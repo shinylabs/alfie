@@ -22,7 +22,7 @@ class Menu(models.Model):
     notes = models.TextField(max_length=255, blank=True, null=True)
 
     def __unicode__(self):
-		return self.name
+        return u'%s' % (self.name)
 
 class Order(models.Model):
     """
@@ -50,8 +50,8 @@ class Order(models.Model):
     ship_timestamp = models.DateTimeField(blank=True, null=True, editable=False)
 
     # Payment info
-    last_4_digits = models.CharField(max_length=4)
-    stripe_id = models.CharField(max_length=255)
+    last_4_digits = models.CharField(max_length=4, blank=True, null=True)
+    stripe_id = models.CharField(max_length=255, blank=True, null=True)
 
     def __unicode__(self):
         return u'%s' % (self.id)

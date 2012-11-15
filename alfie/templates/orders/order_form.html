@@ -33,19 +33,43 @@
 
 <form action="" method="post">{% csrf_token %}
     {{ orderform.non_field_errors }}
-    <table>
-    	<tr>
-    		<td><img src="{{ STATIC_URL }}img/box1.png"><br>{{ orderform.menu.0 }}</td>
-    		<td><img src="{{ STATIC_URL }}img/box2.png"><br>{{ orderform.menu.1 }}</td>
-    		<td><img src="{{ STATIC_URL }}img/box3.png"><br>{{ orderform.menu.2 }}</td>
-    	</tr>
-        <tr>
-            <td>Product listing<br><br>Price: $11.99/mo</td>
-            <td>Product listing<br><br>Price: $21.99/mo</td>
-            <td>Product listing<br><br>Price: $31.99/mo</td>
-        </tr>
-    </table>
-  <input type="submit" class="radius button" value="{% trans "Next"%}" />
+
+    <div class="row">
+        <div class="ten columns centered">
+            <div class="panel radius">
+                {{ choiceform }}
+            </div>
+        </div>
+    </div>
+
+<!-- 
+    <div class="row">
+        <div class="ten columns centered">
+            <div class="panel radius">
+                {{ orderform.menu }}
+            </div>
+        </div>
+    </div>
+-->
+
+    <div class="row">
+        <div class="ten columns centered">
+            <table width="100%">
+                <tr>
+                    <td><img src="{{ STATIC_URL }}img/box1.png"><br>{{ orderform.menu.0 }}</td>
+                    <td><img src="{{ STATIC_URL }}img/box2.png"><br>{{ orderform.menu.1 }}</td>
+                    <td><img src="{{ STATIC_URL }}img/box3.png"><br>{{ orderform.menu.2 }}</td>
+                </tr>
+                <tr>
+                    <td>Product listing<br><br>Price: $11.99/mo</td>
+                    <td>Product listing<br><br>Price: $21.99/mo</td>
+                    <td>Product listing<br><br>Price: $31.99/mo</td>
+                </tr>
+            </table>
+
+            <input type="submit" class="radius button" value="{% trans "Next"%}" />
+        </div>
+    </div>
 </form>
 
 
