@@ -117,6 +117,8 @@ def signup(request, signup_form=SignupForm,
         form = signup_form(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
+            # pass on newly made user id
+            request.session['user_id'] = user.id
 
             # Send the signup complete signal
             userena_signals.signup_complete.send(sender=None,
@@ -330,6 +332,7 @@ def signin(request, auth_form=AuthenticationForm,
                                                      form.cleaned_data['remember_me'])
             user = authenticate(identification=identification,
                                 password=password)
+            request.session['user_id'] = '13'
             if user.is_active:
                 login(request, user)
                 if remember_me:

@@ -32,12 +32,11 @@ def startOrder(request):
 	# Initialize forms
 	else:
 		if 'choice' in request.session:
-			choice = request.session['choice']
-			if request.user.is_authenticated():
-				auth = True
+			if 'user_id' in request.session:
+				return HttpResponseRedirect('/order/pay')
 			else:
-				auth = False
-			return HttpResponse('You already selected %s. <a href="/order/cancel">Cancel order</a>? <br>User auth is %s. <a href="/accounts/signup">Register</a>?' % (choice, auth))
+				choice = request.session['choice']
+				return HttpResponse('You already selected %s. <a href="/order/cancel">Cancel order</a>? <a href="/accounts/signup">Sign up</a>?' % choice)
 		else:
 			# Some unbound forms
 			orderform = OrderForm()
@@ -47,9 +46,27 @@ def startOrder(request):
 
 def cancelOrder(request):
 	# Reset variable in session
-	del request.session['choice']
+	if 'choice' in request.session:
+		del request.session['choice']
+	if 'user_id' in request.session:
+		del request.session['user_id']
 	# Redirect back to function
 	return HttpResponseRedirect('/order/')
+
+def payOrder(request):
+	if request.user.is_authenticated():
+		auth = True
+	else:
+		auth = False
+	if 'choice' not in request.session or 'user_id' not in request.session:
+		return HttpResponseRedirect('/order/')
+	else:
+		choice = request.session['choice']
+		user = request.session['user_id']
+		return render_to_response('orders/payment.html', {'choice': choice, 'auth': auth, 'user': user}, context_instance=RequestContext(request))
+
+def saveOrder(request):
+	pass
 
 """
 
@@ -61,10 +78,10 @@ index -> order form / register form / shipping form / payment form / preferences
 /order
 	input: menu selection
 	redirect -> /register
-/register
+/accounts/signup
 	input: username, email, password, name, address
 	redirect -> /pay
-/pay
+/order/pay
 	input: card card info to stripe, last 4 digit, stripe_id
 	redirect -> /username/preferences
 /accounts/username/preferences

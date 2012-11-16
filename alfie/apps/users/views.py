@@ -11,10 +11,6 @@ def login(request):
 def logout(request):
 	return HttpResponse('logout-> <a href="/logout">logout</a>')
 
-def payment(request):
-	return render_to_response('stripes/payment.html', context_instance=RequestContext(request))
-
-
 """
 
 LOGIN FLOW

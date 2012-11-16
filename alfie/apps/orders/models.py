@@ -37,7 +37,7 @@ class Order(models.Model):
         2           102         01          2013
     """
 
-    choice = models.ForeignKey(Menu)
+    choice = models.ForeignKey(Menu) #task rename to menu
     user = models.ForeignKey(User, blank=True, null=True)
     # pack = models.ForeignKey(Ramen)
     month = models.CharField(max_length=2, blank=True, null=True)

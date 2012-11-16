@@ -11,6 +11,9 @@
 {% endblock %}
 
 {% block content %}
+
+Menu: {{ choice }} / Auth: {{ auth }} / User: {{ user }} / Month: {% now "M" %} / Year: {% now "Y" %}
+
 <form id="user_form" accept-charset="UTF-8" action="" class="form-stacked"  method="post">
     {% csrf_token %}    
     <fieldset>
@@ -60,6 +63,6 @@
   
   </fieldset>
 
-  <input class="radius button" id="user_submit" name="commit" type="submit" value="Send payment">
+  <input class="radius button" id="user_submit" name="commit" type="submit" value="Send payment"> <a href="/order/cancel">Cancel</a>
 </form>
 {% endblock %}
