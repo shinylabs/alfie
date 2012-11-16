@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from alfie.apps.orders.forms import OrderForm, ChoiceForm, UserForm
+from alfie.apps.orders.models import Menu
 from alfie.apps.users.forms import SignupFormExtra
 
 def startOrder(request):
@@ -28,7 +29,8 @@ def startOrder(request):
 			auth = True
 		else:
 			auth = False
-		return HttpResponse('You chose %s. User auth is %s. Now <a href="/accounts/signup">sign up</a> or <a href="/accounts/signin">sign in</a>.' % (choice, auth))
+		#return HttpResponse('You chose %s. User auth is %s. Now <a href="/accounts/signup">sign up</a> or <a href="/accounts/signin">sign in</a>.' % (choice, auth))
+		return HttpResponseRedirect('/accounts/signup')
 	# Initialize forms
 	else:
 		if 'choice' in request.session:
@@ -36,7 +38,8 @@ def startOrder(request):
 				return HttpResponseRedirect('/order/pay')
 			else:
 				choice = request.session['choice']
-				return HttpResponse('You already selected %s. <a href="/order/cancel">Cancel order</a>? <a href="/accounts/signup">Sign up</a>?' % choice)
+				#return HttpResponse('You already selected %s. <a href="/order/cancel">Cancel order</a>? <a href="/accounts/signup">Sign up</a>?' % choice)
+				return HttpResponseRedirect('/accounts/signup')
 		else:
 			# Some unbound forms
 			orderform = OrderForm()
@@ -54,22 +57,25 @@ def cancelOrder(request):
 	return HttpResponseRedirect('/order/')
 
 def payOrder(request):
-	if request.user.is_authenticated():
-		auth = True
+	if request.method == 'POST':
+		return HttpResponse('payment posted')
 	else:
-		auth = False
-	if 'choice' not in request.session or 'user_id' not in request.session:
-		return HttpResponseRedirect('/order/')
-	else:
-		choice = request.session['choice']
-		user = request.session['user_id']
-		return render_to_response('orders/payment.html', {'choice': choice, 'auth': auth, 'user': user}, context_instance=RequestContext(request))
+		if request.user.is_authenticated():
+			auth = True
+		else:
+			auth = False
+		if 'choice' not in request.session or 'user_id' not in request.session:
+			return HttpResponseRedirect('/order/')
+		else:
+			choice = request.session['choice']
+			user = request.session['user_id']
+			price = Menu.objects.get(pk=choice).price
+			return render_to_response('orders/payment.html', {'choice': choice, 'price': price, 'auth': auth, 'user': user}, context_instance=RequestContext(request))
 
 def saveOrder(request):
 	pass
 
 """
-
 ORDER FLOW
 
 index -> order form / register form / shipping form / payment form / preferences form -> success page -> success email
