@@ -1,9 +1,21 @@
+# python
+import datetime
+now = datetime.datetime.now()
+
+# django
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
+
+# data
+from django.contrib.auth.models import User
+from alfie.apps.users.models import UserProfile
+from alfie.apps.orders.models import Menu, Order
+
+# forms
 from alfie.apps.orders.forms import OrderForm, ChoiceForm, UserForm
-from alfie.apps.orders.models import Menu
 from alfie.apps.users.forms import SignupFormExtra
+
 
 def startOrder(request):
 	"""
@@ -58,7 +70,12 @@ def cancelOrder(request):
 
 def payOrder(request):
 	if request.method == 'POST':
-		return HttpResponse('payment posted')
+		last_4_digits = '4242'
+		request.session['last_4_digits'] = last_4_digits
+		stripe_token = '12jiojio1jiojoi'
+		request.session['stripe_token'] = stripe_token
+		#bigups http://stackoverflow.com/questions/13328810/django-redirect-to-view
+		return redirect('alfie.apps.orders.views.saveOrder')
 	else:
 		if request.user.is_authenticated():
 			auth = True
@@ -73,7 +90,38 @@ def payOrder(request):
 			return render_to_response('orders/payment.html', {'choice': choice, 'price': price, 'auth': auth, 'user': user}, context_instance=RequestContext(request))
 
 def saveOrder(request):
-	pass
+	if 'choice' in request.session:
+		# Create the new Order object
+		order = Order(
+				choice=Menu(pk=request.session['choice']), 
+				user=User(pk=request.session['user_id']), 
+				month=now.month, 
+				year=now.year, 
+				order_timestamp=datetime.datetime.now(),
+				last_4_digits=request.session['last_4_digits'], 
+				stripe_id=request.session['stripe_token']
+		)
+		order.save()
+
+		# Update the UserProfile
+		#bigups http://stackoverflow.com/questions/7498328/how-to-do-a-reverse-foreignkey-lookup-for-all-records-in-django
+		profile = UserProfile.objects.get(user=request.session['user_id'])
+		profile.subscribed = True
+		profile.choice = request.session['choice']
+		profile.last_4_digits = request.session['last_4_digits']
+		profile.stripe_id = request.session['stripe_token']
+		profile.save()
+
+		# Reset the keys
+		del request.session['choice']
+		del request.session['user_id']
+		del request.session['last_4_digits']
+		del request.session['stripe_token']
+
+		# Success message
+		return HttpResponse('Success! You are order #%s' % order.id)
+	else:
+		return HttpResponseRedirect('/order/')
 
 """
 ORDER FLOW

@@ -1,7 +1,7 @@
+import datetime
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
-import datetime
 
 # https://docs.djangoproject.com/en/dev/topics/auth/
 
@@ -39,14 +39,14 @@ class Order(models.Model):
 
     choice = models.ForeignKey(Menu) #task rename to menu
     user = models.ForeignKey(User, blank=True, null=True)
-    # pack = models.ForeignKey(Ramen)
+    # pack = models.ForeignKey(Ramen) #task create then link to ramen app
     month = models.CharField(max_length=2, blank=True, null=True)
     year = models.CharField(max_length=4, blank=True, null=True)
 
     # Housekeeping
     payment_attempt = models.IntegerField(blank=True, null=True)
     last_payment_attempt = models.DateTimeField(blank=True, null=True, editable=False)
-    order_timestamp = models.DateTimeField(blank=True, null=True, editable=False) # auto_now_add=True, 
+    order_timestamp = models.DateTimeField(blank=True, null=True, editable=False) #task auto_now_add=True, 
     ship_timestamp = models.DateTimeField(blank=True, null=True, editable=False)
 
     # Payment info
