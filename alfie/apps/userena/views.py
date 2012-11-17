@@ -118,7 +118,7 @@ def signup(request, signup_form=SignupForm,
         if form.is_valid():
             user = form.save()
             # pass on newly made user id
-            request.session['user_id'] = user.id
+            request.session['user'] = user.id
 
             # Send the signup complete signal
             userena_signals.signup_complete.send(sender=None,

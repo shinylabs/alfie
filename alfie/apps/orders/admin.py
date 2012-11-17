@@ -1,9 +1,9 @@
+import sys
+import datetime
 from django.contrib import admin
 from django.db import models
-from alfie.apps.orders.models import Menu, Order
 from django.forms import TextInput, Textarea
-import datetime
-import sys
+from alfie.apps.orders.models import Menu, Order
 
 class MenuAdmin(admin.ModelAdmin):
 	save_on_top = True
@@ -11,7 +11,7 @@ class MenuAdmin(admin.ModelAdmin):
 
 class OrderAdmin(admin.ModelAdmin):
 	save_on_top = True
-	list_display = ('id', 'choice', 'user', 'month', 'year')
+	list_display = ('id', 'menu', 'user', 'month', 'year', 'paid')
 
 admin.site.register(Menu, MenuAdmin)
 admin.site.register(Order, OrderAdmin)

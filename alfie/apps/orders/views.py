@@ -9,12 +9,12 @@ from django.shortcuts import render_to_response, redirect
 
 # data
 from django.contrib.auth.models import User
-from alfie.apps.users.models import UserProfile
+from alfie.apps.profiles.models import Profile
 from alfie.apps.orders.models import Menu, Order
 
 # forms
-from alfie.apps.orders.forms import OrderForm, ChoiceForm, UserForm
-from alfie.apps.users.forms import SignupFormExtra
+from alfie.apps.orders.forms import MenuForm, UserForm, OrderForm
+from alfie.apps.profiles.forms import SignupFormExtra
 
 
 def startOrder(request):
@@ -31,40 +31,34 @@ def startOrder(request):
 	# When a form is sent
 	if request.method == 'POST': 
 		# Bound form to POST data
-		form = ChoiceForm(request.POST)
+		form = MenuForm(request.POST)
 		# What is the choice from form
-		choice = form.data['choice']
+		menu = form.data['menu']
 		# Set session variable
-		request.session['choice'] = choice
-		# Check if user status
-		if request.user.is_authenticated():
-			auth = True
-		else:
-			auth = False
-		#return HttpResponse('You chose %s. User auth is %s. Now <a href="/accounts/signup">sign up</a> or <a href="/accounts/signin">sign in</a>.' % (choice, auth))
+		request.session['menu'] = menu
 		return HttpResponseRedirect('/accounts/signup')
+	
 	# Initialize forms
 	else:
-		if 'choice' in request.session:
-			if 'user_id' in request.session:
+		if 'menu' in request.session:
+			if 'user' in request.session:
 				return HttpResponseRedirect('/order/pay')
 			else:
-				choice = request.session['choice']
-				#return HttpResponse('You already selected %s. <a href="/order/cancel">Cancel order</a>? <a href="/accounts/signup">Sign up</a>?' % choice)
+				menu = request.session['menu']
 				return HttpResponseRedirect('/accounts/signup')
 		else:
 			# Some unbound forms
 			orderform = OrderForm()
-			choiceform = ChoiceForm()
+			menuform = MenuForm()
 			userform = UserForm()
-			return render_to_response('orders/order_form.html', {'orderform': orderform, 'choiceform': choiceform, 'userform': userform}, context_instance=RequestContext(request))		
+			return render_to_response('orders/order_form.html', {'orderform': orderform, 'menuform': menuform, 'userform': userform}, context_instance=RequestContext(request))		
 
 def cancelOrder(request):
 	# Reset variable in session
-	if 'choice' in request.session:
-		del request.session['choice']
-	if 'user_id' in request.session:
-		del request.session['user_id']
+	if 'menu' in request.session:
+		del request.session['menu']
+	if 'user' in request.session:
+		del request.session['user']
 	# Redirect back to function
 	return HttpResponseRedirect('/order/')
 
@@ -77,49 +71,42 @@ def payOrder(request):
 		#bigups http://stackoverflow.com/questions/13328810/django-redirect-to-view
 		return redirect('alfie.apps.orders.views.saveOrder')
 	else:
-		if request.user.is_authenticated():
-			auth = True
-		else:
-			auth = False
-		if 'choice' not in request.session or 'user_id' not in request.session:
+		if 'menu' not in request.session or 'user' not in request.session:
 			return HttpResponseRedirect('/order/')
 		else:
-			choice = request.session['choice']
-			user = request.session['user_id']
-			price = Menu.objects.get(pk=choice).price
-			return render_to_response('orders/payment.html', {'choice': choice, 'price': price, 'auth': auth, 'user': user}, context_instance=RequestContext(request))
+			menu = request.session['menu']
+			user = request.session['user']
+			price = Menu.objects.get(pk=menu).price
+			return render_to_response('orders/payment.html', {'menu': menu, 'price': price, 'user': user}, context_instance=RequestContext(request))
 
 def saveOrder(request):
-	if 'choice' in request.session:
+	if 'menu' in request.session:
 		# Create the new Order object
 		order = Order(
-				choice=Menu(pk=request.session['choice']), 
-				user=User(pk=request.session['user_id']), 
+				menu=Menu(pk=request.session['menu']), 
+				user=User(pk=request.session['user']), 
 				month=now.month, 
 				year=now.year, 
-				order_timestamp=datetime.datetime.now(),
-				last_4_digits=request.session['last_4_digits'], 
-				stripe_id=request.session['stripe_token']
+				stripe_token=request.session['stripe_token']
 		)
 		order.save()
 
 		# Update the UserProfile
 		#bigups http://stackoverflow.com/questions/7498328/how-to-do-a-reverse-foreignkey-lookup-for-all-records-in-django
-		profile = UserProfile.objects.get(user=request.session['user_id'])
+		profile = Profile.objects.get(user=request.session['user'])
 		profile.subscribed = True
-		profile.choice = request.session['choice']
+		profile.menu = request.session['menu']
 		profile.last_4_digits = request.session['last_4_digits']
-		profile.stripe_id = request.session['stripe_token']
 		profile.save()
 
 		# Reset the keys
-		del request.session['choice']
-		del request.session['user_id']
+		del request.session['menu']
+		del request.session['user']
 		del request.session['last_4_digits']
 		del request.session['stripe_token']
 
 		# Success message
-		return HttpResponse('Success! You are order #%s' % order.id)
+		return HttpResponse('Success! You are order #%s. Go <a href="/">home</a>' % order.id)
 	else:
 		return HttpResponseRedirect('/order/')
 

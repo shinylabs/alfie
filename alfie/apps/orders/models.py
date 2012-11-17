@@ -29,7 +29,7 @@ class Order(models.Model):
     Creates a Order object that defines an order to be filled and shipped.
 
     Initial data:
-        _choice_    _user_      _month_     _year_
+        _menu_      _user_      _month_     _year_
         0           23          12          2012
         0           25          12          2012
         1           32          12          2012
@@ -37,21 +37,20 @@ class Order(models.Model):
         2           102         01          2013
     """
 
-    choice = models.ForeignKey(Menu) #task rename to menu
-    user = models.ForeignKey(User, blank=True, null=True)
-    # pack = models.ForeignKey(Ramen) #task create then link to ramen app
-    month = models.CharField(max_length=2, blank=True, null=True)
-    year = models.CharField(max_length=4, blank=True, null=True)
+    menu = models.ForeignKey(Menu)
+    user = models.ForeignKey(User)
+    month = models.CharField(max_length=2)
+    year = models.CharField(max_length=4)
 
     # Housekeeping
-    payment_attempt = models.IntegerField(blank=True, null=True)
-    last_payment_attempt = models.DateTimeField(blank=True, null=True, editable=False)
-    order_timestamp = models.DateTimeField(blank=True, null=True, editable=False) #task auto_now_add=True, 
-    ship_timestamp = models.DateTimeField(blank=True, null=True, editable=False)
+    ordered = models.DateTimeField(blank=True, null=True, editable=False, auto_now_add=True)
+    paid = models.DateTimeField(blank=True, null=True, editable=False)
+    shipped = models.DateTimeField(blank=True, null=True, editable=False)
 
     # Payment info
-    last_4_digits = models.CharField(max_length=4, blank=True, null=True)
-    stripe_id = models.CharField(max_length=255, blank=True, null=True)
+    stripe_token = models.CharField(max_length=255, blank=True, null=True)
+    payment_attempts = models.IntegerField(blank=True, null=True)
+    last_payment_attempt = models.DateTimeField(blank=True, null=True, editable=False)
 
     def __unicode__(self):
         return u'%s' % (self.id)

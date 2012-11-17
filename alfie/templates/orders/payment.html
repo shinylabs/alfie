@@ -12,7 +12,7 @@
 
 {% block content %}
 
-Menu: {{ choice }} / Price: ${{ price }} / Auth: {{ auth }} / User: {{ user }} / Month: {% now "M" %} / Year: {% now "Y" %}
+Menu: {{ menu }} / Price: ${{ price }} / User: {{ user }}
 
 <form id="user_form" accept-charset="UTF-8" action="" class="form-stacked"  method="post">
     {% csrf_token %}    

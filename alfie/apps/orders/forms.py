@@ -1,12 +1,12 @@
+from django import forms
 from django.forms import ModelForm
 from alfie.apps.orders.models import Menu, Order
-from django import forms
 
 #bigups http://stackoverflow.com/questions/656614/django-forms-modelchoicefield-using-radioselect-widget-grouped-by-fk
-class ChoiceForm(forms.ModelForm):
+class MenuForm(forms.ModelForm):
 	class Meta:
 		model = Order
-		fields = ('choice',)
+		fields = ('menu',)
 
 class UserForm(forms.ModelForm):
 	class Meta:
@@ -32,9 +32,3 @@ class OrderForm(forms.ModelForm):
 	class Meta:
 		model = Order
 """
-
-class SignupForm(forms.ModelForm):
-	pass
-
-class PaymentForm(forms.ModelForm):
-	pass

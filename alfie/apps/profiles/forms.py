@@ -2,7 +2,7 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 # https://docs.djangoproject.com/en/dev/ref/contrib/localflavor/#united-states-of-america-us
 from django.contrib.localflavor.us.forms import *
-from alfie.apps.users.models import UserProfile
+from alfie.apps.profiles.models import Profile
 from userena.forms import SignupForm
 
 class SignupFormExtra(SignupForm):
@@ -10,12 +10,12 @@ class SignupFormExtra(SignupForm):
     A form to demonstrate how to add extra fields to the signup form, in this
     case adding the first and last name.
     """
-    first_name = forms.CharField(label=_(u'First name'), max_length=30, required=True)
-    last_name = forms.CharField(label=_(u'Last name'), max_length=30, required=True)
+    first_name = forms.CharField(label=_(u'First name'), max_length=30)
+    last_name = forms.CharField(label=_(u'Last name'), max_length=30)
 
     # shipping address
     ship_address_1 = forms.CharField(label=_(u"Address"), max_length=128)
-    ship_address_2 = forms.CharField(label=_(u"Address cont'd"), max_length=128)
+    ship_address_2 = forms.CharField(label=_(u"Address cont'd"), max_length=128, required=False)
     ship_city = forms.CharField(label=_(u"City"), max_length=64)
     ship_state = USStateField(label=_(u"State"))
     ship_zip_code = forms.CharField(label=_(u"Zip code"), max_length=5)
@@ -44,12 +44,6 @@ class SignupFormExtra(SignupForm):
         # Userena expects to get the new user from this form, so return the new
         return new_user
 
-PLAN_LEVEL = (
-    ('s', 'Small'),
-    ('m', 'Medium'),
-    ('l', 'Large'),
-)
-
 SPICE_LEVEL = (
     ('1', 'Meh'),
     ('2', 'Miami'),
@@ -66,8 +60,7 @@ ALLERGY = (
     ('o', 'other'),
 )
 
-class UserPrefForm(forms.Form):
+class PrefForm(forms.Form):
     # PROFILE
-    plan = forms.CharField(label=_(u"plan level"), max_length=255)
     spice = forms.CharField(label=_(u"spice level"), max_length=255)
     allergy = forms.CharField(label=_(u"allergy"), max_length=255)

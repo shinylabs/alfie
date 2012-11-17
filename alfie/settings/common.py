@@ -204,7 +204,7 @@ THIRD_PARTY_APPS = (
 )
 
 LOCAL_APPS = (
-    'alfie.apps.users',
+    'alfie.apps.profiles',
     'alfie.apps.orders',
 )
 
@@ -281,7 +281,7 @@ LOGIN_REDIRECT_URL = '/accounts/%(username)s/'
 LOGIN_URL = '/accounts/signin/'
 LOGOUT_URL = '/accounts/signout/'
 
-AUTH_PROFILE_MODULE = 'users.UserProfile'
+AUTH_PROFILE_MODULE = 'profiles.Profile'
 
 USERENA_ACTIVATION_REQUIRED = False
 USERENA_DISABLE_PROFILE_LIST = True
