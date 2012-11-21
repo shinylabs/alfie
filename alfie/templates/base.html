@@ -46,7 +46,12 @@
 					<h1><a href="/"><img src="{{ STATIC_URL }}img/luckyramencat_logo.png" width="75">LuckyRamenCat</a></h1>
 				</div>
 				<div class="two columns"><br><br>
-					<a href="/accounts/signup">Sign up</a> | <a href="/accounts/signin">Sign in</a>
+					{% if user.is_authenticated %}
+						{% if profile %}<p>Hello, {{ profile.user.first_name }}.</p>{% endif %}
+						<a href="/accounts/signout">Sign out</a>
+					{% else %}
+						<a href="/accounts/signup">Sign up</a> | <a href="/accounts/signin">Sign in</a>
+					{% endif %}
 				</div>
 			</div>
 		</header>
@@ -85,7 +90,11 @@
 	<!-- Initialize JS Plugins -->
 	<script src="{{ STATIC_URL }}js/app.js"></script>
 
-	{% block jquery %}{% endblock %}
+	<!-- jQuery code blocks -->
+  	<script>
+  	{% block jquery %}{% endblock %}
+  	</script>
+
 
 	<!-- Asynchronous Google Analytics snippet. Change UA-XXXXX-X to be your site's ID.mathiasbynens.be/notes/async-analytics-snippet -->
 	<script type="text/javascript">

@@ -4,6 +4,14 @@
 {% block title %}{% trans "Signup" %}{% endblock %}
 
 {% block content %}
+<ul class="breadcrumbs">
+  <li><a href="/">Home</a></li>
+  <li><a href="/order/cancel">1. Menu</a></li>
+  <li class="current"><a href="#">2. Register</a></li>
+  <li class="unavailable"><a href="#">3. Pay</a></li>
+  <li class="unavailable"><a href="#">4. Prefs</a></li>
+</ul>
+
 <form action="" method="post">
   {% csrf_token %}
   <fieldset>

@@ -64,30 +64,13 @@ def cancelOrder(request):
 
 def payOrder(request):
 	if request.method == 'POST':
-		last_4_digits = '4242'
-		request.session['last_4_digits'] = last_4_digits
-		stripe_token = '12jiojio1jiojoi'
-		request.session['stripe_token'] = stripe_token
-		#bigups http://stackoverflow.com/questions/13328810/django-redirect-to-view
-		return redirect('alfie.apps.orders.views.saveOrder')
-	else:
-		if 'menu' not in request.session or 'user' not in request.session:
-			return HttpResponseRedirect('/order/')
-		else:
-			menu = request.session['menu']
-			user = request.session['user']
-			price = Menu.objects.get(pk=menu).price
-			return render_to_response('orders/payment.html', {'menu': menu, 'price': price, 'user': user}, context_instance=RequestContext(request))
-
-def saveOrder(request):
-	if 'menu' in request.session:
 		# Create the new Order object
 		order = Order(
 				menu=Menu(pk=request.session['menu']), 
 				user=User(pk=request.session['user']), 
 				month=now.month, 
 				year=now.year, 
-				stripe_token=request.session['stripe_token']
+				stripe_token=request.POST['stripe_token']
 		)
 		order.save()
 
@@ -96,19 +79,22 @@ def saveOrder(request):
 		profile = Profile.objects.get(user=request.session['user'])
 		profile.subscribed = True
 		profile.menu = request.session['menu']
-		profile.last_4_digits = request.session['last_4_digits']
 		profile.save()
 
 		# Reset the keys
 		del request.session['menu']
 		del request.session['user']
-		del request.session['last_4_digits']
-		del request.session['stripe_token']
 
 		# Success message
 		return HttpResponse('Success! You are order #%s. Go <a href="/">home</a>' % order.id)
 	else:
-		return HttpResponseRedirect('/order/')
+		if 'menu' not in request.session or 'user' not in request.session:
+			return HttpResponseRedirect('/order/')
+		else:
+			menu = request.session['menu']
+			user = request.session['user']
+			price = Menu.objects.get(pk=menu).price
+			return render_to_response('orders/payment.html', {'menu': menu, 'price': price, 'user': user}, context_instance=RequestContext(request))
 
 """
 ORDER FLOW

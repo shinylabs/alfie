@@ -2,11 +2,19 @@
 {% load i18n %}
 
 {% block content %}
+<ul class="breadcrumbs">
+  <li><a href="/">Home</a></li>
+  <li class="current"><a href="#">1. Menu</a></li>
+  <li class="unavailable"><a href="#">2. Register</a></li>
+  <li class="unavailable"><a href="#">3. Pay</a></li>
+  <li class="unavailable"><a href="#">4. Prefs</a></li>
+</ul>
+
 <form action="" method="post">{% csrf_token %}
     {{ orderform.non_field_errors }}
 
     <div class="row">
-        <div class="ten columns centered">
+        <div class="twelve columns">
             <div class="panel radius">
                 {{ menuform }}
             </div>
@@ -15,7 +23,7 @@
     </div>
 
     <div class="row" style="display:none;">
-        <div class="ten columns centered">
+        <div class="twelve columns">
             <table width="100%">
                 <tr>
                     <td><img src="{{ STATIC_URL }}img/box1.png"><br>{{ orderform.menu.0 }}</td>
