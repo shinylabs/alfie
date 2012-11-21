@@ -11,7 +11,7 @@ from django.views.generic.list import ListView
 from django.conf import settings
 from django.contrib import messages
 from django.utils.translation import ugettext as _
-from django.http import HttpResponseForbidden, Http404
+from django.http import HttpResponse, HttpResponseForbidden, Http404
 
 from userena.forms import (SignupForm, SignupFormOnlyEmail, AuthenticationForm, ChangeEmailForm, EditProfileForm)
 from userena.models import UserenaSignup
@@ -694,3 +694,9 @@ def profile_list(request, page=1, template_name='userena/profile_list.html',
                                    extra_context=extra_context,
                                    template_object_name='profile',
                                    **kwargs)
+
+@secure_required
+@permission_required_or_403('change_user', (User, 'username', 'username'))
+def prefs_change(request, username, template_name='userena/password_form.html',
+                    pass_form=PasswordChangeForm, success_url=None, extra_context=None):
+    return HttpResponse('prefs change')

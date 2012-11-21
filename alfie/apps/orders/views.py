@@ -13,7 +13,7 @@ from alfie.apps.profiles.models import Profile
 from alfie.apps.orders.models import Menu, Order
 
 # forms
-from alfie.apps.orders.forms import MenuForm, UserForm, OrderForm
+from alfie.apps.orders.forms import MenuForm, UserForm, OrderForm, PrefsForm
 from alfie.apps.profiles.forms import SignupFormExtra
 
 
@@ -83,10 +83,10 @@ def payOrder(request):
 
 		# Reset the keys
 		del request.session['menu']
-		del request.session['user']
 
 		# Success message
-		return HttpResponse('Success! You are order #%s. Go <a href="/">home</a>' % order.id)
+		#bigups http://stackoverflow.com/questions/13328810/django-redirect-to-view
+		return redirect('alfie.apps.orders.views.savePrefs')
 	else:
 		if 'menu' not in request.session or 'user' not in request.session:
 			return HttpResponseRedirect('/order/')
@@ -95,6 +95,23 @@ def payOrder(request):
 			user = request.session['user']
 			price = Menu.objects.get(pk=menu).price
 			return render_to_response('orders/payment.html', {'menu': menu, 'price': price, 'user': user}, context_instance=RequestContext(request))
+
+def savePrefs(request):
+	if request.method == 'POST': 
+		# Bound form to POST data
+		profile = Profile.objects.get(user=request.session['user'])
+		form = PrefsForm(request.POST, instance=profile)
+		form.save()
+		
+		# Reset the keys
+		del request.session['user']
+
+		return HttpResponseRedirect('/')
+	# Initialize forms
+	else:
+		prefsform = PrefsForm()
+		return render_to_response('orders/prefs_form.html', {'prefsform': prefsform}, context_instance=RequestContext(request))		
+
 
 """
 ORDER FLOW
@@ -111,8 +128,8 @@ index -> order form / register form / shipping form / payment form / preferences
 /order/pay
 	input: card card info to stripe, last 4 digit, stripe_id
 	redirect -> /username/preferences
-/accounts/username/preferences
+/order/prefs
 	input: profile selection
-/accounts/username/refer
+/order/refer
 	output: discount code
 """

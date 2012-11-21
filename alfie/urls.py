@@ -28,7 +28,7 @@ urlpatterns += patterns('',
 urlpatterns += patterns('',
 	#original url(r'^accounts/signup/$', 'userena.views.signup', {'signup_form': SignupFormExtra, 'success_url': '/order/pay/'}),
 	url(r'^accounts/signup/$', 'alfie.apps.userena.views.signup', {'signup_form': SignupFormExtra, 'success_url': '/order/pay/'}),
-	url(r'^accounts/', include('userena.urls')),
+	url(r'^accounts/', include('alfie.apps.userena.urls')),
 )
 
 if settings.DEBUG:

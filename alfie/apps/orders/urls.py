@@ -5,4 +5,5 @@ urlpatterns = patterns('alfie.apps.orders.views',
    	url(r'^order/$', 'startOrder'),
    	url(r'^order/cancel/$', 'cancelOrder'),
     url(r'^order/pay/$', 'payOrder'),
+    url(r'^order/prefs/$', 'savePrefs'),
 )

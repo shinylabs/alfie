@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<ul class="breadcrumbs">
+  <li><a href="/">Home</a></li>
+  <li class="unavailable"><a href="#">1. Menu</a></li>
+  <li class="unavailable"><a href="#">2. Register</a></li>
+  <li class="unavailable"><a href="#">3. Pay</a></li>
+  <li class="current"><a href="#">4. Prefs</a></li>
+</ul>
+
+<form action="" method="post">{% csrf_token %}
+    {{ prefsform.non_field_errors }}
+
+    <div class="row">
+        <div class="twelve columns">
+            <div class="panel radius">
+                {{ prefsform }}
+            </div>
+            <input type="submit" class="radius button" value="{% trans "Save"%}" />
+        </div>
+    </div>
+</form>
+{% endblock %}
