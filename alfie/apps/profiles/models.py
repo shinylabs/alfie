@@ -30,6 +30,7 @@ class Profile(UserenaBaseProfile):
     # Preferences
     spice = models.CharField(_("spice level"), max_length=255, blank=True, null=True)
     allergy = models.CharField(_("allergy"), max_length=255, blank=True, null=True)
+    # cats vs dogs
 
     # Housekeeping
     created = models.DateTimeField(auto_now_add=True)

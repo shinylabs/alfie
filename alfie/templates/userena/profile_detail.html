@@ -26,49 +26,66 @@
     <div class="row">
     <div class="two columns">
       {% block profile_details %}
-        <img class="mugshot" src="{{ profile.get_mugshot_url }}" alt="{% trans "Your mugshot" %}" />
+        <img class="mugshot" width="100%" src="{{ profile.get_mugshot_url }}" alt="{% trans "Your mugshot" %}" />
     </div><!-- two columns -->
     <div class="four columns">
+      <div class="panel">
+        <strong>Menu choice:</strong>
+        {{ profile.menu }}
+      </div><!--panel-->
+
+      <div class="panel">
         <dl>
           {% block profile_definition_list %}
             {% if profile.user.get_full_name %}
               <dt><strong>{% trans "Name" %}</strong></dt>
               <dd>{{ profile.user.get_full_name }}</dd>
+              <br>
             {% endif %}
             {% if profile.user.email and not hide_email %}
               <dt><strong>{% trans "Email" %}</strong></dt>
               <dd>{{ profile.user.email }}</dd>
+              <br>
             {% endif %}
             {% if profile.age %}
               <dt>{% trans "Age" %}</dt>
               <dd>{{ profile.age }}</dd>
+              <br>
             {% endif %}
             {% if profile.website %}
               <dt>{% trans "Website" %}</dt>
               <dd>{{ profile.website|urlize }}</dd>
+              <br>
             {% endif %}
             {% if profile.location %}
               <dt>{% trans "Location" %}</dt>
               <dd>{{ profile.location }}</dd>
+              <br>
             {% endif %}
             {% if profile.about_me %}
               <dt>{% trans "About me" %}</dt>
               <dd>{{ profile.about_me }}</dd>
+              <br>
             {% endif %}
-            <dt><strong>Shipping Address</strong></dt>
-            <dd>{{ profile.ship_address_1 }} {{ profile.ship_address_2 }},<br>
-                {{ profile.ship_city }}, {{ profile.ship_state }} {{ profile.ship_zip_code }} 
-            </dd>
+            {% if profile.ship_address_1 %}
+              <dt><strong>Shipping Address</strong></dt>
+              <dd>{{ profile.ship_address_1 }} {% if profile.ship_address_1 %}{{ profile.ship_address_2 }}{% endif %}<br>
+                {{ profile.ship_city }}, {{ profile.ship_state }} {{ profile.ship_zip_code }}</dd>
+              <br>
+            {% endif %}
           {% endblock %}
         </dl>
-
-        <strong>Menu choice:</strong>
-        {{ profile.menu }}
-
       {% endblock %}
+      </div><!-- panel -->
     </div><!-- four columns-->
     <div class="six columns">
-      SOMETHING HERE, maybe activity stream?
+      <div class="panel">
+        <input type="text" placeholder="Status updates">
+      </div><!--panel-->
+
+      <div class="panel">
+        SOMETHING HERE, maybe activity stream?
+      </div><!--panel-->
     </div><!-- six columns -->
 
     </div><!-- row -->
