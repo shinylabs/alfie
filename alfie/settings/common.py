@@ -206,6 +206,7 @@ THIRD_PARTY_APPS = (
 LOCAL_APPS = (
     'alfie.apps.profiles',
     'alfie.apps.orders',
+    'alfie.apps.ramens',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
