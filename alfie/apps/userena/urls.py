@@ -3,7 +3,7 @@ from django.views.generic.base import TemplateView
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 
-from userena import views as userena_views
+from alfie.apps.userena import views as userena_views
 from userena import settings as userena_settings
 
 urlpatterns = patterns('',
@@ -98,8 +98,19 @@ urlpatterns = patterns('',
 )
 
 urlpatterns += patterns('alfie.apps.userena.views',
-     # Change preferences
+    # Change menu
+    url(r'^(?P<username>[\.\w]+)/menu/$',
+       'menu_change',
+       name='userena_menu_change'),
+    # Change prefs
     url(r'^(?P<username>[\.\w]+)/prefs/$',
        'prefs_change',
        name='userena_prefs_change'),
+)
+
+urlpatterns += patterns('alfie.apps.userena.views',
+     # Test
+    url(r'^(?P<username>[\.\w]+)/test/$',
+       'test',
+       name='userena_test'),
 )

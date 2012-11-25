@@ -1,8 +1,4 @@
-import sys
-import datetime
 from django.contrib import admin
-from django.db import models
-from django.forms import TextInput, Textarea
 from alfie.apps.orders.models import Menu, Order
 
 class MenuAdmin(admin.ModelAdmin):

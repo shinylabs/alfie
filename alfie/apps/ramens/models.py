@@ -50,6 +50,9 @@ class Box(models.Model):
 	def __unicode__(self):
 		return u'%s - %s' % (self.month, self.year)
 
+	class Meta:
+		verbose_name_plural = "boxes"
+
 class Membership(models.Model):
 	ramen = models.ForeignKey(Ramen)
 	box = models.ForeignKey(Box)
@@ -59,3 +62,6 @@ class Membership(models.Model):
 #tasks create abstract base classes for housekeeping purposes
 #bigups https://docs.djangoproject.com/en/dev/topics/db/models/#abstract-base-classes
 # name, created
+
+#notes
+# django model _meta https://django-model-_meta-reference.readthedocs.org/en/latest/

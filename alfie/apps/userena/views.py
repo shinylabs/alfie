@@ -13,7 +13,7 @@ from django.contrib import messages
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseForbidden, Http404
 
-from userena.forms import (SignupForm, SignupFormOnlyEmail, AuthenticationForm, ChangeEmailForm, EditProfileForm)
+from alfie.apps.userena.forms import (SignupForm, SignupFormOnlyEmail, AuthenticationForm, ChangeEmailForm, EditProfileForm, EditMenuChoiceForm, EditPrefsForm)
 from userena.models import UserenaSignup
 from userena.decorators import secure_required
 from userena.backends import UserenaAuthenticationBackend
@@ -696,7 +696,70 @@ def profile_list(request, page=1, template_name='userena/profile_list.html',
                                    **kwargs)
 
 @secure_required
-@permission_required_or_403('change_user', (User, 'username', 'username'))
-def prefs_change(request, username, template_name='userena/password_form.html',
-                    pass_form=PasswordChangeForm, success_url=None, extra_context=None):
-    return HttpResponse('prefs change')
+#@permission_required_or_403('menu_change', (get_profile_model(), 'user__username', 'username')) #tasks create permission in user db
+def menu_change(request, username, edit_menu_form=EditMenuChoiceForm,
+                 template_name='userena/menu_form.html', success_url=None,
+                 extra_context=None, **kwargs):
+    user = get_object_or_404(User,
+                             username__iexact=username)
+
+    profile = user.get_profile()
+
+    menu_initial = {'menu': profile.menu}
+
+    form = edit_menu_form(instance=profile, initial=menu_initial)
+
+    if request.method == 'POST':
+        form = edit_menu_form(request.POST, request.FILES, instance=profile, initial=menu_initial)
+
+        if form.is_valid():
+            profile = form.save()
+
+            if userena_settings.USERENA_USE_MESSAGES:
+                messages.success(request, _('Your menu choice has been updated.'), fail_silently=True)
+
+            if success_url: redirect_to = success_url
+            else: redirect_to = reverse('userena_profile_detail', kwargs={'username': username})
+            return redirect(redirect_to)
+
+    if not extra_context: extra_context = dict()
+    extra_context['form'] = form
+    extra_context['profile'] = profile
+    return ExtraContextTemplateView.as_view(template_name=template_name, extra_context=extra_context)(request)
+
+@secure_required
+#@permission_required_or_403('menu_change', (get_profile_model(), 'user__username', 'username')) #tasks create permission in user db
+def prefs_change(request, username, edit_prefs_form=EditPrefsForm,
+                 template_name='userena/prefs_form.html', success_url=None,
+                 extra_context=None, **kwargs):
+    user = get_object_or_404(User,
+                             username__iexact=username)
+
+    profile = user.get_profile()
+
+    prefs_initial = {'spice': profile.spice, 
+                     'allergy': profile.allergy}
+
+    form = edit_prefs_form(instance=profile, initial=prefs_initial)
+
+    if request.method == 'POST':
+        form = edit_prefs_form(request.POST, request.FILES, instance=profile, initial=prefs_initial)
+
+        if form.is_valid():
+            profile = form.save()
+
+            if userena_settings.USERENA_USE_MESSAGES:
+                messages.success(request, _('Your prefs choice has been updated.'), fail_silently=True)
+
+            if success_url: redirect_to = success_url
+            else: redirect_to = reverse('userena_profile_detail', kwargs={'username': username})
+            return redirect(redirect_to)
+
+    if not extra_context: extra_context = dict()
+    extra_context['form'] = form
+    extra_context['profile'] = profile
+    return ExtraContextTemplateView.as_view(template_name=template_name, extra_context=extra_context)(request)
+
+@secure_required
+def test(request, username):
+    return HttpResponse('works')

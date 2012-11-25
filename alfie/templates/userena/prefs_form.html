@@ -2,24 +2,24 @@
 {% load i18n %}
 {% load url from future %}
 
-{% block title %}{% trans "Account setup" %}{% endblock %}
+{% block title %}{% trans "Menu Change" %}{% endblock %}
 
 {% block content_title %}<h2>{% blocktrans with profile.user.username as username %}Account &raquo; {{ username }}{% endblocktrans %}</h2>{% endblock %}
 
 {% block content %}
   <ul id="box-nav" class="nav-bar">
     <li><a href="{% url 'userena_profile_detail' user.username %}"><span>{% trans 'View profile' %}</span></a></li>
-    <li class="active"><a href="{% url 'userena_profile_edit' user.username %}">{% trans "Edit profile" %}</a></li>
+    <li><a href="{% url 'userena_profile_edit' user.username %}">{% trans "Edit profile" %}</a></li>
     <li><a href="{% url 'userena_password_change' user.username %}">{% trans "Change password" %}</a></li>
     <li><a href="{% url 'userena_email_change' user.username %}">{% trans "Change email" %}</a></li>
     <li><a href="{% url 'userena_menu_change' user.username %}">{% trans "Change menu" %}</a></li>
-    <li><a href="{% url 'userena_prefs_change' user.username %}">{% trans "Change prefs" %}</a></li>
+    <li class="active"><a href="{% url 'userena_prefs_change' user.username %}">{% trans "Change prefs" %}</a></li>
   </ul>
 
 <form action="" enctype="multipart/form-data" method="post">
   {% csrf_token %}
   <fieldset>
-    <legend>{% trans "Edit Profile" %}</legend>
+    <legend>{% trans "Prefs change" %}</legend>
     {{ form.as_p }}
   </fieldset>
   <input type="submit" class="radius button" value="{% trans "Save changes" %}" />
