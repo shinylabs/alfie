@@ -7,6 +7,9 @@ from userena.models import UserenaBaseProfile
 
 # https://docs.djangoproject.com/en/dev/topics/auth/
 
+class Cutelist(models.Model):
+    name = models.CharField(max_length=300)
+
 class Profile(UserenaBaseProfile):
     """
     Creates a Profile object keyed to a User object that defines user profile information.
@@ -26,11 +29,12 @@ class Profile(UserenaBaseProfile):
     ship_city = models.CharField(_("City"), max_length=64, blank=True, null=True)
     ship_state = USStateField(_("State"), blank=True, null=True)
     ship_zip_code = models.CharField(_("Zip code"), max_length=5, blank=True, null=True)
-	
+
     # Preferences
+    #bigups http://stackoverflow.com/questions/2726476/django-multiple-choice-field-checkbox-select-multiple
     spice = models.CharField(_("spice level"), max_length=255, blank=True, null=True)
     allergy = models.CharField(_("allergy"), max_length=255, blank=True, null=True)
-    # cats vs dogs
+    cuter = models.ManyToManyField(Cutelist, blank=True, null=True)
 
     # Housekeeping
     created = models.DateTimeField(auto_now_add=True)

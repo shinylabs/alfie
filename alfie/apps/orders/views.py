@@ -101,7 +101,11 @@ def savePrefs(request):
 		# Bound form to POST data
 		profile = Profile.objects.get(user=request.session['user'])
 		form = PrefsForm(request.POST, instance=profile)
-		form.save()
+		if form.is_valid():
+			form.spice = request.spicy
+			form.allergy = request.allergies
+			form.cutelist = request.cuter
+			form.save()
 		
 		# Reset the keys
 		del request.session['user']
@@ -111,7 +115,6 @@ def savePrefs(request):
 	else:
 		prefsform = PrefsForm()
 		return render_to_response('orders/prefs_form.html', {'prefsform': prefsform}, context_instance=RequestContext(request))		
-
 
 """
 ORDER FLOW

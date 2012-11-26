@@ -16,10 +16,33 @@
     <div class="row">
         <div class="twelve columns">
             <div class="panel radius">
-                {{ prefsform }}
+
+              <h4>Which is cuter?</h4>
+              {% for radio in prefsform.cuter %}
+              <div class="myradio">
+                  {{ radio }}
+              </div>
+              {% endfor %}
+
+              <h4>How spicy do you want it?</h4>
+              {% for radio in prefsform.spicy %}
+              <div class="myradio">
+                  {{ radio }}
+              </div>
+              {% endfor %}
+
+              <h4>Allergies?</h4>
+              {% for box in prefsform.allergies %}
+              <div class="myradio">
+                  {{ box }}
+              </div>
+              {% endfor %}
+
             </div>
             <input type="submit" class="radius button" value="{% trans "Save"%}" />
         </div>
     </div>
 </form>
 {% endblock %}
+
+

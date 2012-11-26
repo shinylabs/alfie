@@ -37,7 +37,6 @@ class Migration(SchemaMigration):
         db.create_table('ramens_ramen', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=128, null=True, blank=True)),
-            ('size', self.gf('django.db.models.fields.CharField')(max_length=128, null=True, blank=True)),
             ('price', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=7, decimal_places=2, blank=True)),
             ('notes', self.gf('django.db.models.fields.TextField')(max_length=255, null=True, blank=True)),
             ('upc', self.gf('django.db.models.fields.IntegerField')(max_length=128, null=True, blank=True)),
@@ -161,7 +160,6 @@ class Migration(SchemaMigration):
             'price': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '7', 'decimal_places': '2', 'blank': 'True'}),
             'ratings': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'reviews': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['ramens.Review']", 'null': 'True', 'blank': 'True'}),
-            'size': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'}),
             'upc': ('django.db.models.fields.IntegerField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'}),
             'weight': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'})
         },
