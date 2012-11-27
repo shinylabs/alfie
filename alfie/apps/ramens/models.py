@@ -1,5 +1,15 @@
+import os
+import sys
 from django.db import models
+from django.core.files import File
+from django.core.files.temp import NamedTemporaryFile
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils.translation import ugettext as _
+from django.db.models import permalink
+
+# Where to store all the images in devmode
+MEDIA_PATH = 'alfie/media/'
+RAMEN_FILE_PATH = 'img/ramen/'
 
 class Manufacturer(models.Model):
 	name = models.CharField(max_length=128, blank=True, null=True)
@@ -34,8 +44,13 @@ class Ramen(models.Model):
 	nutrition = models.TextField(max_length=255, blank=True, null=True)
 	ingredients = models.TextField(max_length=255, blank=True, null=True)
 	flavors = models.ManyToManyField(Flavor, blank=True, null=True)
+	# Image data
+	image_url = models.URLField(blank=True, null=True)
+	saved_image = models.ImageField(upload_to=RAMEN_FILE_PATH, blank=True)
+    # Backoffice
 	reviews = models.ManyToManyField(Review, blank=True, null=True)
 	ratings = models.IntegerField(blank=True, null=True)
+	# Housekeeping
 	created = models.DateTimeField(blank=True, null=True, editable=False, auto_now_add=True)
 
 	def __unicode__(self):
