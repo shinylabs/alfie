@@ -2,8 +2,10 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 # https://docs.djangoproject.com/en/dev/ref/contrib/localflavor/#united-states-of-america-us
 from django.contrib.localflavor.us.forms import *
-from alfie.apps.profiles.models import Profile
+
+# Import from other apps
 from userena.forms import SignupForm
+from alfie.apps.profiles.models import Profile
 
 class SignupFormExtra(SignupForm):
     """ 
@@ -44,23 +46,12 @@ class SignupFormExtra(SignupForm):
         # Userena expects to get the new user from this form, so return the new
         return new_user
 
-SPICE_LEVEL = (
-    ('1', 'Meh'),
-    ('2', 'Miami'),
-    ('3', 'Four Alarm'),
-    ('4', 'Jeremy Lin'),
-)
+class EditMenuChoiceForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ('choice',)
 
-ALLERGY = (
-    ('s', 'shellfish'),
-    ('g', 'gluten'),
-    ('k', 'milk'),
-    ('p', 'peanut'),
-    ('m', 'msg'),
-    ('o', 'other'),
-)
-
-class PrefForm(forms.Form):
-    # PROFILE
-    spice = forms.CharField(label=_(u"spice level"), max_length=255)
-    allergy = forms.CharField(label=_(u"allergy"), max_length=255)
+class EditPrefsForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ('spicy', 'allergy',)

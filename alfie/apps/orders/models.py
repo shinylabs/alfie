@@ -1,7 +1,9 @@
-import datetime
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
+
+# Import other models
+from alfie.apps.ramens.models import Box
 
 # https://docs.djangoproject.com/en/dev/topics/auth/
 
@@ -29,28 +31,29 @@ class Order(models.Model):
     Creates a Order object that defines an order to be filled and shipped.
 
     Initial data:
-        _menu_      _user_      _month_     _year_
-        0           23          12          2012
-        0           25          12          2012
-        1           32          12          2012
-        1           48          12          2012
-        2           102         01          2013
+        _id_        _choice_    _user_      _box.month_     _box.year_
+        1           0           23          12              2012
+        2           0           25          12              2012
+        3           1           32          12              2012
+        4           1           48          12              2012
+        5           2           102         01              2013
     """
-
-    menu = models.ForeignKey(Menu)
     user = models.ForeignKey(User)
-    month = models.CharField(max_length=2)
-    year = models.CharField(max_length=4)
+    choice = models.OneToOneField(Menu, blank=True, null=True)
+    box = models.ForeignKey(Box, blank=True, null=True)
 
     # Housekeeping
-    ordered = models.DateTimeField(blank=True, null=True, editable=False, auto_now_add=True)
-    paid = models.DateTimeField(blank=True, null=True, editable=False)
-    shipped = models.DateTimeField(blank=True, null=True, editable=False)
+    created = models.DateTimeField(auto_now_add=True, editable=False)
+    gotpaid = models.DateTimeField(blank=True, null=True)
+    shipped = models.DateTimeField(blank=True, null=True)
+    updated = models.DateTimeField(auto_now=True, editable=False)
+    notes = models.CharField(max_length=255, blank=True, null=True)
 
     # Payment info
     stripe_token = models.CharField(max_length=255, blank=True, null=True)
+    last_4_digits = models.CharField(max_length=4, blank=True, null=True)
     payment_attempts = models.IntegerField(blank=True, null=True)
     last_payment_attempt = models.DateTimeField(blank=True, null=True, editable=False)
 
     def __unicode__(self):
-        return u'%s' % (self.id)
+        return u'Order %s for %s' % (self.id, self.user.first_name)

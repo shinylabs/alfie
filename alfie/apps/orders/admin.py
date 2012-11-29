@@ -7,7 +7,7 @@ class MenuAdmin(admin.ModelAdmin):
 
 class OrderAdmin(admin.ModelAdmin):
 	save_on_top = True
-	list_display = ('id', 'menu', 'user', 'month', 'year', 'paid')
+	list_display = ('id', 'choice', 'user')
 
 admin.site.register(Menu, MenuAdmin)
 admin.site.register(Order, OrderAdmin)

@@ -13,7 +13,8 @@ from django.contrib import messages
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseForbidden, Http404
 
-from alfie.apps.userena.forms import (SignupForm, SignupFormOnlyEmail, AuthenticationForm, ChangeEmailForm, EditProfileForm, EditMenuChoiceForm, EditPrefsForm)
+from alfie.apps.userena.forms import (SignupForm, SignupFormOnlyEmail, AuthenticationForm, ChangeEmailForm, EditProfileForm)
+from alfie.apps.profiles.forms import (EditMenuChoiceForm, EditPrefsForm)
 from userena.models import UserenaSignup
 from userena.decorators import secure_required
 from userena.backends import UserenaAuthenticationBackend
@@ -121,13 +122,10 @@ def signup(request, signup_form=SignupForm,
             request.session['user'] = user.id
 
             # Send the signup complete signal
-            userena_signals.signup_complete.send(sender=None,
-                                                 user=user)
-
+            userena_signals.signup_complete.send(sender=None, user=user)
 
             if success_url: redirect_to = success_url
-            else: redirect_to = reverse('userena_signup_complete',
-                                        kwargs={'username': user.username})
+            else: redirect_to = reverse('userena_signup_complete', kwargs={'username': user.username})
 
             # A new signed user should logout the old one.
             if request.user.is_authenticated():
@@ -705,7 +703,7 @@ def menu_change(request, username, edit_menu_form=EditMenuChoiceForm,
 
     profile = user.get_profile()
 
-    menu_initial = {'menu': profile.menu}
+    menu_initial = {'menu': profile.choice}
 
     form = edit_menu_form(instance=profile, initial=menu_initial)
 
@@ -737,7 +735,7 @@ def prefs_change(request, username, edit_prefs_form=EditPrefsForm,
 
     profile = user.get_profile()
 
-    prefs_initial = {'spice': profile.spice, 
+    prefs_initial = {'spicy': profile.spicy, 
                      'allergy': profile.allergy}
 
     form = edit_prefs_form(instance=profile, initial=prefs_initial)

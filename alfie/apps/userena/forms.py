@@ -8,8 +8,6 @@ from userena import settings as userena_settings
 from userena.models import UserenaSignup
 from userena.utils import get_profile_model
 
-from alfie.apps.profiles.models import Profile
-
 import random
 
 attrs_dict = {'class': 'required'}
@@ -227,7 +225,7 @@ class EditProfileForm(forms.ModelForm):
 
     class Meta:
         model = get_profile_model()
-        exclude = ['user', 'menu', 'mugshot', 'privacy', 'spice', 'allergy', 'subscribed',]
+        exclude = ['user', 'choice', 'mugshot', 'privacy', 'cutest', 'spicy', 'allergy', 'subscribed', 'cancelled', 'killed', 'updated', 'notes', 'last_4_digits',]
 
     def save(self, force_insert=False, force_update=False, commit=True):
         profile = super(EditProfileForm, self).save(commit=commit)
@@ -238,13 +236,3 @@ class EditProfileForm(forms.ModelForm):
         user.save()
 
         return profile
-
-class EditMenuChoiceForm(forms.ModelForm):
-    class Meta:
-        model = Profile
-        fields = ['menu']
-
-class EditPrefsForm(forms.ModelForm):
-    class Meta:
-        model = Profile
-        fields = ['spice', 'allergy']

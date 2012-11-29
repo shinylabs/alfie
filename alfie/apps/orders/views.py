@@ -13,7 +13,7 @@ from alfie.apps.profiles.models import Profile
 from alfie.apps.orders.models import Menu, Order
 
 # forms
-from alfie.apps.orders.forms import MenuForm, UserForm, OrderForm, PrefsForm
+from alfie.apps.orders.forms import OrderForm, PrefsForm
 from alfie.apps.profiles.forms import SignupFormExtra
 
 
@@ -31,32 +31,30 @@ def startOrder(request):
 	# When a form is sent
 	if request.method == 'POST': 
 		# Bound form to POST data
-		form = MenuForm(request.POST)
+		form = OrderForm(request.POST)
 		# What is the choice from form
-		menu = form.data['menu']
+		menu_choice = form.data['menu']
 		# Set session variable
-		request.session['menu'] = menu
+		request.session['menu_choice'] = menu_choice
 		return HttpResponseRedirect('/accounts/signup')
 	
 	# Initialize forms
 	else:
-		if 'menu' in request.session:
+		if 'menu_choice' in request.session:
 			if 'user' in request.session:
 				return HttpResponseRedirect('/order/pay')
 			else:
-				menu = request.session['menu']
+				menu_choice = request.session['menu_choice']
 				return HttpResponseRedirect('/accounts/signup')
 		else:
 			# Some unbound forms
 			orderform = OrderForm()
-			menuform = MenuForm()
-			userform = UserForm()
-			return render_to_response('orders/order_form.html', {'orderform': orderform, 'menuform': menuform, 'userform': userform}, context_instance=RequestContext(request))		
+			return render_to_response('orders/order_form.html', {'orderform': orderform}, context_instance=RequestContext(request))		
 
 def cancelOrder(request):
 	# Reset variable in session
-	if 'menu' in request.session:
-		del request.session['menu']
+	if 'menu_choice' in request.session:
+		del request.session['menu_choice']
 	if 'user' in request.session:
 		del request.session['user']
 	# Redirect back to function
@@ -66,45 +64,41 @@ def payOrder(request):
 	if request.method == 'POST':
 		# Create the new Order object
 		order = Order(
-				menu=Menu(pk=request.session['menu']), 
+				choice=Menu(pk=request.session['menu_choice']),
 				user=User(pk=request.session['user']), 
-				month=now.month, 
-				year=now.year, 
 				stripe_token=request.POST['stripe_token']
 		)
-		order.save()
+		order.save() #tasks set last_4_digits
 
 		# Update the UserProfile
 		#bigups http://stackoverflow.com/questions/7498328/how-to-do-a-reverse-foreignkey-lookup-for-all-records-in-django
 		profile = Profile.objects.get(user=request.session['user'])
-		profile.subscribed = True
-		profile.menu = request.session['menu']
-		profile.save()
+		profile.choice = Menu(pk=request.session['menu_choice'])
+		profile.subscribed = now
+		profile.save() #tasks set last_4_digits
 
 		# Reset the keys
-		del request.session['menu']
+		del request.session['menu_choice']
 
 		# Success message
 		#bigups http://stackoverflow.com/questions/13328810/django-redirect-to-view
 		return redirect('alfie.apps.orders.views.savePrefs')
 	else:
-		if 'menu' not in request.session or 'user' not in request.session:
+		if 'menu_choice' not in request.session or 'user' not in request.session:
 			return HttpResponseRedirect('/order/')
 		else:
-			menu = request.session['menu']
+			menu_choice = request.session['menu_choice']
 			user = request.session['user']
-			price = Menu.objects.get(pk=menu).price
-			return render_to_response('orders/payment.html', {'menu': menu, 'price': price, 'user': user}, context_instance=RequestContext(request))
+			price = Menu.objects.get(pk=menu_choice).price
+			return render_to_response('orders/payment.html', {'menu_choice': menu_choice, 'price': price, 'user': user}, context_instance=RequestContext(request))
 
 def savePrefs(request):
 	if request.method == 'POST': 
 		# Bound form to POST data
 		profile = Profile.objects.get(user=request.session['user'])
 		form = PrefsForm(request.POST, instance=profile)
+		
 		if form.is_valid():
-			form.spice = request.spicy
-			form.allergy = request.allergies
-			form.cutelist = request.cuter
 			form.save()
 		
 		# Reset the keys

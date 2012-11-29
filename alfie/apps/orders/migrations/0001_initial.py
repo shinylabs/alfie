@@ -21,14 +21,16 @@ class Migration(SchemaMigration):
         # Adding model 'Order'
         db.create_table('orders_order', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('menu', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['orders.Menu'])),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('month', self.gf('django.db.models.fields.CharField')(max_length=2)),
-            ('year', self.gf('django.db.models.fields.CharField')(max_length=4)),
-            ('ordered', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, null=True, blank=True)),
-            ('paid', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
+            ('choice', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['orders.Menu'], unique=True, null=True, blank=True)),
+            ('box', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['ramens.Box'], null=True, blank=True)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('gotpaid', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
             ('shipped', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
+            ('updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
+            ('notes', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
             ('stripe_token', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
+            ('last_4_digits', self.gf('django.db.models.fields.CharField')(max_length=4, null=True, blank=True)),
             ('payment_attempts', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
             ('last_payment_attempt', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
         ))
@@ -90,17 +92,66 @@ class Migration(SchemaMigration):
         },
         'orders.order': {
             'Meta': {'object_name': 'Order'},
+            'box': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['ramens.Box']", 'null': 'True', 'blank': 'True'}),
+            'choice': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['orders.Menu']", 'unique': 'True', 'null': 'True', 'blank': 'True'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'gotpaid': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'last_4_digits': ('django.db.models.fields.CharField', [], {'max_length': '4', 'null': 'True', 'blank': 'True'}),
             'last_payment_attempt': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'menu': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['orders.Menu']"}),
-            'month': ('django.db.models.fields.CharField', [], {'max_length': '2'}),
-            'ordered': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'null': 'True', 'blank': 'True'}),
-            'paid': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            'notes': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'payment_attempts': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'shipped': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'stripe_token': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
+            'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
+        },
+        'ramens.box': {
+            'Meta': {'object_name': 'Box'},
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'month': ('django.db.models.fields.CharField', [], {'max_length': '2'}),
+            'ramens': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['ramens.Ramen']", 'through': "orm['ramens.Membership']", 'symmetrical': 'False'}),
             'year': ('django.db.models.fields.CharField', [], {'max_length': '4'})
+        },
+        'ramens.flavor': {
+            'Meta': {'object_name': 'Flavor'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'taste': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'})
+        },
+        'ramens.manufacturer': {
+            'Meta': {'object_name': 'Manufacturer'},
+            'address': ('django.db.models.fields.TextField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'}),
+            'origin': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'}),
+            'website': ('django.db.models.fields.URLField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
+        },
+        'ramens.membership': {
+            'Meta': {'object_name': 'Membership'},
+            'box': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['ramens.Box']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'ramen': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['ramens.Ramen']"})
+        },
+        'ramens.ramen': {
+            'Meta': {'object_name': 'Ramen'},
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'null': 'True', 'blank': 'True'}),
+            'description': ('django.db.models.fields.TextField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'dimensions': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'}),
+            'directions': ('django.db.models.fields.TextField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'flavors': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['ramens.Flavor']", 'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'image_url': ('django.db.models.fields.URLField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'}),
+            'ingredients': ('django.db.models.fields.TextField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'mfg': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['ramens.Manufacturer']", 'null': 'True', 'blank': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'notes': ('django.db.models.fields.TextField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'nutrition': ('django.db.models.fields.TextField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
+            'price': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '7', 'decimal_places': '2', 'blank': 'True'}),
+            'ratings': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'saved_image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'blank': 'True'}),
+            'upc': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'}),
+            'weight': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'})
         }
     }
 

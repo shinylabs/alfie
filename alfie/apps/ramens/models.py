@@ -1,11 +1,6 @@
-import os
-import sys
 from django.db import models
-from django.core.files import File
-from django.core.files.temp import NamedTemporaryFile
-from django.core.files.uploadedfile import SimpleUploadedFile
+from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
-from django.db.models import permalink
 
 # Where to store all the images in devmode
 MEDIA_PATH = 'alfie/media/'
@@ -18,7 +13,7 @@ class Manufacturer(models.Model):
 	origin = models.CharField(max_length=128, blank=True, null=True)
 
 	def __unicode__(self):
-		return u'%s' % (self.name)
+		return u'%s in %s' % (self.name, self.origin)
 
 class Flavor(models.Model):
 	taste = models.CharField(max_length=128, blank=True, null=True)
@@ -26,16 +21,11 @@ class Flavor(models.Model):
 	def __unicode__(self):
 		return u'%s' % (self.taste)
 
-class Review(models.Model):
-	notes = models.TextField(max_length=255, blank=True, null=True)
-	# rating # switch to https://github.com/dcramer/django-ratings
-	created = models.DateTimeField(blank=True, null=True, editable=False, auto_now_add=True)
-
 class Ramen(models.Model):
-	name = models.CharField(max_length=128, blank=True, null=True)
+	name = models.CharField(max_length=255)
 	price = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
 	notes = models.TextField(max_length=255, blank=True, null=True)
-	upc = models.IntegerField(max_length=128, blank=True, null=True)
+	upc = models.CharField(max_length=128, blank=True, null=True)
 	mfg = models.ForeignKey(Manufacturer, blank=True, null=True)
 	weight = models.CharField(max_length=128, blank=True, null=True)
 	dimensions = models.CharField(max_length=128, blank=True, null=True)
@@ -48,13 +38,15 @@ class Ramen(models.Model):
 	image_url = models.URLField(blank=True, null=True)
 	saved_image = models.ImageField(upload_to=RAMEN_FILE_PATH, blank=True)
     # Backoffice
-	reviews = models.ManyToManyField(Review, blank=True, null=True)
 	ratings = models.IntegerField(blank=True, null=True)
 	# Housekeeping
 	created = models.DateTimeField(blank=True, null=True, editable=False, auto_now_add=True)
 
 	def __unicode__(self):
-		return u'%s' % (self.name)
+		obj_desc = u'%s' % (self.name)
+		if self.mfg.origin is not None:
+			obj_desc = obj_desc + u' from %s' % (self.mfg.origin)
+		return obj_desc
 
 class Box(models.Model):
 	ramens = models.ManyToManyField(Ramen, through='Membership')
@@ -63,7 +55,7 @@ class Box(models.Model):
 	created = models.DateTimeField(blank=True, null=True, editable=False, auto_now_add=True)
 
 	def __unicode__(self):
-		return u'%s - %s' % (self.month, self.year)
+		return u'%s/%s Box' % (self.month, self.year)
 
 	class Meta:
 		verbose_name_plural = "boxes"
@@ -71,8 +63,16 @@ class Box(models.Model):
 class Membership(models.Model):
 	ramen = models.ForeignKey(Ramen)
 	box = models.ForeignKey(Box)
-	notes = models.TextField(max_length=255, blank=True, null=True)
-	created = models.DateTimeField(blank=True, null=True, editable=False, auto_now_add=True)
+
+class Review(models.Model):
+	ramen = models.ForeignKey(Ramen)
+	text = models.TextField(max_length=255, blank=True, null=True)
+	# rating # switch to https://github.com/dcramer/django-ratings
+	created = models.DateTimeField(auto_now_add=True, editable=False)
+	published = models.DateTimeField(blank=True, null=True)
+
+	def __unicode__(self):
+		return u'Review for %s' % (self.ramen.name)
 
 #tasks create abstract base classes for housekeeping purposes
 #bigups https://docs.djangoproject.com/en/dev/topics/db/models/#abstract-base-classes

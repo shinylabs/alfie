@@ -8,38 +8,14 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'Profile'
-        db.create_table('profiles_profile', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('mugshot', self.gf('django.db.models.fields.files.ImageField')(max_length=100, blank=True)),
-            ('privacy', self.gf('django.db.models.fields.CharField')(default='closed', max_length=15)),
-            ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
-            ('choice', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['orders.Menu'])),
-            ('ship_address_1', self.gf('django.db.models.fields.CharField')(max_length=128, null=True, blank=True)),
-            ('ship_address_2', self.gf('django.db.models.fields.CharField')(max_length=128, null=True, blank=True)),
-            ('ship_city', self.gf('django.db.models.fields.CharField')(max_length=64, null=True, blank=True)),
-            ('ship_state', self.gf('django.contrib.localflavor.us.models.USStateField')(max_length=2, null=True, blank=True)),
-            ('ship_zip_code', self.gf('django.db.models.fields.CharField')(max_length=5, null=True, blank=True)),
-            ('cutest', self.gf('django.db.models.fields.CharField')(max_length=1, null=True, blank=True)),
-            ('spicy', self.gf('django.db.models.fields.CharField')(max_length=2, null=True, blank=True)),
-            ('allergy', self.gf('django.db.models.fields.CharField')(max_length=2, null=True, blank=True)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('subscribed', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
-            ('cancelled', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
-            ('killed', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
-            ('updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-            ('notes', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('last_4_digits', self.gf('django.db.models.fields.CharField')(max_length=4, null=True, blank=True)),
-            ('payment_attempts', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('last_payment_attempt', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
-        ))
-        db.send_create_signal('profiles', ['Profile'])
 
+        # Changing field 'Profile.choice'
+        db.alter_column('profiles_profile', 'choice_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['orders.Menu'], null=True))
 
     def backwards(self, orm):
-        # Deleting model 'Profile'
-        db.delete_table('profiles_profile')
 
+        # Changing field 'Profile.choice'
+        db.alter_column('profiles_profile', 'choice_id', self.gf('django.db.models.fields.related.ForeignKey')(default=datetime.datetime(2012, 11, 29, 0, 0), to=orm['orders.Menu']))
 
     models = {
         'auth.group': {
@@ -90,7 +66,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Profile'},
             'allergy': ('django.db.models.fields.CharField', [], {'max_length': '2', 'null': 'True', 'blank': 'True'}),
             'cancelled': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'choice': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['orders.Menu']"}),
+            'choice': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['orders.Menu']", 'null': 'True', 'blank': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'cutest': ('django.db.models.fields.CharField', [], {'max_length': '1', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),

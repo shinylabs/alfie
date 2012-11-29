@@ -5,7 +5,7 @@
 	"fields": {
 		"name": "tinybox",
 		"size": "4",
-		"price": "11.99",
+		"price": "12",
 		"notes": "For people that want to try"
 	}
 },
@@ -15,7 +15,7 @@
 	"fields": {
 		"name": "bigbox",
 		"size": "8",
-		"price": "21.99",
+		"price": "22",
 		"notes": "For the ramen fanatic"
 	}
 },
@@ -24,8 +24,8 @@
 	"pk": 3,
 	"fields": {
 		"name": "sumobox",
-		"size": "16",
-		"price": "31.99",
+		"size": "12",
+		"price": "32",
 		"notes": "If you just want to mainline"
 	}
 }
