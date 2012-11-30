@@ -1,4 +1,5 @@
 from django import forms
+from django.forms.widgets import RadioSelect, CheckboxSelectMultiple
 from django.utils.translation import ugettext_lazy as _
 # https://docs.djangoproject.com/en/dev/ref/contrib/localflavor/#united-states-of-america-us
 from django.contrib.localflavor.us.forms import *
@@ -55,3 +56,7 @@ class EditPrefsForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ('spicy', 'allergy',)
+        widgets = {
+            'spicy': RadioSelect(),
+            'allergy': CheckboxSelectMultiple(attrs={'checked' : 'checked'}),
+            }
