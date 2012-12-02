@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="panel">
+	<h4>{{ object.name }} Details</h4>
+
+	<table width="50%">
+    {% for key, value in object.get_field_values %}
+        {% if value %}
+        <tr>
+            <td>{{ key }}: {{ value }}</td>
+        </tr>
+        {% endif %}
+    {% endfor %}
+	</table>
+</div>
+
+<ul class="button-group">
+  <li><a class="button" href="{% url box_list %}">List</a></li>
+  <li><a class="button" href="{% url box_update box.id %}">Update</a></li>
+  <li><a class="button" href="{% url box_delete box.id %}">Delete</a></li>
+</ul>
+{% endblock %}

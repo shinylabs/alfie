@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Box</h2>
+    <ul>
+        {% for box in box_list %}
+            <li><a href="{{ box.get_absolute_url }}">Box #{{ box.id }}</a></li>
+        {% endfor %}
+    </ul>
+
+    <p><a class="button" href="{% url box_add %}">Create</a> <a class="button" href="{% url ramen_list %}">Ramen</a> <a class="button" href="{% url mfg_list %}">Manufacturers</a></p>
+{% endblock %}

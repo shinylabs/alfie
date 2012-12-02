@@ -14,7 +14,11 @@ class Manufacturer(models.Model):
 	origin = models.CharField(max_length=128, blank=True, null=True)
 
 	def get_absolute_url(self):
-		return reverse('mfg_detail', args=[self.pk])
+		return reverse('mfg_detail', kargs={'pk': self.pk})
+
+	#bigups http://stackoverflow.com/questions/2217478/django-templates-loop-through-and-print-all-available-properties-of-an-object
+	def get_field_values(self):
+		return [(field.name, field.value_to_string(self)) for field in Manufacturer._meta.fields]
 
 	def __unicode__(self):
 		return u'%s in %s' % (self.name, self.origin)
@@ -49,6 +53,10 @@ class Ramen(models.Model):
 	def get_absolute_url(self):
 		return reverse('ramen_detail', kwargs={'pk': self.pk})
 
+	#bigups http://stackoverflow.com/questions/2217478/django-templates-loop-through-and-print-all-available-properties-of-an-object
+	def get_field_values(self):
+		return [(field.name, field.value_to_string(self)) for field in Ramen._meta.fields]
+
 	def __unicode__(self):
 		obj_desc = u'%s' % (self.name)
 		if self.mfg is not None:
@@ -60,6 +68,13 @@ class Box(models.Model):
 	month = models.CharField(max_length=2)
 	year = models.CharField(max_length=4)
 	created = models.DateTimeField(blank=True, null=True, editable=False, auto_now_add=True)
+
+	def get_absolute_url(self):
+		return reverse('box_detail', kwargs={'pk': self.pk})
+
+	#bigups http://stackoverflow.com/questions/2217478/django-templates-loop-through-and-print-all-available-properties-of-an-object
+	def get_field_values(self):
+		return [(field.name, field.value_to_string(self)) for field in Box._meta.fields]
 
 	def __unicode__(self):
 		return u'%s/%s Box' % (self.month, self.year)

@@ -1,9 +1,26 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>{{ object.name }} Details</h2>
+<div class="panel">
+	<h4>{{ mfg.name }} Details</h4>
 
-<p>{{ object }}</p>
+	<table width="100%">
+    {% for key, value in mfg.get_field_values %}
+        {% if value %}
+        <tr>
+            <td width="20%"><strong>{{ key }}</strong></td><td>{{ value }}</td>
+        </tr>
+        {% endif %}
+    {% endfor %}
+	</table>
+</div>
+
+<p align="right"><a class="secondary radius button" href="{% url ramen_add %}">New ramen</a></p>
+{% for ramen in ramen_list %}
+  <div class="panel">
+    <a href="{{ ramen.get_absolute_url }}">{{ ramen }} - ${{ ramen.price }}</a>
+  </div>
+{% endfor %}
 
 <ul class="button-group">
   <li><a class="button" href="{% url mfg_list %}">List</a></li>
