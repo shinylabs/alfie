@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ object.name }} Details</h2>
+
+<p>{{ object }}</p>
+
+<ul class="button-group">
+  <li><a class="button" href="{% url ramen_list %}">List</a></li>
+  <li><a class="button" href="{% url ramen_update ramen.id %}">Update</a></li>
+  <li><a class="button" href="{% url ramen_delete ramen.id %}">Delete</a></li>
+</ul>
+{% endblock %}

@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
@@ -11,6 +12,9 @@ class Manufacturer(models.Model):
 	address = models.TextField(max_length=255, blank=True, null=True)
 	website = models.URLField(max_length=255, blank=True, null=True)
 	origin = models.CharField(max_length=128, blank=True, null=True)
+
+	def get_absolute_url(self):
+		return reverse('mfg_detail', args=[self.pk])
 
 	def __unicode__(self):
 		return u'%s in %s' % (self.name, self.origin)
@@ -42,9 +46,12 @@ class Ramen(models.Model):
 	# Housekeeping
 	created = models.DateTimeField(blank=True, null=True, editable=False, auto_now_add=True)
 
+	def get_absolute_url(self):
+		return reverse('ramen_detail', kwargs={'pk': self.pk})
+
 	def __unicode__(self):
 		obj_desc = u'%s' % (self.name)
-		if self.mfg.origin is not None:
+		if self.mfg is not None:
 			obj_desc = obj_desc + u' from %s' % (self.mfg.origin)
 		return obj_desc
 

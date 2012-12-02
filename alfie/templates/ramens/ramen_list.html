@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Ramen</h2>
+    <ul>
+        {% for ramen in ramen_list %}
+            <li><a href="{{ ramen.get_absolute_url }}">{{ ramen.name }}</a></li>
+        {% endfor %}
+    </ul>
+
+    <p><a class="button" href="{% url ramen_add %}">Create</a></p>
+{% endblock %}

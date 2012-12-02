@@ -21,6 +21,7 @@ urlpatterns = patterns('',
 urlpatterns += patterns('',
 	url(r'^', include('alfie.apps.front.urls')),
 	url(r'^', include('alfie.apps.orders.urls')),
+	url(r'^', include('alfie.apps.ramens.urls')),
 	#url(r'^', include('alfie.apps.profiles.urls')),
 )
 

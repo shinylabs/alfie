@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if object.name %}
+<h2>Update {{ object.name }}</h2>
+{% else %}
+<h2>Add new object</h2>
+{% endif %}
+
+<form action="" method="POST">{% csrf_token %}
+
+	{{ form }}
+
+	<input class="button" type="submit" value="Go" />
+</form>
+
+{% if object.name %}
+<ul class="button-group">
+  <li><a class="button" href="{% url ramen_list %}">List</a></li>
+  <li><a class="button" href="{% url ramen_detail ramen.id %}">Detail</a></li>
+  <li><a class="button" href="{% url ramen_delete ramen.id %}">Delete</a></li>
+</ul>
+{% endif %}
+{% endblock %}
