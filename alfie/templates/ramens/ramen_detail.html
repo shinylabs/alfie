@@ -15,6 +15,16 @@
 	</table>
 </div>
 
+{% if object.shipping_box %}
+<div class="panel">
+	Shipped via
+	{% for box in object.shipping_box.all %}
+	{% if not forloop.first %}and{% endif %}
+	<a href="{% url box_detail box.id %}">{{ box }}</a>
+	{% endfor %}
+</div>
+{% endif %}
+
 <ul class="button-group">
   <li><a class="button" href="{% url ramen_list %}">List</a></li>
   <li><a class="button" href="{% url ramen_update ramen.id %}">Update</a></li>

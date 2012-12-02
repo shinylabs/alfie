@@ -64,6 +64,7 @@ class BoxDetailView(DetailView):
 	queryset = Box.objects.all()
 	context_object_name = 'box'
 	template_name = 'ramens/box_detail.html'
+	#bigups http://stackoverflow.com/questions/4918768/django-manytomany-in-template-format
 
 class BoxUpdateView(UpdateView):
 	model = Box

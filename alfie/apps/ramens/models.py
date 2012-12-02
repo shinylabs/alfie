@@ -14,7 +14,7 @@ class Manufacturer(models.Model):
 	origin = models.CharField(max_length=128, blank=True, null=True)
 
 	def get_absolute_url(self):
-		return reverse('mfg_detail', kargs={'pk': self.pk})
+		return reverse('mfg_detail', args=[self.pk])
 
 	#bigups http://stackoverflow.com/questions/2217478/django-templates-loop-through-and-print-all-available-properties-of-an-object
 	def get_field_values(self):
@@ -30,25 +30,26 @@ class Flavor(models.Model):
 		return u'%s' % (self.taste)
 
 class Ramen(models.Model):
-	name = models.CharField(max_length=255)
-	price = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
-	notes = models.TextField(max_length=255, blank=True, null=True)
 	upc = models.CharField(max_length=128, blank=True, null=True)
 	mfg = models.ForeignKey(Manufacturer, blank=True, null=True)
-	weight = models.CharField(max_length=128, blank=True, null=True)
-	dimensions = models.CharField(max_length=128, blank=True, null=True)
+	name = models.CharField(max_length=255)
+	price = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
+	# Descriptive Data
 	description = models.TextField(max_length=255, blank=True, null=True)
 	directions = models.TextField(max_length=255, blank=True, null=True)
-	nutrition = models.TextField(max_length=255, blank=True, null=True)
-	ingredients = models.TextField(max_length=255, blank=True, null=True)
-	flavors = models.ManyToManyField(Flavor, blank=True, null=True)
+	weight = models.CharField(max_length=128, blank=True, null=True)
+	dimensions = models.CharField(max_length=128, blank=True, null=True)
 	# Image data
 	image_url = models.URLField(blank=True, null=True)
 	saved_image = models.ImageField(upload_to=RAMEN_FILE_PATH, blank=True)
-    # Backoffice
-	ratings = models.IntegerField(blank=True, null=True)
+    # Metadata
+	nutrition = models.TextField(max_length=255, blank=True, null=True)
+	ingredients = models.TextField(max_length=255, blank=True, null=True)
+	flavors = models.ManyToManyField(Flavor, blank=True, null=True)
+	ratings = models.IntegerField(blank=True, null=True, editable=False)
 	# Housekeeping
 	created = models.DateTimeField(blank=True, null=True, editable=False, auto_now_add=True)
+	notes = models.TextField(max_length=255, blank=True, null=True)
 
 	def get_absolute_url(self):
 		return reverse('ramen_detail', kwargs={'pk': self.pk})
@@ -64,13 +65,13 @@ class Ramen(models.Model):
 		return obj_desc
 
 class Box(models.Model):
-	ramens = models.ManyToManyField(Ramen, through='Membership')
+	ramens = models.ManyToManyField(Ramen, related_name='shipping_box')
 	month = models.CharField(max_length=2)
 	year = models.CharField(max_length=4)
 	created = models.DateTimeField(blank=True, null=True, editable=False, auto_now_add=True)
 
 	def get_absolute_url(self):
-		return reverse('box_detail', kwargs={'pk': self.pk})
+		return reverse('box_detail', args=[self.pk])
 
 	#bigups http://stackoverflow.com/questions/2217478/django-templates-loop-through-and-print-all-available-properties-of-an-object
 	def get_field_values(self):
@@ -81,10 +82,6 @@ class Box(models.Model):
 
 	class Meta:
 		verbose_name_plural = "boxes"
-
-class Membership(models.Model):
-	ramen = models.ForeignKey(Ramen)
-	box = models.ForeignKey(Box)
 
 class Review(models.Model):
 	ramen = models.ForeignKey(Ramen)
