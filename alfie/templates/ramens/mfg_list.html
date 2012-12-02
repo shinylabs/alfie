@@ -4,7 +4,9 @@
     <h2>Manufacturers</h2>
     <ul>
         {% for mfg in mfg_list %}
-            <li>{{ mfg.name }}</li>
+            <li><a href="{{ mfg.get_absolute_url }}">{{ mfg.name }}</a></li>
         {% endfor %}
     </ul>
+
+    <p><a class="button" href="{% url mfg_add %}">Create</a> <a class="button" href="{% url ramen_list %}">Ramen</a></p>
 {% endblock %}
