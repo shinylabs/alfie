@@ -18,6 +18,8 @@ HEROKU_ADDONS = (
 )
 ########## END GLOBALS
 
+APPS_TO_WATCH = ['alfie.apps.orders', 'alfie.apps.fakers', 'alfie.apps.profiles', 'alfie.apps.ramens']
+
 
 ########## HELPERS
 def cont(cmd, message):
@@ -50,6 +52,10 @@ def syncdb():
     """Run a syncdb."""
     local('%(run)s syncdb --noinput' % env)
 
+@task
+def initmigrate():
+    for app in APPS_TO_WATCH:
+        local('python manage.py schemamigration %s --initial' % app)
 
 @task
 def migrate(app=None):

@@ -22,7 +22,7 @@ class Migration(SchemaMigration):
         db.create_table('orders_order', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('choice', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['orders.Menu'], unique=True, null=True, blank=True)),
+            ('choice', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['orders.Menu'], null=True, blank=True)),
             ('box', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['ramens.Box'], null=True, blank=True)),
             ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('gotpaid', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
@@ -93,7 +93,7 @@ class Migration(SchemaMigration):
         'orders.order': {
             'Meta': {'object_name': 'Order'},
             'box': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['ramens.Box']", 'null': 'True', 'blank': 'True'}),
-            'choice': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['orders.Menu']", 'unique': 'True', 'null': 'True', 'blank': 'True'}),
+            'choice': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['orders.Menu']", 'null': 'True', 'blank': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'gotpaid': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -111,7 +111,7 @@ class Migration(SchemaMigration):
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'month': ('django.db.models.fields.CharField', [], {'max_length': '2'}),
-            'ramens': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['ramens.Ramen']", 'through': "orm['ramens.Membership']", 'symmetrical': 'False'}),
+            'ramens': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'shipping_box'", 'symmetrical': 'False', 'to': "orm['ramens.Ramen']"}),
             'year': ('django.db.models.fields.CharField', [], {'max_length': '4'})
         },
         'ramens.flavor': {
@@ -126,12 +126,6 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'}),
             'origin': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'}),
             'website': ('django.db.models.fields.URLField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
-        },
-        'ramens.membership': {
-            'Meta': {'object_name': 'Membership'},
-            'box': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['ramens.Box']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'ramen': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['ramens.Ramen']"})
         },
         'ramens.ramen': {
             'Meta': {'object_name': 'Ramen'},

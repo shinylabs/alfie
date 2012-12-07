@@ -8,14 +8,26 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Adding model 'Faker'
+        db.create_table('fakers_faker', (
+            ('user_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True, primary_key=True)),
+        ))
+        db.send_create_signal('fakers', ['Faker'])
 
-        # Changing field 'Profile.choice'
-        db.alter_column('profiles_profile', 'choice_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['orders.Menu'], null=True))
+        # Adding model 'FakeProfile'
+        db.create_table('fakers_fakeprofile', (
+            ('profile_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['profiles.Profile'], unique=True, primary_key=True)),
+        ))
+        db.send_create_signal('fakers', ['FakeProfile'])
+
 
     def backwards(self, orm):
+        # Deleting model 'Faker'
+        db.delete_table('fakers_faker')
 
-        # Changing field 'Profile.choice'
-        db.alter_column('profiles_profile', 'choice_id', self.gf('django.db.models.fields.related.ForeignKey')(default=datetime.datetime(2012, 11, 29, 0, 0), to=orm['orders.Menu']))
+        # Deleting model 'FakeProfile'
+        db.delete_table('fakers_fakeprofile')
+
 
     models = {
         'auth.group': {
@@ -54,6 +66,14 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
+        'fakers.fakeprofile': {
+            'Meta': {'object_name': 'FakeProfile', '_ormbases': ['profiles.Profile']},
+            'profile_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['profiles.Profile']", 'unique': 'True', 'primary_key': 'True'})
+        },
+        'fakers.faker': {
+            'Meta': {'object_name': 'Faker', '_ormbases': ['auth.User']},
+            'user_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True', 'primary_key': 'True'})
+        },
         'orders.menu': {
             'Meta': {'object_name': 'Menu'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -89,4 +109,4 @@ class Migration(SchemaMigration):
         }
     }
 
-    complete_apps = ['profiles']
+    complete_apps = ['fakers']

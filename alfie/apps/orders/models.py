@@ -39,7 +39,7 @@ class Order(models.Model):
         5           2           102         01              2013
     """
     user = models.ForeignKey(User)
-    choice = models.OneToOneField(Menu, blank=True, null=True)
+    choice = models.ForeignKey(Menu, blank=True, null=True)
     box = models.ForeignKey(Box, blank=True, null=True)
 
     # Housekeeping

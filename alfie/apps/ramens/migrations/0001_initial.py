@@ -28,21 +28,21 @@ class Migration(SchemaMigration):
         # Adding model 'Ramen'
         db.create_table('ramens_ramen', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('price', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=7, decimal_places=2, blank=True)),
-            ('notes', self.gf('django.db.models.fields.TextField')(max_length=255, null=True, blank=True)),
             ('upc', self.gf('django.db.models.fields.CharField')(max_length=128, null=True, blank=True)),
             ('mfg', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['ramens.Manufacturer'], null=True, blank=True)),
-            ('weight', self.gf('django.db.models.fields.CharField')(max_length=128, null=True, blank=True)),
-            ('dimensions', self.gf('django.db.models.fields.CharField')(max_length=128, null=True, blank=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('price', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=7, decimal_places=2, blank=True)),
             ('description', self.gf('django.db.models.fields.TextField')(max_length=255, null=True, blank=True)),
             ('directions', self.gf('django.db.models.fields.TextField')(max_length=255, null=True, blank=True)),
-            ('nutrition', self.gf('django.db.models.fields.TextField')(max_length=255, null=True, blank=True)),
-            ('ingredients', self.gf('django.db.models.fields.TextField')(max_length=255, null=True, blank=True)),
+            ('weight', self.gf('django.db.models.fields.CharField')(max_length=128, null=True, blank=True)),
+            ('dimensions', self.gf('django.db.models.fields.CharField')(max_length=128, null=True, blank=True)),
             ('image_url', self.gf('django.db.models.fields.URLField')(max_length=200, null=True, blank=True)),
             ('saved_image', self.gf('django.db.models.fields.files.ImageField')(max_length=100, blank=True)),
+            ('nutrition', self.gf('django.db.models.fields.TextField')(max_length=255, null=True, blank=True)),
+            ('ingredients', self.gf('django.db.models.fields.TextField')(max_length=255, null=True, blank=True)),
             ('ratings', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
             ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, null=True, blank=True)),
+            ('notes', self.gf('django.db.models.fields.TextField')(max_length=255, null=True, blank=True)),
         ))
         db.send_create_signal('ramens', ['Ramen'])
 
@@ -63,13 +63,13 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('ramens', ['Box'])
 
-        # Adding model 'Membership'
-        db.create_table('ramens_membership', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('ramen', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['ramens.Ramen'])),
-            ('box', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['ramens.Box'])),
+        # Adding M2M table for field ramens on 'Box'
+        db.create_table('ramens_box_ramens', (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('box', models.ForeignKey(orm['ramens.box'], null=False)),
+            ('ramen', models.ForeignKey(orm['ramens.ramen'], null=False))
         ))
-        db.send_create_signal('ramens', ['Membership'])
+        db.create_unique('ramens_box_ramens', ['box_id', 'ramen_id'])
 
         # Adding model 'Review'
         db.create_table('ramens_review', (
@@ -98,8 +98,8 @@ class Migration(SchemaMigration):
         # Deleting model 'Box'
         db.delete_table('ramens_box')
 
-        # Deleting model 'Membership'
-        db.delete_table('ramens_membership')
+        # Removing M2M table for field ramens on 'Box'
+        db.delete_table('ramens_box_ramens')
 
         # Deleting model 'Review'
         db.delete_table('ramens_review')
@@ -111,7 +111,7 @@ class Migration(SchemaMigration):
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'month': ('django.db.models.fields.CharField', [], {'max_length': '2'}),
-            'ramens': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['ramens.Ramen']", 'through': "orm['ramens.Membership']", 'symmetrical': 'False'}),
+            'ramens': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'shipping_box'", 'symmetrical': 'False', 'to': "orm['ramens.Ramen']"}),
             'year': ('django.db.models.fields.CharField', [], {'max_length': '4'})
         },
         'ramens.flavor': {
@@ -126,12 +126,6 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'}),
             'origin': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'}),
             'website': ('django.db.models.fields.URLField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'})
-        },
-        'ramens.membership': {
-            'Meta': {'object_name': 'Membership'},
-            'box': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['ramens.Box']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'ramen': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['ramens.Ramen']"})
         },
         'ramens.ramen': {
             'Meta': {'object_name': 'Ramen'},
