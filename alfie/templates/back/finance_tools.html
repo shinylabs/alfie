@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+<div class="panel">
+	<h4>Finance tools</h4>
+
+	<h6>List of upgrades/downgrades</h6>
+	<hr>
+	<h6>List of cancel/refund</h6>
+	<hr>
+	<h6>List of chargebacks</h6>
+
+	<dl class="sub-nav">
+	<dt>Filter:</dt>
+	<dd class="active"><a href="#">Current</a></dd>
+	<dd><a href="#">Previous</a></dd>
+	<dd><a href="#">Dec</a></dd>
+	<dd><a href="#">Nov</a></dd>
+	<dd><a href="#">Oct</a></dd>
+	</dl>		
+</div>
+<a class="button">Charge all orders</a> <a class="button">Create new coupons</a>
+{% endblock %}

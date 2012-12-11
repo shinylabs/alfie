@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+<ul class="block-grid three-up">
+	<li><div class="panel callout radius"><h3 style="color: white;">ORDERS: 3894</h3></div></li>
+	<li><div class="panel callout radius"><h3 style="color: white;">PACKED: 300</h3></div></li>
+	<li><div class="panel callout radius"><h3 style="color: white;">SHIPPED: 290</h3></div></li>
+</ul>
+
+<div class="panel">
+	<h4>Customer Reports</h4>
+	
+	<p>Total customers: {{ profiles|length }}</p>
+
+	<div style="height: 300px; overflow: auto; margin-bottom: 25px;">
+	<table class="twelve" width="100%">
+		<thead>
+		<tr><th>Name</th><th>Email</th><th>State</th></tr>
+		</thead>
+		<tbody>
+		{% for profile in profiles %}
+			<tr><td>{{ profile.user.first_name }} {{ profile.user.last_name }}</td><td>{{ profile.user.email }}</td><td>{{ profile.ship_state }}</td></tr>
+		{% endfor %}
+		</tbody>
+	</table>
+	</div>
+
+	<dl class="sub-nav">
+	  <dt>Filter:</dt>
+	  <dd class="active"><a href="#">Current</a></dd>
+	  <dd><a href="#">Previous</a></dd>
+	  <dd><a href="#">Dec</a></dd>
+	  <dd><a href="#">Nov</a></dd>
+	  <dd><a href="#">Oct</a></dd>
+	</dl>	
+</div>
+
+<div class="panel">
+	<h4>Inventory Reports</h4>
+
+	<p>Ramen needed: {{ inv_count }}</p>
+
+	<p>Plan choices: A - {% widthratio box_a_count profiles|length 100 %}% ({{ box_a_count }}), B - {% widthratio box_b_count profiles|length 100 %}% ({{ box_b_count }}), C - {% widthratio box_c_count profiles|length 100 %}% ({{ box_c_count }})</p>
+
+	<dl class="sub-nav">
+	  <dt>Filter:</dt>
+	  <dd class="active"><a href="#">Current</a></dd>
+	  <dd><a href="#">Previous</a></dd>
+	  <dd><a href="#">Dec</a></dd>
+	  <dd><a href="#">Nov</a></dd>
+	  <dd><a href="#">Oct</a></dd>
+	</dl>
+</div>
+
+<div class="panel">
+	<h4>Financial Reports</h4>
+
+	<p>Total revenue: {{ total_rev }}</p>
+	<p>Total costs:</p>
+	<p>Total profit:</p>
+
+	<dl class="sub-nav">
+	  <dt>Filter:</dt>
+	  <dd class="active"><a href="#">Current</a></dd>
+	  <dd><a href="#">Previous</a></dd>
+	  <dd><a href="#">Dec</a></dd>
+	  <dd><a href="#">Nov</a></dd>
+	  <dd><a href="#">Oct</a></dd>
+	</dl>
+</div>
+{% endblock %}

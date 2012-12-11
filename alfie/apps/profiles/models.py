@@ -81,6 +81,7 @@ class Profile(UserenaBaseProfile):
     notes = models.CharField(max_length=255, blank=True, null=True)
 
 	# Payment info
+    stripe_cust_id = models.CharField(max_length=100, blank=True, null=True)
     last_4_digits = models.CharField(max_length=4, blank=True, null=True)
-    payment_attempts = models.IntegerField(blank=True, null=True)
+    payment_attempts = models.IntegerField(blank=True, null=True, default='0')
     last_payment_attempt = models.DateTimeField(blank=True, null=True, editable=False)

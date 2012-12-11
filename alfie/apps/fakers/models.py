@@ -32,9 +32,15 @@ class FakerManager(models.Manager):
 		p.ship_city = user_info['City']
 		p.ship_state = user_info['State']
 		p.ship_zip_code = user_info['ZipCode']
+		p.ccnumber = user_info['CCNumber']
+		p.cvv = user_info['CVV2']
+		p.exp_month = user_info['CCExpires'].split('/')[0]
+		p.exp_year = user_info['CCExpires'].split('/')[1]
 		p.save()
 
 	def make_fakers(self, user_info):
+		successcounter = 0
+		failcounter = 0
 		for i in range(len(user_info)):
 			f = Faker(
 				username=user_info[i]['Username'],
@@ -43,7 +49,14 @@ class FakerManager(models.Manager):
 				email = user_info[i]['EmailAddress'],
 				password = self.salt_hash(user_info[i]['Password'])
 			)
-			f.save()
+			try:
+				f.save()
+				self.make_profile(f, user_info[i])
+				successcounter+=1
+			except:
+				failcounter+=1
+				pass
+		print 'Added %s and failed to add %s' % (successcounter, failcounter)
 
 	@staticmethod
 	def create_orders():
@@ -57,4 +70,7 @@ class Faker(User):
 	objects = FakerManager()
 
 class FakeProfile(Profile):
-	pass
+	ccnumber = models.CharField(max_length=16, blank=True, null=True)
+	cvv =  models.CharField(max_length=3, blank=True, null=True)
+	exp_month = models.CharField(max_length=2, blank=True, null=True)
+	exp_year = models.CharField(max_length=4, blank=True, null=True)

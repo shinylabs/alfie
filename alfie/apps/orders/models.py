@@ -51,6 +51,7 @@ class Order(models.Model):
 
     # Payment info
     stripe_token = models.CharField(max_length=255, blank=True, null=True)
+    stripe_invoice = models.CharField(max_length=255, blank=True, null=True)
     last_4_digits = models.CharField(max_length=4, blank=True, null=True)
     payment_attempts = models.IntegerField(blank=True, null=True)
     last_payment_attempt = models.DateTimeField(blank=True, null=True, editable=False)
