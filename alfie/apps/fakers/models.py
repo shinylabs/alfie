@@ -65,7 +65,7 @@ class FakerManager(models.Manager):
 			try:
 				f.save()
 				print '\nSaved %s' % f.username
-				self.objects.make_profile(f, user_info[i])
+				self.make_profile(f, user_info[i])
 				print 'Made a profile for %s' % f.username
 				successcounter+=1
 			except:
