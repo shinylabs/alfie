@@ -48,6 +48,3 @@ def make_orders():
 		o.user = Faker.objects.get(id=i)
 		o.choice = Faker.objects.get(id=i).profile.choice
 		o.save()
-
-make_fakers(load_csv(csvfile))
-make_orders()

@@ -1,5 +1,8 @@
 """
-from alfie.apps.fakers.models import Faker, Fakep
+//SHELL CMDS
+
+from alfie.apps.fakers.models import *
+from alfie.apps.orders.models import Order, Menu
 from alfie.apps.fakers.csvtools import *
 users = load_csv_dict(csvfile)
 Faker.objects.make_fakers(users)
@@ -31,6 +34,7 @@ from django.contrib.auth.models import User
 from alfie.apps.profiles.models import Profile
 from alfie.apps.orders.models import Menu, Order
 
+# tools
 from alfie.apps.fakers.csvtools import *
 """
 Imports in:
@@ -41,10 +45,11 @@ Imports in:
 
 class FakerManager(models.Manager):
 	"""
-		This manager does:
-			make_fakers
-			make_profiles
-			make_orders
+		This object manager does:
+			salt/hash passwords
+			make fakers
+			make fake profiles
+			create fake orders
 	"""
 	@staticmethod	#bigups http://stackoverflow.com/questions/4909585/interesting-takes-exactly-1-argument-2-given-python-error
 	def salt_hash(password):
@@ -113,8 +118,10 @@ class FakerManager(models.Manager):
 			o = Order()
 			o.user = f
 			o.choice = f.profile.choice
-			o.created = when
 			try:
+				o.save()
+				# hack around auto_now_add
+				o.created = when
 				o.save()
 				print '\nCreated an order for %s' % f.username
 				successcount+=1
@@ -123,11 +130,8 @@ class FakerManager(models.Manager):
 				print '\nSomething about %s failed :(' % f.username
 				failcount+=1
 				pass
-		print '\nStarted with %s users and added %s users ' % (self.count(), successcount)
+		print '\nStarted with %s users and added %s orders in %s/%s' % (self.count(), successcount, when.month, when.year)
 		if failcount > 0: print 'Failed to add %s.\nThese failed: %s' % (failcount, badlist)
-
-	def charge_orders(self):
-		print self.get(id=10)
 
 class Faker(User):
 	objects = FakerManager()
