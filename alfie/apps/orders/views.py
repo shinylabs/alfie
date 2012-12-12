@@ -17,7 +17,7 @@ from alfie.apps.orders.forms import OrderForm, PrefsForm
 from alfie.apps.profiles.forms import SignupFormExtra
 
 
-def startOrder(request):
+def start_order(request):
 	"""
 		Shows off menu choices
 	
@@ -51,7 +51,7 @@ def startOrder(request):
 			orderform = OrderForm()
 			return render_to_response('orders/order_form.html', {'orderform': orderform}, context_instance=RequestContext(request))		
 
-def cancelOrder(request):
+def cancel_order(request):
 	# Reset variable in session
 	if 'menu_choice' in request.session:
 		del request.session['menu_choice']
@@ -60,7 +60,7 @@ def cancelOrder(request):
 	# Redirect back to function
 	return HttpResponseRedirect('/order/')
 
-def payOrder(request):
+def pay_order(request):
 	if request.method == 'POST':
 		# Create the new Order object
 		order = Order(
@@ -92,7 +92,7 @@ def payOrder(request):
 			price = Menu.objects.get(pk=menu_choice).price
 			return render_to_response('orders/payment.html', {'menu_choice': menu_choice, 'price': price, 'user': user}, context_instance=RequestContext(request))
 
-def savePrefs(request):
+def save_prefs(request):
 	if request.method == 'POST': 
 		# Bound form to POST data
 		profile = Profile.objects.get(user=request.session['user'])

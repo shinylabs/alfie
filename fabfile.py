@@ -18,7 +18,12 @@ HEROKU_ADDONS = (
 )
 ########## END GLOBALS
 
-APPS_TO_WATCH = ['alfie.apps.orders', 'alfie.apps.fakers', 'alfie.apps.profiles', 'alfie.apps.ramens']
+APPS_TO_WATCH = [
+    'alfie.apps.orders', 
+    'alfie.apps.profiles', 
+    'alfie.apps.ramens',
+    'alfie.apps.fakers', 
+]
 
 
 ########## HELPERS
@@ -53,9 +58,15 @@ def syncdb():
     local('%(run)s syncdb --noinput' % env)
 
 @task
-def initmigrate():
+def initschema():
     for app in APPS_TO_WATCH:
         local('python manage.py schemamigration %s --initial' % app)
+@task
+def updateschema():
+    #bigups http://stackoverflow.com/questions/3876936/how-to-continue-the-task-when-fabric-meet-an-error
+    env.warn_only = True
+    for app in APPS_TO_WATCH:
+        local('python manage.py schemamigration %s --auto' % app)
 
 @task
 def migrate(app=None):

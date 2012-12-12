@@ -5,21 +5,19 @@ from django.utils.translation import ugettext as _
 # Import other models
 from alfie.apps.ramens.models import Box
 
-# https://docs.djangoproject.com/en/dev/topics/auth/
-
 class Menu(models.Model):
     """
     Creates a Menu object that defines LuckyRamenCat menu options.
 
     Initial data:
-        _name_      _size_      _price_     _notes_
-        tinybox     4           11.99       For people that want to try
-        bigbox      8           21.99       For the ramen fanatic
-        sumobox     16          31.99       If you just want to mainline
+        _name_      _slots_     _price_     _notes_
+        tinybox     4           12.00       For people that want to try
+        bigbox      8           22.00       For the ramen fanatic
+        sumobox     16          32.00       If you just want to mainline
     """
 
     name = models.CharField(max_length=128, blank=True, null=True)
-    size = models.CharField(max_length=128, blank=True, null=True)
+    slots = models.CharField(max_length=128, blank=True, null=True)
     price = models.DecimalField(max_digits=7, decimal_places=2)
     notes = models.TextField(max_length=255, blank=True, null=True)
 
@@ -41,6 +39,7 @@ class Order(models.Model):
     user = models.ForeignKey(User)
     choice = models.ForeignKey(Menu, blank=True, null=True)
     box = models.ForeignKey(Box, blank=True, null=True)
+    coupon = models.CharField(max_length=25, blank=True, null=True)
 
     # Housekeeping
     created = models.DateTimeField(auto_now_add=True, editable=False)
@@ -50,8 +49,6 @@ class Order(models.Model):
     notes = models.CharField(max_length=255, blank=True, null=True)
 
     # Payment info
-    stripe_token = models.CharField(max_length=255, blank=True, null=True)
-    stripe_invoice = models.CharField(max_length=255, blank=True, null=True)
     last_4_digits = models.CharField(max_length=4, blank=True, null=True)
     payment_attempts = models.IntegerField(blank=True, null=True)
     last_payment_attempt = models.DateTimeField(blank=True, null=True, editable=False)

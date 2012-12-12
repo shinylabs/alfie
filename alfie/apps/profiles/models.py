@@ -27,6 +27,8 @@ class Profile(UserenaBaseProfile):
     ship_city = models.CharField(_("City"), max_length=64, blank=True, null=True)
     ship_state = USStateField(_("State"), blank=True, null=True)
     ship_zip_code = models.CharField(_("Zip code"), max_length=5, blank=True, null=True)
+    address_verified = models.BooleanField(default=False)
+    shipping_rate = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
 
     # Preferences
     #bigups http://stackoverflow.com/questions/2726476/django-multiple-choice-field-checkbox-select-multiple
@@ -82,6 +84,6 @@ class Profile(UserenaBaseProfile):
 
 	# Payment info
     stripe_cust_id = models.CharField(max_length=100, blank=True, null=True)
+    stripe_token = models.CharField(max_length=255, blank=True, null=True)
     last_4_digits = models.CharField(max_length=4, blank=True, null=True)
-    payment_attempts = models.IntegerField(blank=True, null=True, default='0')
-    last_payment_attempt = models.DateTimeField(blank=True, null=True, editable=False)
+    overdue = models.BooleanField(default=False)

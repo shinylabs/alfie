@@ -3,18 +3,30 @@ from django.contrib.auth.models import User
 from alfie.apps.profiles.models import Profile
 from alfie.apps.orders.models import Menu, Order
 
-class FakerManager(models.Manager):
-	#bigups http://stackoverflow.com/questions/4909585/interesting-takes-exactly-1-argument-2-given-python-error
-	@staticmethod
-	def load_csv(csvfile):
-		import csv
-		reader = csv.DictReader(open(csvfile))
-		user_info = []
-		for row in reader:
-			user_info.append(row)
-		return user_info
+from alfie.apps.fakers.csvtools import *
+"""
+Imports in:
+	load_csv_dict(csvfile)
+	load_csv(csvfile)
+	write_csv(data, step=500)
+"""
 
-	@staticmethod
+"""
+from alfie.apps.fakers.models import Faker, Fakep
+from alfie.apps.orders.models import Menu, Order
+from alfie.apps.fakers.csvtools import *
+users = load_csv_dict(csvfile)
+Faker.objects.make_fakers(users)
+"""
+
+class FakerManager(models.Manager):
+	"""
+		This manager does:
+			make_fakers
+			make_profiles
+			make_orders
+	"""
+	@staticmethod	#bigups http://stackoverflow.com/questions/4909585/interesting-takes-exactly-1-argument-2-given-python-error
 	def salt_hash(password):
 		#bigups http://stackoverflow.com/questions/9594125/salt-and-hash-a-password-in-python
 		import hashlib, uuid
@@ -25,7 +37,7 @@ class FakerManager(models.Manager):
 	@staticmethod
 	def make_profile(f, user_info):
 		import random
-		p = FakeProfile()
+		p = Fakep()
 		p.user = f
 		p.choice = random.choice(Menu.objects.all())
 		p.ship_address_1 = user_info['StreetAddress']
@@ -41,6 +53,7 @@ class FakerManager(models.Manager):
 	def make_fakers(self, user_info):
 		successcounter = 0
 		failcounter = 0
+		badlist = []
 		for i in range(len(user_info)):
 			f = Faker(
 				username=user_info[i]['Username'],
@@ -51,12 +64,17 @@ class FakerManager(models.Manager):
 			)
 			try:
 				f.save()
-				self.make_profile(f, user_info[i])
+				print '\nSaved %s' % f.username
+				self.objects.make_profile(f, user_info[i])
+				print 'Made a profile for %s' % f.username
 				successcounter+=1
 			except:
+				badlist.append(user_info[i]['Username'])
+				print '\nSomething about %s failed :(' % f.username
 				failcounter+=1
 				pass
-		print 'Added %s and failed to add %s' % (successcounter, failcounter)
+		print '\nStarted with %s users and added %s users ' % (len(user_info), successcounter)
+		if failcounter > 0: print 'Failed to add %s.\nThese failed: %s' % (failcounter, badlist)
 
 	@staticmethod
 	def create_orders():
@@ -69,7 +87,7 @@ class FakerManager(models.Manager):
 class Faker(User):
 	objects = FakerManager()
 
-class FakeProfile(Profile):
+class Fakep(Profile):
 	ccnumber = models.CharField(max_length=16, blank=True, null=True)
 	cvv =  models.CharField(max_length=3, blank=True, null=True)
 	exp_month = models.CharField(max_length=2, blank=True, null=True)

@@ -1,5 +1,9 @@
 import csv
 
+csvfile = 'alfie/apps/fakers/fakedata/names500.csv'
+csvfile2 = 'alfie/apps/fakers/fakedata/names1000.csv'
+csvfile3 = 'alfie/apps/fakers/fakedata/names1500.csv'
+
 def load_csv_dict(csvfile):
 	"""
 	Returns list of data dictionaries
@@ -10,7 +14,7 @@ def load_csv_dict(csvfile):
 		datarows.append(row)
 	return datarows
 
-def load_csv(csvfile='names10k.csv'):
+def load_csv(csvfile='fakedata/biglist10k.csv'):
 	"""
 	Returns list of header row and data rows
 	"""

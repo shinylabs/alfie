@@ -1,15 +1,17 @@
 from alfie.apps.fakers.models import Faker, FakeProfile
 from alfie.apps.orders.models import Menu, Order
 
-csvfile = 'alfie/apps/fakers/names50.csv'
+from alfie.apps.fakers.csvtools import *
+"""
+Imports in:
+	load_csv_dict(csvfile)
+	load_csv(csvfile)
+	write_csv(data, step=500)
+"""
 
-def load_csv(csvfile):
-	import csv
-	reader = csv.DictReader(open(csvfile))
-	user_info = []
-	for row in reader:
-		user_info.append(row)
-	return user_info
+csvfile = 'alfie/apps/fakers/fakedata/names500.csv'
+csvfile2 = 'alfie/apps/fakers/fakedata/names1000.csv'
+csvfile3 = 'alfie/apps/fakers/fakedata/names1500.csv'
 
 def salt_hash(password):
 	#bigups http://stackoverflow.com/questions/9594125/salt-and-hash-a-password-in-python
