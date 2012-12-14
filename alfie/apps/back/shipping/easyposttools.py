@@ -26,8 +26,27 @@ class Postage(object):
 
 from alfie.apps.profiles.models import Profile
 
-def verify_addr():
-	pass
+def verify_addr(profile):
+	payload = {
+		'street1': profile.ship_address_1,
+		'street2': profile.ship_address_2,
+		'city': profile.ship_city,
+		'state': profile.ship_state,
+		'zip': profile.ship_zip_code
+	}
+	try:
+		response = Address.verify(**payload)
+		if response['error']:
+			print 'Unverified :('
+			pass
+		else: 
+			profile.address_verified = True
+			profile.save()
+			return True
+	except:
+		print "Something broke :("
+		pass
+
 
 def set_rate(profile, price):
 	try:
@@ -53,8 +72,8 @@ def check_rate(profile, box=None):
 	payload.update(box)
 
 	try:
-		p = Postage.rates(**payload)
-		for item in p['rates']:
+		response = Postage.rates(**payload)
+		for item in response['rates']:
 			if item['service'] == 'ParcelPost':
 				print '\nParcel shipping a %s oz %s from %s to %s costs $%s' % (box['parcel']['weight'], profile.choice.name, fromzip['from']['zip'], profile.get_addr()[-1], item['rate'])
 				set_rate(profile, float(item['rate']))
