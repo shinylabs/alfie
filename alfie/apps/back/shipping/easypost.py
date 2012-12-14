@@ -2,6 +2,7 @@ import urllib
 import base64
 import json
 
+# urlfech vs urllib2, urlfetch can set deadlines on requests
 _httplib = None
 try:
   from google.appengine.api import urlfetch
@@ -14,8 +15,10 @@ if not _httplib:
   _httplib = "urllib2"
 
 
+# set api key
+from django.conf import settings
+api_key = settings.TEST_EASYPOST_API_KEY
 
-api_key = "..."
 base_url = 'http://www.easypost.co/api'
 
 headers = {
@@ -135,7 +138,7 @@ class Postage(object):
   def list(cls):
     return EasyPost.post(EasyPost.api_url("postage", "list"), {})
 
-
+"""
 
 ## Testing
 test_values = {
@@ -183,3 +186,5 @@ print Postage.buy(**compare_data)
 print Postage.get("test.png")
 listt = Postage.list()
 print listt["postages"][0]
+
+"""

@@ -87,3 +87,9 @@ class Profile(UserenaBaseProfile):
     stripe_token = models.CharField(max_length=255, blank=True, null=True)
     last_4_digits = models.CharField(max_length=4, blank=True, null=True)
     overdue = models.BooleanField(default=False)
+
+    def get_addr(self):
+        return [self.ship_address_1, self.ship_address_2, self.ship_city, self.ship_state, self.ship_zip_code]
+
+    def get_pref(self):
+        return [self.cutest, self.spicy, self.allergy]
