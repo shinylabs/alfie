@@ -35,7 +35,7 @@ from alfie.apps.profiles.models import Profile
 from alfie.apps.orders.models import Menu, Order
 
 # tools
-from alfie.apps.fakers.csvtools import *
+from alfie.apps.fakers.csvutil import *
 """
 Imports in:
 	load_csv_dict(csvfile)

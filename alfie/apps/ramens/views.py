@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy
-from alfie.apps.ramens.models import Ramen, Manufacturer, Box
+from alfie.apps.ramens.models import Ramen, Brand, Box
 
 class RamenListView(ListView):
 	model = Ramen
@@ -21,35 +21,39 @@ class RamenDeleteView(DeleteView):
 	model = Ramen
 	success_url = reverse_lazy('ramen_list')
 
-class MfgListView(ListView):
-	model = Manufacturer
-	context_object_name = 'mfg_list'
-	template_name = 'ramens/mfg_list.html'
 
-class MfgCreateView(CreateView):
-	model = Manufacturer
-	template_name = 'ramens/mfg_form.html'
 
-class MfgDetailView(DetailView):
-	queryset = Manufacturer.objects.all()
-	context_object_name = 'mfg'
-	template_name = 'ramens/mfg_detail.html'
+class BrandListView(ListView):
+	model = Brand
+	context_object_name = 'brand_list'
+	template_name = 'ramens/brand_list.html'
+
+class BrandCreateView(CreateView):
+	model = Brand
+	template_name = 'ramens/brand_form.html'
+
+class BrandDetailView(DetailView):
+	queryset = Brand.objects.all()
+	context_object_name = 'brand'
+	template_name = 'ramens/brand_detail.html'
 
 	def get_context_data(self, **kwargs):
 		# Call the base implementation first to get a context
-		context = super(MfgDetailView, self).get_context_data(**kwargs)
+		context = super(BrandDetailView, self).get_context_data(**kwargs)
 		# Add in a QuerySet of all the ramen
-		context['ramen_list'] = Ramen.objects.filter(mfg__id=self.kwargs['pk'])
+		context['ramen_list'] = Ramen.objects.filter(brand__id=self.kwargs['pk'])
 		return context
 
-class MfgUpdateView(UpdateView):
-	model = Manufacturer
-	success_url = reverse_lazy('mfg_list')
-	template_name = 'ramens/mfg_form.html'
+class BrandUpdateView(UpdateView):
+	model = Brand
+	success_url = reverse_lazy('brand_list')
+	template_name = 'ramens/brand_form.html'
 
-class MfgDeleteView(DeleteView):
-	model = Manufacturer
-	success_url = reverse_lazy('mfg_list')
+class BrandDeleteView(DeleteView):
+	model = Brand
+	success_url = reverse_lazy('brand_list')
+
+
 
 class BoxListView(ListView):
 	model = Box

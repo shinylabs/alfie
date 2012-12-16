@@ -7,7 +7,7 @@ from django.utils.translation import ugettext as _
 MEDIA_PATH = 'alfie/media/'
 RAMEN_FILE_PATH = 'img/ramen/'
 
-class Manufacturer(models.Model):
+class Brand(models.Model):
 	name = models.CharField(max_length=128, blank=True, null=True)
 	address = models.TextField(max_length=255, blank=True, null=True)
 	website = models.URLField(max_length=255, blank=True, null=True)
@@ -21,7 +21,10 @@ class Manufacturer(models.Model):
 		return [(field.name, field.value_to_string(self)) for field in Manufacturer._meta.fields]
 
 	def __unicode__(self):
-		return u'%s in %s' % (self.name, self.origin)
+		obj_desc = u'%s' % (self.name)
+		if self.origin is not None:
+			obj_desc = obj_desc + u' from %s' % (self.origin)
+		return obj_desc
 
 class Flavor(models.Model):
 	taste = models.CharField(max_length=128, blank=True, null=True)
@@ -31,22 +34,29 @@ class Flavor(models.Model):
 
 class Ramen(models.Model):
 	upc = models.CharField(max_length=128, blank=True, null=True)
-	mfg = models.ForeignKey(Manufacturer, blank=True, null=True)
+	brand = models.ForeignKey(Brand, blank=True, null=True)
 	name = models.CharField(max_length=255)
 	price = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
-	# Descriptive Data
+
+	# Description
 	description = models.TextField(max_length=255, blank=True, null=True)
 	directions = models.TextField(max_length=255, blank=True, null=True)
+
+	# Packing
 	weight = models.CharField(max_length=128, blank=True, null=True)
 	dimensions = models.CharField(max_length=128, blank=True, null=True)
-	# Image data
+	packaging = models.CharField(max_length=128, blank=True, null=True)
+
+	# Image
 	image_url = models.URLField(blank=True, null=True)
 	saved_image = models.ImageField(upload_to=RAMEN_FILE_PATH, blank=True)
+
     # Metadata
 	nutrition = models.TextField(max_length=255, blank=True, null=True)
 	ingredients = models.TextField(max_length=255, blank=True, null=True)
 	flavors = models.ManyToManyField(Flavor, blank=True, null=True)
-	ratings = models.IntegerField(blank=True, null=True, editable=False)
+	ratings = models.DecimalField(max_digits=5, decimal_places=1, blank=True, null=True, editable=False)
+
 	# Housekeeping
 	created = models.DateTimeField(blank=True, null=True, editable=False, auto_now_add=True)
 	notes = models.TextField(max_length=255, blank=True, null=True)
@@ -60,8 +70,8 @@ class Ramen(models.Model):
 
 	def __unicode__(self):
 		obj_desc = u'%s' % (self.name)
-		if self.mfg is not None:
-			obj_desc = obj_desc + u' from %s' % (self.mfg.origin)
+		if self.brand is not None:
+			obj_desc = obj_desc + u' from %s' % (self.brand.origin)
 		return obj_desc
 
 class Box(models.Model):

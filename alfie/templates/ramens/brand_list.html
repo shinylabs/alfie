@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Brands</h2>
+    <ul>
+        {% for brand in brand_list %}
+            <li><a href="{{ brand.get_absolute_url }}">{{ brand.name }}</a></li>
+        {% endfor %}
+    </ul>
+
+    <p><a class="button" href="{% url brand_add %}">Create</a> <a class="button" href="{% url ramen_list %}">Ramen</a> <a class="button" href="{% url box_list %}">Boxes</a></p>
+{% endblock %}
