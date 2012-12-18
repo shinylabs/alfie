@@ -26,6 +26,8 @@ Imports in:
 	  def list(cls):
 """
 
+import sys
+
 from alfie.apps.profiles.models import Profile
 
 def verify_addr(profile):
@@ -38,16 +40,14 @@ def verify_addr(profile):
 	}
 	try:
 		response = Address.verify(**payload)
+		print >>sys.stderr, response
 		if response['error']:
-			print 'Unverified :('
-			pass
-		else: 
-			profile.address_verified = True
-			profile.save()
+			return False
+		else:
 			return True
 	except:
-		print "Something broke :("
-		pass
+		print >>sys.stderr, 'Something broke :('
+		return False
 
 
 def set_rate(profile, price):
@@ -72,16 +72,18 @@ def check_rate(profile, box=None):
 		box = {"parcel": {"weight": 80,"height": 12,"width": 12,"length": 12}}
 
 	payload.update(box)
+	print >>sys.stderr, payload
 
 	try:
 		response = Postage.rates(**payload)
+		print >>sys.stderr, response
 		for item in response['rates']:
 			if item['service'] == 'ParcelPost':
-				print '\nParcel shipping a %s oz %s from %s to %s costs $%s' % (box['parcel']['weight'], profile.choice.name, fromzip['from']['zip'], profile.get_addr()[-1], item['rate'])
+				print >>sys.stderr, '\nParcel shipping a %s oz %s from %s to %s costs $%s' % (box['parcel']['weight'], profile.choice.name, fromzip['from']['zip'], profile.get_addr()[-1], item['rate'])
 				set_rate(profile, float(item['rate']))
-				return (profile, float(item['rate']))
+				return float(item['rate'])
 	except:
-		print "Something broke :("
+		print >>sys.stderr, "Check rate failed :("
 		pass
 
 def check_rates():

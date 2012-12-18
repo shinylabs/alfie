@@ -18,6 +18,7 @@ from alfie.apps.profiles.forms import SignupFormExtra
 
 # util
 from alfie.apps.back.finance.stripeutil import create_customer
+from alfie.apps.back.shipping.easypostutil import check_rate, verify_addr
 
 def start_order(request):
 	"""
@@ -65,8 +66,8 @@ def cancel_order(request):
 def pay_order(request):
 	if request.method == 'POST':
 		# Set variables
-		choice=Menu(pk=request.session['menu_choice'])
-		user=User(pk=request.session['user'])
+		choice=Menu.objects.get(pk=request.session['menu_choice'])
+		user=User.objects.get(pk=request.session['user'])
 		if 'stripe_token' in request.POST:
 			stripe_token=request.POST['stripe_token']
 		if 'coupon' in request.POST:
@@ -86,18 +87,24 @@ def pay_order(request):
 			order.coupon=coupon
 		except:
 			pass
-		order.save() #tasks set last_4_digits
+		order.save()
 
 		# Update the UserProfile
 		#bigups http://stackoverflow.com/questions/7498328/how-to-do-a-reverse-foreignkey-lookup-for-all-records-in-django
 		profile = user.profile
-		profile.choice = Menu(pk=choice)
+		profile.choice = choice
 		profile.subscribed = now
 		# create_customer imported from stripeutil.py
 		profile.stripe_cust_id = create_customer(profile, stripe_token, coupon=coupon)
 		profile.stripe_token = stripe_token
 		profile.last_4_digits = last4
-		profile.save() #tasks set last_4_digits
+		profile.save()
+
+		# Verify address
+		profile.address_verified = verify_addr(profile)
+		# Check shipping rate
+		profile.shipping_rate = check_rate(profile)
+		profile.save()
 
 		# Reset the keys
 		del request.session['menu_choice']
