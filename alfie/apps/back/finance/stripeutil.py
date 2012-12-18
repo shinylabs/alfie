@@ -1,11 +1,12 @@
 """
 //SHELL CMDS
 
-from alfie.apps.back.finance.stripetools import *
+from alfie.apps.back.finance.stripeutil import *
 fake_numbers()
 create_token()
 create_customer()
 """
+import sys
 
 # time
 import datetime
@@ -164,4 +165,14 @@ def delete_customer(profile):
 	except:
 		pass
 
+def coupon_list():
+	return stripe.Coupon.all()
 
+def create_coupon(name, percent_off=0, max_redemptions=0):
+	response = stripe.Coupon.create(
+			id=name,
+			duration='once',
+			percent_off=percent_off,
+			max_redemptions=max_redemptions
+		)
+	return response
