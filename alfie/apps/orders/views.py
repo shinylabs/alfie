@@ -49,7 +49,7 @@ def start_order(request):
 		else:
 			# Some unbound forms
 			orderform = OrderForm()
-			return render_to_response('orders/order_form.html', {'orderform': orderform}, context_instance=RequestContext(request))		
+			return render_to_response('orders/order_form.html', {'orderform': orderform}, context_instance=RequestContext(request))
 
 def cancel_order(request):
 	# Reset variable in session

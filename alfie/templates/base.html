@@ -62,6 +62,21 @@
 			</div>
 		</header>
 
+		{% if messages %}
+		<section class="messages">
+			<div class="row">
+				<div class="twelve columns">
+				    {% for message in messages %}
+				      <div class="alert-box success">
+				      {{ message }}
+				      <a href="" class="close">&times;</a>
+				      </div>
+				    {% endfor %}
+				</div>
+			</div>
+		</section>
+		{% endif %}
+
 		<section class="page">
 			<div class="row">
 				<div class="twelve columns">

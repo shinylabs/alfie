@@ -108,6 +108,13 @@ urlpatterns += patterns('alfie.apps.userena.views',
        name='userena_prefs_change'),
 )
 
+urlpatterns += patterns('alfie.apps.profiles.views',
+    # Cancel
+    url(r'^(?P<username>[\.\w]+)/cancel/$',
+       'cancel_profile',
+       name='cancel_profile'),
+)
+
 urlpatterns += patterns('alfie.apps.userena.views',
      # Test
     url(r'^(?P<username>[\.\w]+)/test/$',

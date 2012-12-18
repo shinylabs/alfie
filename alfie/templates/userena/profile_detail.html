@@ -19,6 +19,7 @@
             <li><a href="{% url 'userena_email_change' user.username %}">{% trans "Change email" %}</a></li>
             <li><a href="{% url 'userena_menu_change' user.username %}">{% trans "Change menu" %}</a></li>
             <li><a href="{% url 'userena_prefs_change' user.username %}">{% trans "Change prefs" %}</a></li>
+            <li><a href="{% url 'cancel_profile' user.username %}">{% trans "Cancel" %}</a></li>
           {% endblock %}
         </ul>
       {% endif %}

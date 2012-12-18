@@ -1,7 +1,11 @@
-from alfie.apps.fakers.models import Faker, FakeProfile
+"""
+from alfie.apps.fakers.fakersutil import *
+"""
+
+from alfie.apps.fakers.models import Faker, Fakep
 from alfie.apps.orders.models import Menu, Order
 
-from alfie.apps.fakers.csvtools import *
+from alfie.apps.fakers.csvutil import *
 """
 Imports in:
 	load_csv_dict(csvfile)
@@ -22,7 +26,7 @@ def salt_hash(password):
 
 def make_profile(f, user_info):
 	import random
-	p = FakeProfile()
+	p = Fakep()
 	p.user = f
 	p.choice = random.choice(Menu.objects.all())
 	p.ship_address_1 = user_info['StreetAddress']

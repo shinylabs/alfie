@@ -142,8 +142,26 @@ def create_customer():
 	print '\nStarted with %s users and created %s customers ' % (Fakep.objects.count(), successcount)
 	if failcount > 0: print 'Failed to create %s customers.\nThese failed: %s' % (failcount, badlist)
 
-def update_customer():
-	pass
+def update_subscription(profile, choice, prorate="False"):
+	"""
+		Retrieve customer id then update parameters
+	"""
+	cu = stripe.Customer.retrieve(profile.stripe_cust_id)
+	try:
+		cu.update_subscription(plan=choice, prorate=prorate)
+		return True
+	except:
+		pass
+		return False
 
-def delete_customer():
-	pass
+def delete_customer(profile):
+	"""
+		Deletes a customer
+	"""
+	cu = stripe.Customer.retrieve(profile.stripe_cust_id)
+	try:
+		cu.cancel_subscription()
+	except:
+		pass
+
+

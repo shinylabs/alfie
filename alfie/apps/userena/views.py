@@ -15,6 +15,7 @@ from django.http import HttpResponse, HttpResponseForbidden, Http404
 
 from alfie.apps.userena.forms import (SignupForm, SignupFormOnlyEmail, AuthenticationForm, ChangeEmailForm, EditProfileForm)
 from alfie.apps.profiles.forms import (EditMenuChoiceForm, EditPrefsForm)
+from alfie.apps.back.finance.stripeutil import *
 from userena.models import UserenaSignup
 from userena.decorators import secure_required
 from userena.backends import UserenaAuthenticationBackend
@@ -695,11 +696,10 @@ def profile_list(request, page=1, template_name='userena/profile_list.html',
 
 @secure_required
 #@permission_required_or_403('menu_change', (get_profile_model(), 'user__username', 'username')) #tasks create permission in user db
-def menu_change(request, username, edit_menu_form=EditMenuChoiceForm,
+def menu_change(request, username, edit_menu_form=EditMenuChoiceForm, 
                  template_name='userena/menu_form.html', success_url=None,
                  extra_context=None, **kwargs):
-    user = get_object_or_404(User,
-                             username__iexact=username)
+    user = get_object_or_404(User, username__iexact=username)
 
     profile = user.get_profile()
 
@@ -711,13 +711,27 @@ def menu_change(request, username, edit_menu_form=EditMenuChoiceForm,
         form = edit_menu_form(request.POST, request.FILES, instance=profile, initial=menu_initial)
 
         if form.is_valid():
-            profile = form.save()
+            """
+            check if current order has shipped
+                if no, update profile choice, update order choice, update stripe subscription object
+                else, queue change next month
+            """
+            if form.has_shipped(profile) is False:
+                profile = form.save()
+                try:
+                    update_subscription(profile, profile.choice.name, prorate="False")
+                except:
+                    pass
+                msg = 'Your menu choice has been updated.'
+            else:
+                profile = form.save()
+                msg = 'Your changes will be scheduled for next month.'
 
             if userena_settings.USERENA_USE_MESSAGES:
-                messages.success(request, _('Your menu choice has been updated.'), fail_silently=True)
+                messages.success(request, _(msg), fail_silently=True)
 
             if success_url: redirect_to = success_url
-            else: redirect_to = reverse('userena_profile_detail', kwargs={'username': username})
+            else: redirect_to = reverse('userena_menu_change', kwargs={'username': username})
             return redirect(redirect_to)
 
     if not extra_context: extra_context = dict()

@@ -52,6 +52,20 @@ class EditMenuChoiceForm(forms.ModelForm):
         model = Profile
         fields = ('choice',)
 
+    def has_shipped(self, profile):
+        """
+        Checks if an order has shipped for current month, returns True or False
+        """
+        import datetime
+        now = datetime.datetime.now()
+
+        ship_status = profile.user.orders.all().filter(created__lte=now).order_by('-created')[0].shipped
+
+        if ship_status is None:
+            return False
+        else:
+            return True
+
 class EditPrefsForm(forms.ModelForm):
     class Meta:
         model = Profile

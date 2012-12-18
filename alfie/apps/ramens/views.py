@@ -3,6 +3,10 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.core.urlresolvers import reverse_lazy
 from alfie.apps.ramens.models import Ramen, Brand, Box
 
+#bigups http://stackoverflow.com/questions/4631865/caching-query-results-in-django
+#from django.core.cache import cache
+#cache.set('key', Brand.objects.all())
+
 class RamenListView(ListView):
 	model = Ramen
 	context_object_name = 'ramen_list'

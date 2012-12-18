@@ -36,7 +36,7 @@ class Order(models.Model):
         4           1           48          12              2012
         5           2           102         01              2013
     """
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, related_name='orders')
     choice = models.ForeignKey(Menu, blank=True, null=True)
     box = models.ForeignKey(Box, blank=True, null=True)
     coupon = models.CharField(max_length=25, blank=True, null=True)

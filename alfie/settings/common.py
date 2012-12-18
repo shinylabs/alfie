@@ -132,6 +132,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.tz',
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.request',
+    #'alfie.apps.ramens.context_processors.cached_queries'
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-loaders
