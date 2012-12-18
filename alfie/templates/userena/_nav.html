@@ -1,0 +1,22 @@
+{% load i18n %}
+{% load url from future %}
+
+{% block profile_navigation %}
+  {% comment %}Dirty hack. Will use django-guardian in the future.{% endcomment %}
+
+  {% if user.username == profile.user.username %}
+    <ul id="box-nav" class="nav-bar">
+      {% block profile_navigation_items %}
+        {# <li class="active"><a href="{% url 'userena_profile_detail' user.username %}">{% trans "View profile" %}</a></li> #}
+        <li><a href="{% url 'userena_profile_edit' user.username %}">{% trans "Edit details" %}</a></li>
+        <li><a href="{% url 'userena_password_change' user.username %}">{% trans "Change password" %}</a></li>
+        <li><a href="{% url 'userena_email_change' user.username %}">{% trans "Change email" %}</a></li>
+        <li><a href="{% url 'userena_menu_change' user.username %}">{% trans "Change menu" %}</a></li>
+        <li><a href="{% url 'userena_payment_change' user.username %}">{% trans "Change payment" %}</a></li>
+        <li><a href="{% url 'userena_prefs_change' user.username %}">{% trans "Change prefs" %}</a></li>
+        <li><a href="{% url 'cancel_profile' user.username %}">{% trans "Cancel" %}</a></li>
+      {% endblock %}
+    </ul>
+  {% endif %}
+
+{% endblock %}

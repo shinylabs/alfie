@@ -66,6 +66,11 @@ class EditMenuChoiceForm(forms.ModelForm):
         else:
             return True
 
+class EditPaymentForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ('last_4_digits',)
+
 class EditPrefsForm(forms.ModelForm):
     class Meta:
         model = Profile

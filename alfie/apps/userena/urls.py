@@ -106,6 +106,10 @@ urlpatterns += patterns('alfie.apps.userena.views',
     url(r'^(?P<username>[\.\w]+)/prefs/$',
        'prefs_change',
        name='userena_prefs_change'),
+    # Change payment
+    url(r'^(?P<username>[\.\w]+)/payment/$',
+       'payment_change',
+       name='userena_payment_change'),
 )
 
 urlpatterns += patterns('alfie.apps.profiles.views',

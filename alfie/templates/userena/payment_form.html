@@ -1,5 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'userena/base_userena.html' %}
 {% load i18n %}
+{% load url from future %}
 
 {% block stripe %}
 <script src="https://js.stripe.com/v1/" type="text/javascript"></script>
@@ -48,27 +49,23 @@ $(document).ready(function() {
 });
 {% endblock %}
 
+{% block content_title %}<h2>{% blocktrans with user.username as username %}Account &raquo; {{ username }}{% endblocktrans %}</h2>{% endblock %}
+
 {% block content %}
-<ul class="breadcrumbs">
-  <li><a href="/">Home</a></li>
-  <li><a href="/order/cancel">1. Menu</a></li>
-  <li class="unavailable"><a href="#">2. Register</a></li>
-  <li class="current"><a href="#">3. Pay</a></li>
-  <li class="unavailable"><a href="#">4. Prefs</a></li>
-</ul>
 
+{% include "userena/_nav.html" %}
 
-<div class="panel radius">
-<h5>Params:</h5>
-Menu choice: {{ menu_choice }} / Price: ${{ price }} / User: {{ user }}
+{% if profile.last_4_digits %}
+<div class="panel">
+    <h4>Current payment info</h4>
+    <p>Last card used: **** **** **** {{ profile.last_4_digits }}</p>
 </div>
-
-<div class="payment-errors"></div>
+{% endif %}
 
 <form id="payment" action="" method="POST">
     {% csrf_token %}    
     <fieldset>
-    <legend>{% trans "Payment" %}</legend>
+    <legend>{% trans "New Payment" %}</legend>
 
     <noscript>
       &lt;p&gt;
@@ -90,6 +87,6 @@ Menu choice: {{ menu_choice }} / Price: ${{ price }} / User: {{ user }}
   
     </fieldset>
 
-  <input class="radius button" id="user_submit" name="commit" type="submit" value="Send payment"> <a href="/order/cancel">Cancel</a>
+  <input class="radius button" id="user_submit" name="commit" type="submit" value="Chang payment">
 </form>
 {% endblock %}

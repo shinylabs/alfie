@@ -16,6 +16,8 @@ from alfie.apps.orders.models import Menu, Order
 from alfie.apps.orders.forms import OrderForm, PrefsForm
 from alfie.apps.profiles.forms import SignupFormExtra
 
+# util
+from alfie.apps.back.finance.stripeutil import create_customer
 
 def start_order(request):
 	"""
@@ -62,19 +64,39 @@ def cancel_order(request):
 
 def pay_order(request):
 	if request.method == 'POST':
+		# Set variables
+		choice=Menu(pk=request.session['menu_choice'])
+		user=User(pk=request.session['user'])
+		if 'stripe_token' in request.POST:
+			stripe_token=request.POST['stripe_token']
+		if 'coupon' in request.POST:
+			coupon=request.POST['coupon']
+		else:
+			coupon = None
+		if 'last4' in request.POST:
+			last4=request.POST['last4']
 		# Create the new Order object
 		order = Order(
-				choice=Menu(pk=request.session['menu_choice']),
-				user=User(pk=request.session['user']), 
-				stripe_token=request.POST['stripe_token']
+				choice=choice,
+				user=user,
+				last_4_digits=last4,
+				last_payment_attempt=now
 		)
+		try:
+			order.coupon=coupon
+		except:
+			pass
 		order.save() #tasks set last_4_digits
 
 		# Update the UserProfile
 		#bigups http://stackoverflow.com/questions/7498328/how-to-do-a-reverse-foreignkey-lookup-for-all-records-in-django
-		profile = Profile.objects.get(user=request.session['user'])
-		profile.choice = Menu(pk=request.session['menu_choice'])
+		profile = user.profile
+		profile.choice = Menu(pk=choice)
 		profile.subscribed = now
+		# create_customer imported from stripeutil.py
+		profile.stripe_cust_id = create_customer(profile, stripe_token, coupon=coupon)
+		profile.stripe_token = stripe_token
+		profile.last_4_digits = last4
 		profile.save() #tasks set last_4_digits
 
 		# Reset the keys
@@ -82,7 +104,7 @@ def pay_order(request):
 
 		# Success message
 		#bigups http://stackoverflow.com/questions/13328810/django-redirect-to-view
-		return redirect('alfie.apps.orders.views.savePrefs')
+		return redirect('alfie.apps.orders.views.save_prefs')
 	else:
 		if 'menu_choice' not in request.session or 'user' not in request.session:
 			return HttpResponseRedirect('/order/')

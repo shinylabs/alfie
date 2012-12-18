@@ -1,4 +1,5 @@
-{% extends 'userena/base_userena.html' %}
+{% extends 'base.html' %}
+{# {% extends 'userena/base_userena.html' %} #}
 {% load i18n %}
 {% load url from future %}
 
@@ -7,14 +8,7 @@
 {% block content_title %}<h2>{% blocktrans with profile.user.username as username %}Account &raquo; {{ username }}{% endblocktrans %}</h2>{% endblock %}
 
 {% block content %}
-  <ul id="box-nav" class="nav-bar">
-    <li><a href="{% url 'userena_profile_detail' user.username %}"><span>{% trans 'View profile' %}</span></a></li>
-    <li><a href="{% url 'userena_profile_edit' user.username %}">{% trans "Edit profile" %}</a></li>
-    <li><a href="{% url 'userena_password_change' user.username %}">{% trans "Change password" %}</a></li>
-    <li><a href="{% url 'userena_email_change' user.username %}">{% trans "Change email" %}</a></li>
-    <li><a href="{% url 'userena_menu_change' user.username %}">{% trans "Change menu" %}</a></li>
-    <li class="active"><a href="{% url 'userena_prefs_change' user.username %}">{% trans "Change prefs" %}</a></li>
-  </ul>
+{% include "userena/_nav.html" %}
 
 <form action="" enctype="multipart/form-data" method="post">
   {% csrf_token %}

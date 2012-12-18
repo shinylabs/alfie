@@ -107,7 +107,7 @@ def create_token():
 	print '\nStarted with %s users and created %s tokens ' % (Fakep.objects.count(), successcount)
 	if failcount > 0: print 'Failed to create %s tokens.\nThese failed: %s' % (failcount, badlist)
 
-def create_customer():
+def create_fake_customer():
 	"""
 		Loop and get Fakep object
 		Get payment info
@@ -143,6 +143,43 @@ def create_customer():
 	print '\nStarted with %s users and created %s customers ' % (Fakep.objects.count(), successcount)
 	if failcount > 0: print 'Failed to create %s customers.\nThese failed: %s' % (failcount, badlist)
 
+def create_customer(profile, stripe_token, **kwargs):
+	"""
+		Takes in profile, stripe_token, create and return a stripe customer object
+	"""
+	try:
+		response = stripe.Customer.create(
+			card = stripe_token,
+			email = profile.user.email,
+			plan = profile.choice.name,
+			coupon = kwargs['coupon'],
+		)
+		return response.id
+	except:
+		pass
+
+def update_customer(profile, **kwargs):
+	"""
+		Updates customer payment info
+	"""
+	cu = stripe.Customer.retrieve(profile.stripe_cust_id)
+	if stripe_token:
+		cu.card = stripe_token
+		cu.save()
+		profile.stripe_token = stripe_token
+		profile.save()
+	return True
+
+def delete_customer(profile):
+	"""
+		Deletes a customer
+	"""
+	cu = stripe.Customer.retrieve(profile.stripe_cust_id)
+	try:
+		cu.cancel_subscription()
+	except:
+		pass
+
 def update_subscription(profile, choice, prorate="False"):
 	"""
 		Retrieve customer id then update parameters
@@ -154,16 +191,6 @@ def update_subscription(profile, choice, prorate="False"):
 	except:
 		pass
 		return False
-
-def delete_customer(profile):
-	"""
-		Deletes a customer
-	"""
-	cu = stripe.Customer.retrieve(profile.stripe_cust_id)
-	try:
-		cu.cancel_subscription()
-	except:
-		pass
 
 def coupon_list():
 	return stripe.Coupon.all()
