@@ -17,7 +17,7 @@
 
 <ul class="block-grid four-up mobile-five-up">
   {% for ramen in box.ramens.all %}
-    <li class="panel" style="height: 230px;"><br><a href="{% url ramen_detail ramen.id %}">{{ ramen }} - ${{ ramen.price }}</a></li>
+    <li class="panel" style="height: 230px;"><br><a href="{% url ramen_detail ramen.id %}">{{ ramen }} - ${{ ramen.msrp }}</a></li>
   {% endfor %}
 </ul>
 

@@ -1,10 +1,27 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h2>Box</h2>
+    <h2>2013 Boxes</h2>
+	<ul class="block-grid four-up mobile-five-up">
+	    <li class="panel" style="height: 230px;"><h3>JAN</h3><a href="{{ box_list.0.get_absolute_url }}">Box #{{ box_list.0.id }}</a></li>
+	    <li class="panel" style="height: 230px;"><h3>FEB</h3><h1><a href="{% url box_add %}">+</a></h1></li>
+	    <li class="panel" style="height: 230px;"><h3>MAR</h3><h1><a href="{% url box_add %}">+</a></h1></li>
+	    <li class="panel" style="height: 230px;"><h3>APR</h3><h1><a href="{% url box_add %}">+</a></h1></li>
+	    
+	    <li class="panel" style="height: 230px;"><h3>MAY</h3><h1><a href="{% url box_add %}">+</a></h1></li>
+	    <li class="panel" style="height: 230px;"><h3>JUN</h3><h1><a href="{% url box_add %}">+</a></h1></li>
+	    <li class="panel" style="height: 230px;"><h3>JUL</h3><h1><a href="{% url box_add %}">+</a></h1></li>
+	    <li class="panel" style="height: 230px;"><h3>AUG</h3><h1><a href="{% url box_add %}">+</a></h1></li>
+
+	    <li class="panel" style="height: 230px;"><h3>SEP</h3><h1><a href="{% url box_add %}">+</a></h1></li>
+	    <li class="panel" style="height: 230px;"><h3>OCT</h3><h1><a href="{% url box_add %}">+</a></h1></li>
+	    <li class="panel" style="height: 230px;"><h3>NOV</h3><h1><a href="{% url box_add %}">+</a></h1></li>
+	    <li class="panel" style="height: 230px;"><h3>DEC</h3><h1><a href="{% url box_add %}">+</a></h1></li>
+	</ul>
+
     <ul>
         {% for box in box_list %}
-            <li><a href="{{ box.get_absolute_url }}">Box #{{ box.id }}</a></li>
+            <li><a href="{{ box_list.0.get_absolute_url }}">Box #{{ box_list.0.id }}</a></li>
         {% endfor %}
     </ul>
 

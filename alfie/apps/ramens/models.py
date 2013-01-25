@@ -36,7 +36,8 @@ class Ramen(models.Model):
 	upc = models.CharField(max_length=128, blank=True, null=True)
 	brand = models.ForeignKey(Brand, blank=True, null=True)
 	name = models.CharField(max_length=255)
-	price = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
+	cogs = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
+	msrp = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
 
 	# Description
 	description = models.TextField(max_length=255, blank=True, null=True)
@@ -75,9 +76,26 @@ class Ramen(models.Model):
 		return obj_desc
 
 class Box(models.Model):
-	ramens = models.ManyToManyField(Ramen, related_name='shipping_box')
-	month = models.CharField(max_length=2)
-	year = models.CharField(max_length=4)
+	"""
+		Req:
+
+		Create box for every menu object every month
+
+		Each box has number of ramen slots defined by Box.slots from menu object
+
+		Each box has m2m relationship to ramens in the box
+
+		Each box cost is calculated from price of every ramen in the box
+
+		Each monthly order has a monthly box object
+	"""
+	name = models.CharField(max_length=255)
+	slots = models.IntegerField(max_length=2)
+	cost = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
+	notes = models.TextField(max_length=255, blank=True, null=True)
+	month = models.IntegerField(max_length=2)
+	year = models.IntegerField(max_length=4)
+	ramens = models.ManyToManyField(Ramen, related_name='ramens')	
 	created = models.DateTimeField(blank=True, null=True, editable=False, auto_now_add=True)
 
 	def get_absolute_url(self):
@@ -87,8 +105,14 @@ class Box(models.Model):
 	def get_field_values(self):
 		return [(field.name, field.value_to_string(self)) for field in Box._meta.fields]
 
+	def get_cost(self):
+		cost = 0
+		for ramen in self.ramens.all():
+			cost += ramen.msrp
+		self.cost = cost
+
 	def __unicode__(self):
-		return u'%s/%s Box' % (self.month, self.year)
+		return u'%s/%s %s' % (self.month, self.year, self.name)
 
 	class Meta:
 		verbose_name_plural = "boxes"

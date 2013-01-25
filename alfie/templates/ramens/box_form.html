@@ -9,7 +9,11 @@
 
 <form action="" method="POST">{% csrf_token %}
 
-	{{ form }}
+	{% for form in box_forms %}
+		{{ form }}
+		<hr>
+	{% endfor %}
+
 
 	<input class="button" type="submit" value="Go" />
 </form>

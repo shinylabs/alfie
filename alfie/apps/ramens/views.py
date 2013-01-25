@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy
 from alfie.apps.ramens.models import Ramen, Brand, Box
+from alfie.apps.ramens.forms import BoxFormSet
 
 #bigups http://stackoverflow.com/questions/4631865/caching-query-results-in-django
 #from django.core.cache import cache
@@ -67,6 +68,26 @@ class BoxListView(ListView):
 class BoxCreateView(CreateView):
 	model = Box
 	template_name = 'ramens/box_form.html'
+
+	#bigups http://stackoverflow.com/questions/4497684/django-class-based-views-with-inline-model-form-or-formset
+	def get_context_data(self, **kwargs):
+		context = super(BoxCreateView, self).get_context_data(**kwargs)
+		if self.request.POST:
+			context['box_forms'] = BoxFormSet(self.request.POST)
+		else:
+			context['box_forms'] = BoxFormSet()
+		return context
+
+	def form_valid(self, form):
+		context = self.get_context_data()
+		box_forms = context['box_forms']
+		if box_forms.is_valid():
+			self.object = form.save()
+			box_forms.instance = self.object
+			box_forms.save()
+			return HttpResponse('saved')
+		else:
+			return self.render_to_response(self.get_context_data(form=form))
 
 class BoxDetailView(DetailView):
 	queryset = Box.objects.all()

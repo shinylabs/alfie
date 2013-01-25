@@ -29,6 +29,8 @@
 	</table>
 	</div>
 
+	<p><table width="100%"><tr><td>A count: {% widthratio a_count profiles|length 100 %}% ({{ a_count }})</td><td>B count: {% widthratio b_count profiles|length 100 %}% ({{ b_count }})</td><td>C count: {% widthratio c_count profiles|length 100 %}% ({{ c_count }})</td></tr></table></p>
+
 	<dl class="sub-nav">
 	  <dt>Filter:</dt>
 	  <dd class="active"><a href="#">Current</a></dd>
@@ -44,7 +46,7 @@
 
 	<p>Ramen needed: {{ inv_count }}</p>
 
-	<p>Plan choices: A - {% widthratio box_a_count profiles|length 100 %}% ({{ box_a_count }}), B - {% widthratio box_b_count profiles|length 100 %}% ({{ box_b_count }}), C - {% widthratio box_c_count profiles|length 100 %}% ({{ box_c_count }})</p>
+	<p><table width="100%"><tr><td>A count: {% widthratio box_a_count profiles|length 100 %}% ({{ box_a_count }})</td><td>B count: {% widthratio box_b_count profiles|length 100 %}% ({{ box_b_count }})</td><td>C count: {% widthratio box_c_count profiles|length 100 %}% ({{ box_c_count }})</td></tr></table></p>
 
 	<dl class="sub-nav">
 	  <dt>Filter:</dt>

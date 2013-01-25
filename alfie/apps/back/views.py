@@ -29,6 +29,9 @@ def financial():
 
 def backoffice(request):
 	profiles = Profile.objects.all()
+	a_count = Profile.objects.filter(choice__id=1).count()
+	b_count = Profile.objects.filter(choice__id=2).count()
+	c_count = Profile.objects.filter(choice__id=3).count()
 
 	inv_count = Order.objects.aggregate(Sum('choice__slots')).values()[0]
 	box_a_count = Order.objects.filter(choice__id=1).filter(created__month=now.month).count()
@@ -40,7 +43,7 @@ def backoffice(request):
 	except:
 		total_rev = 0
 
-	return render_to_response('back/office.html', {'profiles': profiles, 'inv_count': inv_count, 'box_a_count': box_a_count, 'box_b_count': box_b_count, 'box_c_count': box_c_count, 'total_rev': total_rev}, context_instance=RequestContext(request))
+	return render_to_response('back/office.html', {'profiles': profiles, 'a_count': a_count, 'b_count': b_count, 'c_count': c_count, 'inv_count': inv_count, 'box_a_count': box_a_count, 'box_b_count': box_b_count, 'box_c_count': box_c_count, 'total_rev': total_rev}, context_instance=RequestContext(request))
 
 
 def finance_tools(request):
