@@ -4,6 +4,8 @@ from django.core.urlresolvers import reverse_lazy
 from alfie.apps.ramens.models import Ramen, Brand, Box
 from alfie.apps.ramens.forms import BoxFormSet
 
+from django.core.paginator import Paginator
+
 #bigups http://stackoverflow.com/questions/4631865/caching-query-results-in-django
 #from django.core.cache import cache
 #cache.set('key', Brand.objects.all())
@@ -11,6 +13,8 @@ from alfie.apps.ramens.forms import BoxFormSet
 class RamenListView(ListView):
 	model = Ramen
 	context_object_name = 'ramen_list'
+	#bigups http://stackoverflow.com/questions/5907575/how-do-i-use-pagination-with-django-class-based-generic-listviews
+	paginate_by = 25
 
 class RamenCreateView(CreateView):
 	model = Ramen
@@ -31,6 +35,7 @@ class RamenDeleteView(DeleteView):
 class BrandListView(ListView):
 	model = Brand
 	context_object_name = 'brand_list'
+	paginate_by = 25
 	template_name = 'ramens/brand_list.html'
 
 class BrandCreateView(CreateView):

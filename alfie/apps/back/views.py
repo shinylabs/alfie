@@ -12,23 +12,89 @@ from django.db.models import Sum
 #bigups http://stackoverflow.com/questions/5757094/decimal-zero-padding
 from util import moneyfmt
 
+# data
 from alfie.apps.profiles.models import Profile
-from alfie.apps.orders.models import Order
+from alfie.apps.orders.models import Order, Menu
+from alfie.apps.ramens.models import Brand, Flavor, Ramen
 
 # stripe tools
 from alfie.apps.back.finance.stripeutil import *
 
-def customer():
-	pass
-
-def inventory():
-	pass
-
-def financial():
-	pass
-
 def backoffice(request):
-	profiles = Profile.objects.all()
+	return HttpResponse('<a href="inventory">Inventory</a> | <a href="orders">Orders</a> | <a href="finances">Finances</a> | <a href="shipping">Shipping</a> | <a href="customers">Customers</a> ')
+
+def inventory_index(request):
+	"""
+		Manages ramens, brands, boxes
+	"""
+	china_count = Brand.objects.country_count('China')
+	usa_count = Brand.objects.country_count('USA')
+	total_count = Brand.objects.all().count()
+	return HttpResponse('Total brands: %s <br> %s from China <br> %s from USA' % (total_count, china_count, usa_count))
+
+def orders_index(request):
+	"""
+		Manages orders current and past
+
+		Get total orders
+		Get orders for this month
+		Get orders for last month
+		Get orders for the past three months
+
+		Get paid orders 
+		Get orders to be paid
+
+		Get orders to be shipped
+		Get shipped orders
+
+		Menu tools:
+			- CRUD menu
+			- breakdown menu
+	"""
+	return HttpResponse('orders')
+
+def finances_index(request):
+	"""
+		Manages finances processes, produces reports, interfaces with Stripe
+
+		Show payment queue
+
+		Show finance tools
+			- CRUD coupons
+			- poke deadbeats
+	"""
+	return HttpResponse('finances')
+
+def shipping_index(request):
+	"""
+		Manages shipping processes
+
+		Show ship queue
+
+		Show shipping tools
+
+		TODO:
+			Users without admin permissions can only see/interact with this view
+
+	"""
+	return HttpResponse('shipping')
+
+def customers_index(request):
+	"""
+		Manages customers processes and services
+
+		Segment to lists:
+			- good customers
+			- bad customers
+
+		Show service tools
+	"""
+	return HttpResponse('customers')
+
+
+
+
+def backoffice_old(request):
 	a_count = Profile.objects.filter(choice__id=1).count()
 	b_count = Profile.objects.filter(choice__id=2).count()
 	c_count = Profile.objects.filter(choice__id=3).count()
@@ -43,8 +109,7 @@ def backoffice(request):
 	except:
 		total_rev = 0
 
-	return render_to_response('back/office.html', {'profiles': profiles, 'a_count': a_count, 'b_count': b_count, 'c_count': c_count, 'inv_count': inv_count, 'box_a_count': box_a_count, 'box_b_count': box_b_count, 'box_c_count': box_c_count, 'total_rev': total_rev}, context_instance=RequestContext(request))
-
+	return render_to_response('back/office.html', {'a_count': a_count, 'b_count': b_count, 'c_count': c_count, 'inv_count': inv_count, 'box_a_count': box_a_count, 'box_b_count': box_b_count, 'box_c_count': box_c_count, 'total_rev': total_rev}, context_instance=RequestContext(request))
 
 def finance_tools(request):
 	return render_to_response('back/finance_tools.html', context_instance=RequestContext(request))

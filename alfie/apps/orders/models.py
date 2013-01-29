@@ -1,3 +1,7 @@
+# time
+import datetime
+now = datetime.datetime.now()
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
@@ -13,7 +17,7 @@ class Menu(models.Model):
         _name_      _slots_     _price_     _notes_
         tinybox     4           12.00       For people that want to try
         bigbox      8           22.00       For the ramen fanatic
-        sumobox     16          32.00       If you just want to mainline
+        sumobox     14          32.00       If you just want to mainline
     """
 
     name = models.CharField(max_length=128, blank=True, null=True)
@@ -23,6 +27,40 @@ class Menu(models.Model):
 
     def __unicode__(self):
         return u'%s' % (self.name)
+
+class OrderManager(models.Manager):
+    def monthly_total(self, month=now.month):
+        return self.filter(created__month=month).count()
+
+    def prev_month_total(self):
+        pass
+
+    def quarterly_total(self):
+        pass
+
+    def pay_queue(self):
+        """
+        Show queue of orders that need to be paid
+
+        Num of orders paid / num of orders this month
+
+        Num orders paid - num of orders = payment queue
+        """
+        pass
+
+    def ship_queue(self):
+        """
+        Show queue of orders that need to be shipped
+
+        Num of orders shipped / num of orders paid
+
+        Num of orders shipped - num of orders paid = # to insert to ship queue 
+
+        Ship queue pulls box fk to see what inventory needs to be pullled
+
+        Ship queue is removed when confirmed as shipped 
+        """
+        pass
 
 class Order(models.Model):
     """
@@ -52,6 +90,8 @@ class Order(models.Model):
     last_4_digits = models.CharField(max_length=4, blank=True, null=True)
     payment_attempts = models.IntegerField(blank=True, null=True)
     last_payment_attempt = models.DateTimeField(blank=True, null=True, editable=False)
+
+    objects = OrderManager()
 
     def __unicode__(self):
         return u'Order %s for %s' % (self.id, self.user.first_name)

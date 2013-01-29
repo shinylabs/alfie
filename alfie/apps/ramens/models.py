@@ -7,18 +7,23 @@ from django.utils.translation import ugettext as _
 MEDIA_PATH = 'alfie/media/'
 RAMEN_FILE_PATH = 'img/ramen/'
 
+class BrandManager(models.Manager):
+	def country_count(self, country):
+		return self.filter(origin__icontains=country).count()
+
 class Brand(models.Model):
 	name = models.CharField(max_length=128, blank=True, null=True)
 	address = models.TextField(max_length=255, blank=True, null=True)
 	website = models.URLField(max_length=255, blank=True, null=True)
 	origin = models.CharField(max_length=128, blank=True, null=True)
+	objects = BrandManager()
 
 	def get_absolute_url(self):
-		return reverse('mfg_detail', args=[self.pk])
+		return reverse('brand_detail', args=[self.pk])
 
 	#bigups http://stackoverflow.com/questions/2217478/django-templates-loop-through-and-print-all-available-properties-of-an-object
 	def get_field_values(self):
-		return [(field.name, field.value_to_string(self)) for field in Manufacturer._meta.fields]
+		return [(field.name, field.value_to_string(self)) for field in Brand._meta.fields]
 
 	def __unicode__(self):
 		obj_desc = u'%s' % (self.name)
@@ -31,6 +36,10 @@ class Flavor(models.Model):
 
 	def __unicode__(self):
 		return u'%s' % (self.taste)
+
+class RamenManager(models.Manager):
+	def ramen_count(self):
+		return self.count()
 
 class Ramen(models.Model):
 	upc = models.CharField(max_length=128, blank=True, null=True)
@@ -61,6 +70,8 @@ class Ramen(models.Model):
 	# Housekeeping
 	created = models.DateTimeField(blank=True, null=True, editable=False, auto_now_add=True)
 	notes = models.TextField(max_length=255, blank=True, null=True)
+
+	objects = RamenManager()
 
 	def get_absolute_url(self):
 		return reverse('ramen_detail', kwargs={'pk': self.pk})

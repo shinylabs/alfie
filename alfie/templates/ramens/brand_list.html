@@ -1,12 +1,29 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h2>Brands</h2>
+    <h2><a href="{% url brand_list %}">Brands</a></h2>
+	{% if brand_list %}
     <ul>
         {% for brand in brand_list %}
             <li><a href="{{ brand.get_absolute_url }}">{{ brand.name }}</a></li>
         {% endfor %}
     </ul>
+    	{% if is_paginated %}
+    	<p>
+    		{% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}">PREV</a>
+            {% endif %}
+
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">NEXT</a>
+            {% endif %}
+        </p>
+    	{% endif %}
+    {% else %}
+    	<p>No list of objects</p>
+    {% endif %}
 
     <p><a class="button" href="{% url brand_add %}">Create</a> <a class="button" href="{% url ramen_list %}">Ramen</a> <a class="button" href="{% url box_list %}">Boxes</a></p>
 {% endblock %}
