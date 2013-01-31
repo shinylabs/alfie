@@ -30,6 +30,15 @@ class Menu(models.Model):
 
 class OrderManager(models.Manager):
     def monthly_total(self, month=now.month):
+        """
+        Orders are only valid if:
+            - subscribed is not null or blank
+            - address_verified is True
+            - stripe_token is not null or blank
+            - killed is null
+            - overdue is False
+            - cancelled is null
+        """
         return self.filter(created__month=month).count()
 
     def prev_month_total(self):
@@ -37,6 +46,9 @@ class OrderManager(models.Manager):
 
     def quarterly_total(self):
         pass
+
+    def monthly_paid_total(self, month=now.month):
+        return self.filter(created__month=month).exclude(gotpaid__isnull=True).count()
 
     def pay_queue(self):
         """
@@ -47,6 +59,9 @@ class OrderManager(models.Manager):
         Num orders paid - num of orders = payment queue
         """
         pass
+
+    def monthly_shipped_total(self, month=now.month):
+        return self.filter(created__month=month).exclude(shipped__isnull=True).count()
 
     def ship_queue(self):
         """

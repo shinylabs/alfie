@@ -88,8 +88,11 @@ class Profile(UserenaBaseProfile):
     last_4_digits = models.CharField(max_length=4, blank=True, null=True)
     overdue = models.BooleanField(default=False)
 
-    def get_addr(self):
+    def get_addr_values(self):
         return [self.ship_address_1, self.ship_address_2, self.ship_city, self.ship_state, self.ship_zip_code]
+
+    def get_addr(self):
+        return {"street1": self.ship_address_1, "street2": self.ship_address_2, "city": self.ship_city, "state": self.ship_state, "zip": self.ship_zip_code}
 
     def get_pref(self):
         return [self.cutest, self.spicy, self.allergy]

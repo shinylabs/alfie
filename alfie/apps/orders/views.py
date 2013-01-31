@@ -66,16 +66,21 @@ def cancel_order(request):
 def pay_order(request):
 	if request.method == 'POST':
 		# Set variables
-		choice=Menu.objects.get(pk=request.session['menu_choice'])
-		user=User.objects.get(pk=request.session['user'])
+		choice = Menu.objects.get(pk=request.session['menu_choice'])
+
+		user = User.objects.get(pk=request.session['user'])
+
 		if 'stripe_token' in request.POST:
 			stripe_token=request.POST['stripe_token']
+
 		if 'coupon' in request.POST:
 			coupon=request.POST['coupon']
 		else:
 			coupon = None
+
 		if 'last4' in request.POST:
 			last4=request.POST['last4']
+
 		# Create the new Order object
 		order = Order(
 				choice=choice,
@@ -83,10 +88,12 @@ def pay_order(request):
 				last_4_digits=last4,
 				last_payment_attempt=now
 		)
+
 		try:
 			order.coupon=coupon
 		except:
 			pass
+		# save the order
 		order.save()
 
 		# Update the UserProfile

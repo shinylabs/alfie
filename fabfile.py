@@ -23,6 +23,7 @@ APPS_TO_WATCH = [
     'alfie.apps.profiles', 
     'alfie.apps.ramens',
     'alfie.apps.fakers', 
+    'alfie.apps.back', 
 ]
 
 

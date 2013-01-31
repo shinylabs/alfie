@@ -51,7 +51,7 @@ def orders_index(request):
 			- CRUD menu
 			- breakdown menu
 	"""
-	return HttpResponse('orders')
+	return HttpResponse('orders this month: %s' % Order.objects.monthly_total())
 
 def finances_index(request):
 	"""
@@ -63,7 +63,7 @@ def finances_index(request):
 			- CRUD coupons
 			- poke deadbeats
 	"""
-	return HttpResponse('finances')
+	return HttpResponse('orders paid up this month: %s' % Order.objects.monthly_paid_total())
 
 def shipping_index(request):
 	"""
@@ -77,7 +77,7 @@ def shipping_index(request):
 			Users without admin permissions can only see/interact with this view
 
 	"""
-	return HttpResponse('shipping')
+	return HttpResponse('orders shipped this month: %s' % Order.objects.monthly_shipped_total())
 
 def customers_index(request):
 	"""

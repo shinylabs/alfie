@@ -1,7 +1,7 @@
 """
 //SHELL CMDS
 
-from alfie.apps.back.shipping.easyposttools import *
+from alfie.apps.back.shipping.easypostutil import *
 """
 
 from easypost import EasyPost, Address, Postage
@@ -38,6 +38,7 @@ def verify_addr(profile):
 		'state': profile.ship_state,
 		'zip': profile.ship_zip_code
 	}
+	print 'Verifying %s' % payload
 	try:
 		response = Address.verify(**payload)
 		print >>sys.stderr, response
@@ -60,7 +61,7 @@ def set_rate(profile, price):
 
 def check_rate(profile, box=None):
 	fromzip = {"from": {"zip": "95129"}}
-	tozip = {"to": {"zip": str(profile.get_addr()[-1])}}
+	tozip = {"to": {"zip": str(profile.get_addr()['zip'])}}
 
 	payload = dict(fromzip, **tozip)
 
@@ -78,8 +79,8 @@ def check_rate(profile, box=None):
 		response = Postage.rates(**payload)
 		print >>sys.stderr, response
 		for item in response['rates']:
-			if item['service'] == 'ParcelPost':
-				print >>sys.stderr, '\nParcel shipping a %s oz %s from %s to %s costs $%s' % (box['parcel']['weight'], profile.choice.name, fromzip['from']['zip'], profile.get_addr()[-1], item['rate'])
+			if item['service'] == 'ParcelSelect':
+				print >>sys.stderr, '\nParcel shipping a %s oz %s from %s to %s costs $%s' % (box['parcel']['weight'], profile.choice.name, fromzip['from']['zip'], profile.get_addr()['zip'], item['rate'])
 				set_rate(profile, float(item['rate']))
 				return float(item['rate'])
 	except:
