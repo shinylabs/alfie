@@ -318,11 +318,34 @@ class FakerManager(models.Manager):
 		print '\nStarted with %s users and verified %s customers ' % (self.count(), successcount)
 		if failcount > 0: print 'Failed to verify %s customers.\nThese failed: %s' % (failcount, badlist)
 
-	def delete_fake_orders(self):
+	def delete_fake_orders(self, when=now):
 		"""
-			Loop through and delete fake orders
+			Loop through and delete fake orders, filter based on datetime
 		"""
-		pass
+		successcount = 0
+		failcount = 0
+		badlist = []
+		for i in range(2, self.count()+2): # +2 for admin profiles
+			f = self.get(pk=i)
+			o = Order()
+			o.user = f
+			o.choice = f.profile.choice
+			try:
+				o.save()
+				# hack around auto_now_add
+				o.created = when
+				o.save()
+				print '\nCreated an order for %s' % f.username
+				successcount+=1
+			except:
+				badlist.append(f.username)
+				print '\nSomething about %s failed :(' % f.username
+				failcount+=1
+				pass
+		print '\nStarted with %s users and added %s orders in %s/%s' % (self.count(), successcount, when.month, when.year)
+		stat = Stat(key='orders', value=successcount).save()
+		if failcount > 0: print 'Failed to add %s.\nThese failed: %s' % (failcount, badlist)
+
 
 	def delete_fakers(self):
 		"""

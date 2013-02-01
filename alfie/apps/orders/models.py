@@ -1,6 +1,22 @@
 # time
 import datetime
+import calendar
 now = datetime.datetime.now()
+
+#bigups http://stackoverflow.com/questions/4130922/how-to-increment-datetime-month-in-python
+def add_months(sourcedate, months):
+    month = sourcedate.month - 1 + months
+    year = sourcedate.year + month / 12
+    month = month % 12 + 1
+    day = min(sourcedate.day, calendar.monthrange(year,month)[1])
+    return datetime.date(year, month, day)
+
+def subtract_months(sourcedate, months):
+    month = sourcedate.month - 1 - months
+    year = sourcedate.year + month / 12
+    month = month % 12 + 1
+    day = min(sourcedate.day, calendar.monthrange(year,month)[1])
+    return datetime.date(year, month, day)
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -29,7 +45,7 @@ class Menu(models.Model):
         return u'%s' % (self.name)
 
 class OrderManager(models.Manager):
-    def monthly_total(self, month=now.month):
+    def monthly_total(self, now=now):
         """
         Orders are only valid if:
             - subscribed is not null or blank
@@ -39,16 +55,25 @@ class OrderManager(models.Manager):
             - overdue is False
             - cancelled is null
         """
-        return self.filter(created__month=month).count()
+        return self.filter(year=now.year).filter(month=now.month).count()
 
-    def prev_month_total(self):
-        pass
+    def prev_month_total(self, now=now):
+        now = subtract_months(now, 1)
+        return self.filter(year=now.year).filter(month=now.month).count()
 
-    def quarterly_total(self):
-        pass
+    def quarterly_total(self, now=now):
+        count = 0
+        for i in range(3):
+            time = subtract_months(now, i)
+            count = count + self.filter(year=time.year).filter(month=time.month).count()
+        return count
 
-    def monthly_paid_total(self, month=now.month):
-        return self.filter(created__month=month).exclude(gotpaid__isnull=True).count()
+    def monthly_paid_total(self, now=now):
+        return self.filter(year=now.year).filter(month=now.month).exclude(gotpaid__isnull=True).count()
+
+    def prev_monthly_paid_total(self, now=now):
+        now = subtract_months(now, 1)
+        return self.filter(year=now.year).filter(month=now.month).exclude(gotpaid__isnull=True).count()
 
     def pay_queue(self):
         """
@@ -60,8 +85,8 @@ class OrderManager(models.Manager):
         """
         pass
 
-    def monthly_shipped_total(self, month=now.month):
-        return self.filter(created__month=month).exclude(shipped__isnull=True).count()
+    def monthly_shipped_total(self, now=now):
+        return self.filter(year=now.year).filter(month=now.month).exclude(shipped__isnull=True).count()
 
     def ship_queue(self):
         """
@@ -93,6 +118,8 @@ class Order(models.Model):
     choice = models.ForeignKey(Menu, blank=True, null=True)
     box = models.ForeignKey(Box, blank=True, null=True)
     coupon = models.CharField(max_length=25, blank=True, null=True)
+    month = models.IntegerField(max_length=2, blank=True, null=True)
+    year = models.IntegerField(max_length=4, blank=True, null=True)
 
     # Housekeeping
     created = models.DateTimeField(auto_now_add=True, editable=False)
@@ -107,6 +134,26 @@ class Order(models.Model):
     last_payment_attempt = models.DateTimeField(blank=True, null=True, editable=False)
 
     objects = OrderManager()
+
+    def check_cutoff(self):
+        """
+            If past cutoff datetime then push to next month
+            Else save for current month, year and send to shipping queue
+
+            #policy - cutoff is 7 days before last day of the month
+        """
+        import calendar     
+        #bigups http://stackoverflow.com/questions/42950/get-last-day-of-the-month-in-python
+        cutoff = calendar.monthrange(self.created.year, now.month)[1] - 7 # 24 < 31
+        if self.created.day > cutoff:
+            self.year, self.month = self.created.year, self.created.month + 1
+        else:
+            self.year, self.month = self.created.year, self.created.month
+
+    def save(self, *args, **kwargs):
+        super(Order, self).save(*args, **kwargs)
+        self.check_cutoff()
+        super(Order, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return u'Order %s for %s' % (self.id, self.user.first_name)

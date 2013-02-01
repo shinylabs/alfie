@@ -29,8 +29,12 @@ def inventory_index(request):
 	"""
 	china_count = Brand.objects.country_count('China')
 	usa_count = Brand.objects.country_count('USA')
-	total_count = Brand.objects.all().count()
-	return HttpResponse('Total brands: %s <br> %s from China <br> %s from USA' % (total_count, china_count, usa_count))
+	total_brand_count = Brand.objects.all().count()
+	total_ramen_count = Ramen.objects.all().count()
+
+	html = 	"<h1>Inventory</h1><p>Total brands: %s <br> %s from China <br> %s from USA<br><br>Total ramen: %s" % (total_brand_count, china_count, usa_count, total_ramen_count)
+
+	return HttpResponse(html)
 
 def orders_index(request):
 	"""

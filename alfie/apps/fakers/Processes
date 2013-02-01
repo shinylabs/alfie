@@ -1,0 +1,29 @@
+Processes
+
+INVENTORY
+1. Create new box and sent to box queue
+2. Review previous box stats
+3. CRUD ramen, brands, box
+
+ORDERS
+1. Customer creates new order
+2. Customer registers
+3. Customer pays order
+4. Create a new Stripe token
+5. Create a new Stripe customer
+6. Subscribe Stripe customer to subscription plan
+7. If no errors, mark current month's order paid and customer subscribed
+8. Order checks for address verification and shipping rate
+
+SHIPPING
+9. Order sent to shipping queue
+10. Order marked shipped
+11. Order complete
+
+FINANCES
+12. 30 days later customer charged
+13. Reloop order process
+
+CUSTOMERS
+1. LTV
+2. Churn-rate

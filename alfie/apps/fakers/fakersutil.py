@@ -57,7 +57,6 @@ def make_orders():
 
 def make_box():
 	"""
-	
 	"""
 	pass
 

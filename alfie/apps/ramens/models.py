@@ -70,6 +70,7 @@ class Ramen(models.Model):
 	# Housekeeping
 	created = models.DateTimeField(blank=True, null=True, editable=False, auto_now_add=True)
 	notes = models.TextField(max_length=255, blank=True, null=True)
+	boxed = models.DateTimeField(blank=True, null=True, editable=False)
 
 	objects = RamenManager()
 
@@ -116,11 +117,15 @@ class Box(models.Model):
 	def get_field_values(self):
 		return [(field.name, field.value_to_string(self)) for field in Box._meta.fields]
 
-	def get_cost(self):
+	def whats_inside(self):
+		return self.ramens.all()
+
+	def total_cost(self):
 		cost = 0
 		for ramen in self.ramens.all():
 			cost += ramen.msrp
 		self.cost = cost
+		return cost
 
 	def __unicode__(self):
 		return u'%s/%s %s' % (self.month, self.year, self.name)
