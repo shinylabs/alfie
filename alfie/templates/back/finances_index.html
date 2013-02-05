@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+
+<h1>Backoffice / Finances</h1>
+{% include "back/_nav.html" %}
+
+<p>Total: {{ total_count }}</p>
+
+{% for order in unpaid_list|slice:":10" %}
+	<li>{{ order }} - ${{ order.choice.price|floatformat:2 }}</li>
+{% endfor %}
+
+{% endblock %}

@@ -90,6 +90,10 @@ class OrderManager(models.Manager):
     def this_month_shipped(self, now=now):
         return self.filter(year=now.year).filter(month=now.month).exclude(shipped__isnull=True)
 
+    def prev_month_shipped(self, now=now):
+        now = subtract_months(now, 1)
+        return self.filter(year=now.year).filter(month=now.month).exclude(shipped__isnull=True)
+
     def unshipped_list(self, now=now):
         """
             Return of orders that need to be shipped
@@ -132,12 +136,12 @@ class Order(models.Model):
     last_payment_attempt = models.DateTimeField(blank=True, null=True, editable=False)
 
     # Bookkeeping
-    # product_cost = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
-    # prize_cost = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
-    # prints_cost = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
-    # packaging_cost = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
-    # shipping_cost = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
-    # stripe_fee = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
+    product_cost = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
+    prize_cost = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
+    prints_cost = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
+    packaging_cost = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
+    shipping_cost = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
+    stripe_fee = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
 
     objects = OrderManager()
 
@@ -163,3 +167,13 @@ class Order(models.Model):
 
     def __unicode__(self):
         return u'Order %s for %s' % (self.id, self.user.first_name)
+
+"""
+
+#todo
+
+1. check if order is paid with stripe
+2. calc bookkeeping fields
+
+
+"""

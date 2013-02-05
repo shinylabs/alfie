@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+
+<h1>Backoffice / Shipping</h1>
+{% include "back/_nav.html" %}
+
+<p>Total: {{ total_count }}</p>
+
+{% for order in unshipped_list|slice:":10" %}
+	<li>{{ order }} - {{ order.user.profile.ship_state }}</li>
+{% endfor %}
+
+{% endblock %}

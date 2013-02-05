@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+
+<h1>Backoffice / Orders</h1>
+{% include "back/_nav.html" %}
+
+<table class="twelve">
+	<thead>
+		<tr><th>Month</th><th>Current</th><th>Paid</th><th>Shipped</th></tr>
+	</thead>
+	<tbody>
+		
+		<tr><td>JAN</td><td>{{ prev_month_count }}</td><td>{{ prev_paid_count }}</td><td>{{ prev_shipped_count }}</td></tr>
+
+		<tr><td>FEB</td><td>{{ this_month_count }}</td><td>{{ paid_count }}</td><td>{{ shipped_count }}</td></tr>
+
+		<tr><td>MAR</td><td>{{ next_month_count }}</td><td>{{ next_paid_count }}</td><td>{{ next_shipped_count }}</td></tr>
+		
+		<tr><td width="20%"><strong>Total count:</strong></td><td colspan="3">{{ total_count }}</td></tr>
+	</tbody>
+</table>
+
+{% endblock %}

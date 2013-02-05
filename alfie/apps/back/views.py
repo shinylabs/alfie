@@ -7,6 +7,7 @@ from alfie.apps.orders.models import *
 #### time utilities ####
 #todo - move these to a separate module or util file
 import datetime
+import calendar
 now = datetime.datetime.now()
 
 #bigups http://blog.e-shell.org/94
@@ -50,7 +51,7 @@ from alfie.apps.ramens.models import Brand, Flavor, Ramen, Box
 from alfie.apps.back.finance.stripeutil import *
 
 def backoffice(request):
-	return HttpResponse('<a href="inventory">Inventory</a> | <a href="orders">Orders</a> | <a href="finances">Finances</a> | <a href="shipping">Shipping</a> | <a href="customers">Customers</a> ')
+	return render_to_response('back/_index.html', context_instance=RequestContext(request))
 
 def inventory_index(request):
 	"""
@@ -61,9 +62,14 @@ def inventory_index(request):
 	total_brand_count = Brand.objects.all().count()
 	total_ramen_count = Ramen.objects.all().count()
 
-	html = 	"<h1>Inventory</h1><p>Total brands: %s <br> %s from China <br> %s from USA<br><br>Total ramen: %s</p>" % (total_brand_count, china_count, usa_count, total_ramen_count)
-
-	return HttpResponse(html)
+	return render_to_response('back/inventory_index.html', 
+		{
+		 'total_brand_count': total_brand_count, 
+		 'china_count': china_count, 
+		 'usa_count': usa_count, 
+		 'total_ramen_count': total_ramen_count
+		 }, 
+		context_instance=RequestContext(request))
 
 def orders_index(request):
 	"""
@@ -95,19 +101,32 @@ def orders_index(request):
 			- breakdown menu
 	"""
 	total_count = Order.objects.count()
-	month_count = Order.objects.this_month().count()
+	prev_month_count = Order.objects.prev_month().count()
+	this_month_count = Order.objects.this_month().count()
+	next_month_count = Order.objects.this_month(add_months(now, 1)).count()
+
+	prev_paid_count = Order.objects.prev_month_paid().count()
 	paid_count = Order.objects.this_month_paid().count()
+	next_paid_count = Order.objects.this_month_paid(add_months(now, 1)).count()
+
+	prev_shipped_count = Order.objects.prev_month_shipped().count()
 	shipped_count = Order.objects.this_month_shipped().count()
-	html = "<h1>Orders</h1><p>Total orders: %s<br>%s this month <br> %s paid this month <input type='button' value='charge orders'> <br> %s shipped this month <input type='button' value='ship orders'></p>" % (total_count, month_count, paid_count, shipped_count)
+	next_shipped_count = Order.objects.this_month_shipped(add_months(now, 1)).count()
 
-	return HttpResponse(html)
-
-class OrderListView(ListView):
-	pass
-
-class OrderDetailView(DetailView):
-	pass
-
+	return render_to_response('back/orders_index.html', 
+		{	
+		 'total_count': total_count, 
+		 'prev_month_count': prev_month_count, 
+		 'this_month_count': this_month_count, 
+		 'next_month_count': next_month_count,
+		 'prev_paid_count': prev_paid_count,
+		 'paid_count': paid_count, 
+		 'next_paid_count': next_paid_count,
+		 'prev_shipped_count': prev_shipped_count,
+		 'shipped_count': shipped_count,
+		 'next_shipped_count': next_shipped_count
+		 }, 
+		context_instance=RequestContext(request))
 
 def finances_index(request):
 	"""
@@ -119,7 +138,16 @@ def finances_index(request):
 			- CRUD coupons
 			- poke deadbeats
 	"""
-	return HttpResponse('orders paid up this month: %s' % Order.objects.monthly_paid_total())
+	total_count = Order.objects.count()
+	unpaid_list = Order.objects.unpaid_list()
+
+	return render_to_response('back/finances_index.html', 
+		{	
+		 'total_count': total_count, 
+		 'unpaid_list': unpaid_list
+		 }, 
+		context_instance=RequestContext(request))
+
 
 def shipping_index(request):
 	"""
@@ -133,7 +161,15 @@ def shipping_index(request):
 			Users without admin permissions can only see/interact with this view
 
 	"""
-	return HttpResponse('orders shipped this month: %s' % Order.objects.monthly_shipped_total())
+	total_count = Order.objects.count()
+	unshipped_list = Order.objects.unshipped_list()
+
+	return render_to_response('back/shipping_index.html', 
+		{	
+		 'total_count': total_count, 
+		 'unshipped_list': unshipped_list
+		 }, 
+		context_instance=RequestContext(request))
 
 def customers_index(request):
 	"""
@@ -145,45 +181,12 @@ def customers_index(request):
 
 		Show service tools
 	"""
-	return HttpResponse('customers')
-
-
-
-
-def backoffice_old(request):
-	a_count = Profile.objects.filter(choice__id=1).count()
-	b_count = Profile.objects.filter(choice__id=2).count()
-	c_count = Profile.objects.filter(choice__id=3).count()
-
-	inv_count = Order.objects.aggregate(Sum('choice__slots')).values()[0]
-	box_a_count = Order.objects.filter(choice__id=1).filter(created__month=now.month).count()
-	box_b_count = Order.objects.filter(choice__id=2).filter(created__month=now.month).count()
-	box_c_count = Order.objects.filter(choice__id=3).filter(created__month=now.month).count()
-
-	try:
-		total_rev = moneyfmt(Order.objects.aggregate(Sum('choice__price')).values()[0], curr='$')
-	except:
-		total_rev = 0
-
-	return render_to_response('back/office.html', {'a_count': a_count, 'b_count': b_count, 'c_count': c_count, 'inv_count': inv_count, 'box_a_count': box_a_count, 'box_b_count': box_b_count, 'box_c_count': box_c_count, 'total_rev': total_rev}, context_instance=RequestContext(request))
-
-def finance_tools(request):
-	return render_to_response('back/finance_tools.html', context_instance=RequestContext(request))
-
-def finance_coupon(request):
-	# When a form is sent
-	if request.method == 'POST': 
-		coupon_id = request.POST['id']
-		percent_off = request.POST['percent_off']
-		max_redemptions = request.POST['max']
-		response = create_coupon(name=coupon_id, percent_off=percent_off, max_redemptions=max_redemptions)
-		return HttpResponse(response)
-
-	coupons = coupon_list()
-	return render_to_response('back/finance_coupon.html', {'coupons': coupons}, context_instance=RequestContext(request))
-
-def logistics_tools(request):
-	return render_to_response('back/logistics_tools.html', context_instance=RequestContext(request))
+	total_count = Profile.objects.count()
+	return render_to_response('back/customers_index.html', 
+		{	
+		 'total_count': total_count
+		 }, 
+		context_instance=RequestContext(request))
 
 # http://www.nerdydork.com/django-filter-model-on-date-range.html
 
@@ -191,14 +194,19 @@ def logistics_tools(request):
 
 """
 
-Profit/Loss
+#todo
 
-Revenue
-(Products)
-(Costs)
-(Fees)
-(Shipping)
-===
-Total
+1. Templates
+2. Actions
+3. Reporting
+
+Profit/Loss Report
+	Revenue
+	(Products)
+	(Costs)
+	(Fees)
+	(Shipping)
+	===
+	Total
 
 """
