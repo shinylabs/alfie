@@ -45,7 +45,7 @@ class Menu(models.Model):
         return u'%s' % (self.name)
 
 class OrderManager(models.Manager):
-    def monthly_total(self, now=now):
+    def this_month(self, now=now):
         """
         Orders are only valid if:
             - subscribed is not null or blank
@@ -55,52 +55,50 @@ class OrderManager(models.Manager):
             - overdue is False
             - cancelled is null
         """
-        return self.filter(year=now.year).filter(month=now.month).count()
+        return self.filter(year=now.year).filter(month=now.month)
 
-    def prev_month_total(self, now=now):
+    def prev_month(self, now=now):
         now = subtract_months(now, 1)
-        return self.filter(year=now.year).filter(month=now.month).count()
+        return self.filter(year=now.year).filter(month=now.month)
 
-    def quarterly_total(self, now=now):
+    def quarterly(self, now=now):
         count = 0
         for i in range(3):
             time = subtract_months(now, i)
-            count = count + self.filter(year=time.year).filter(month=time.month).count()
+            count = count + self.filter(year=time.year).filter(month=time.month)
         return count
 
-    def monthly_paid_total(self, now=now):
-        return self.filter(year=now.year).filter(month=now.month).exclude(gotpaid__isnull=True).count()
+    def this_month_paid(self, now=now):
+        return self.filter(year=now.year).filter(month=now.month).exclude(gotpaid__isnull=True)
 
-    def prev_monthly_paid_total(self, now=now):
+    def prev_month_paid(self, now=now):
         now = subtract_months(now, 1)
-        return self.filter(year=now.year).filter(month=now.month).exclude(gotpaid__isnull=True).count()
+        return self.filter(year=now.year).filter(month=now.month).exclude(gotpaid__isnull=True)
 
-    def pay_queue(self):
+    def pay_orders(self):
         """
-        Show queue of orders that need to be paid
-
-        Num of orders paid / num of orders this month
-
-        Num orders paid - num of orders = payment queue
+            Call up Stripe API and verify if order has been paid, else charge order, then update Order object
         """
         pass
 
-    def monthly_shipped_total(self, now=now):
-        return self.filter(year=now.year).filter(month=now.month).exclude(shipped__isnull=True).count()
-
-    def ship_queue(self):
+    def unpaid_list(self, now=now):
         """
-        Show queue of orders that need to be shipped
-
-        Num of orders shipped / num of orders paid
-
-        Num of orders shipped - num of orders paid = # to insert to ship queue 
-
-        Ship queue pulls box fk to see what inventory needs to be pullled
-
-        Ship queue is removed when confirmed as shipped 
+            Return orders that need to be paid
         """
-        pass
+        return self.filter(year=now.year).filter(month=now.month).filter(gotpaid__isnull=True)
+
+    def this_month_shipped(self, now=now):
+        return self.filter(year=now.year).filter(month=now.month).exclude(shipped__isnull=True)
+
+    def unshipped_list(self, now=now):
+        """
+            Return of orders that need to be shipped
+
+            Ship queue pulls box fk to see what inventory needs to be pullled
+
+            Ship queue is removed when confirmed as shipped 
+        """
+        return self.filter(year=now.year).filter(month=now.month).filter(shipped__isnull=True)
 
 class Order(models.Model):
     """
@@ -132,6 +130,14 @@ class Order(models.Model):
     last_4_digits = models.CharField(max_length=4, blank=True, null=True)
     payment_attempts = models.IntegerField(blank=True, null=True)
     last_payment_attempt = models.DateTimeField(blank=True, null=True, editable=False)
+
+    # Bookkeeping
+    # product_cost = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
+    # prize_cost = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
+    # prints_cost = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
+    # packaging_cost = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
+    # shipping_cost = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
+    # stripe_fee = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
 
     objects = OrderManager()
 

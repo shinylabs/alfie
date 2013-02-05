@@ -24,6 +24,24 @@ stripe.api_key = settings.TEST_STRIPE_API_KEY
 # profile = p.profile_ptr
 # fakeprofile = p
 
+def create_plans():
+	"""
+		Create and map Stripe plan objects out of Menu objects
+
+		Stripe API:
+			https://stripe.com/docs/api#plans
+
+		Params:
+			- name			-> Menu.name
+			- amount		-> Menu.price (in cents)
+			- interval		-> "month"
+			- currency		-> "usd"
+			- objects		-> "plan"
+			- id 			-> Menu.name.lower()
+			- livemode	 	-> true
+	"""
+	pass
+
 def fake_numbers():
 	"""
 		Old fake numbers generator
