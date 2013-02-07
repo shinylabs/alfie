@@ -1,5 +1,13 @@
 """
-//SHELL CMDS
+// REMEMBER, REMEMBER
+
+FAT MODELS, SKINNY CONTROLLERS
+
+"""
+
+
+"""
+// SHELL CMDS
 
 from alfie.apps.orders.models import *
 """

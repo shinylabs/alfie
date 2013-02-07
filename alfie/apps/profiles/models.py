@@ -1,3 +1,9 @@
+"""
+// SHELL CMDS
+
+from alfie.apps.profiles.models import *
+"""
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _

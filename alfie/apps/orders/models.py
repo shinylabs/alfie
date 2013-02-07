@@ -1,3 +1,9 @@
+"""
+// SHELL CMDS
+
+from alfie.apps.orders.models import *
+"""
+
 # time
 import datetime
 import calendar
@@ -75,12 +81,6 @@ class OrderManager(models.Manager):
         now = subtract_months(now, 1)
         return self.filter(year=now.year).filter(month=now.month).exclude(gotpaid__isnull=True)
 
-    def pay_orders(self):
-        """
-            Call up Stripe API and verify if order has been paid, else charge order, then update Order object
-        """
-        pass
-
     def unpaid_list(self, now=now):
         """
             Return orders that need to be paid
@@ -144,6 +144,21 @@ class Order(models.Model):
     stripe_fee = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
 
     objects = OrderManager()
+
+    def check_paid(self):
+        """
+            Call up Stripe API and verify if order has been paid, else charge order, then update Order object
+        """
+        import stripe
+        from django.conf import settings
+        stripe.api_key = settings.TEST_STRIPE_API_KEY
+
+        cust_id = self.user.profile.stripe_cust_id
+        resp = stripe.Charge.all(customer=cust_id)
+
+        if resp['data'][0]['paid'] is True:
+            self.gotpaid = now;
+            self.save()
 
     def check_cutoff(self):
         """
