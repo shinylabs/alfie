@@ -34,7 +34,7 @@ class Profile(UserenaBaseProfile):
     ship_state = USStateField(_("State"), blank=True, null=True)
     ship_zip_code = models.CharField(_("Zip code"), max_length=5, blank=True, null=True)
     address_verified = models.BooleanField(default=False)
-    shipping_rate = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
+    shipping_rate = models.IntegerField(max_length=7, blank=True, null=True)
 
     # Preferences
     #bigups http://stackoverflow.com/questions/2726476/django-multiple-choice-field-checkbox-select-multiple
@@ -91,8 +91,12 @@ class Profile(UserenaBaseProfile):
 	# Payment info
     stripe_cust_id = models.CharField(max_length=100, blank=True, null=True)
     stripe_token = models.CharField(max_length=255, blank=True, null=True)
-    last_4_digits = models.CharField(max_length=4, blank=True, null=True)
+    last4 = models.IntegerField(max_length=4, blank=True, null=True)
     overdue = models.BooleanField(default=False)
+
+    def check_shipping_rate(self):
+        from alfie.apps.back.shipping.easypostutil import *
+        check_rate(self)
 
     def get_addr_values(self):
         return [self.ship_address_1, self.ship_address_2, self.ship_city, self.ship_state, self.ship_zip_code]

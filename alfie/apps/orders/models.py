@@ -44,7 +44,7 @@ class Menu(models.Model):
 
     name = models.CharField(max_length=128, blank=True, null=True)
     slots = models.CharField(max_length=128, blank=True, null=True)
-    price = models.DecimalField(max_digits=7, decimal_places=2)
+    price = models.IntegerField(max_length=7) # price in pennies
     notes = models.TextField(max_length=255, blank=True, null=True)
 
     def __unicode__(self):
@@ -131,19 +131,34 @@ class Order(models.Model):
     notes = models.CharField(max_length=255, blank=True, null=True)
 
     # Payment info
-    last_4_digits = models.CharField(max_length=4, blank=True, null=True)
+    last4 = models.IntegerField(max_length=4, blank=True, null=True)
     payment_attempts = models.IntegerField(blank=True, null=True)
     last_payment_attempt = models.DateTimeField(blank=True, null=True, editable=False)
 
     # Bookkeeping
-    product_cost = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
-    prize_cost = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
-    prints_cost = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
-    packaging_cost = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
-    shipping_cost = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
-    stripe_fee = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
+    product_cost = models.IntegerField(max_length=7, blank=True, null=True)
+    prize_cost = models.IntegerField(max_length=7, blank=True, null=True)
+    prints_cost = models.IntegerField(max_length=7, blank=True, null=True)
+    packaging_cost = models.IntegerField(max_length=7, blank=True, null=True)
+    shipping_cost = models.IntegerField(max_length=7, blank=True, null=True)
+    stripe_fee = models.IntegerField(max_length=7, blank=True, null=True)
 
     objects = OrderManager()
+
+    def check_card(self):
+        """
+            Call up Stripe API and save last4
+        """
+        import stripe
+        from django.conf import settings
+        stripe.api_key = settings.TEST_STRIPE_API_KEY
+
+        cust_id = self.user.profile.stripe_cust_id
+        resp = stripe.Charge.all(customer=cust_id)
+
+        if resp['data'][0]['card']['last4']:
+            self.last4 = resp['data'][0]['card']['last4'];
+            self.save()        
 
     def check_paid(self):
         """
@@ -159,6 +174,21 @@ class Order(models.Model):
         if resp['data'][0]['paid'] is True:
             self.gotpaid = now;
             self.save()
+
+    def check_stripe_fee(self):
+        """
+            Call up Stripe API and save last4
+        """
+        import stripe
+        from django.conf import settings
+        stripe.api_key = settings.TEST_STRIPE_API_KEY
+
+        cust_id = self.user.profile.stripe_cust_id
+        resp = stripe.Charge.all(customer=cust_id)
+
+        if resp['data'][0]['fee']:
+            self.stripe_fee = resp['data'][0]['fee'];
+            self.save()    
 
     def check_cutoff(self):
         """

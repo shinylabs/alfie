@@ -53,7 +53,7 @@ def verify_addr(profile):
 
 def set_rate(profile, price):
 	try:
-		profile.shipping_rate = price
+		profile.shipping_rate = price * 100
 		profile.save()
 		return True
 	except:

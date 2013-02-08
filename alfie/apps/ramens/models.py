@@ -45,8 +45,8 @@ class Ramen(models.Model):
 	upc = models.CharField(max_length=128, blank=True, null=True)
 	brand = models.ForeignKey(Brand, blank=True, null=True)
 	name = models.CharField(max_length=255)
-	cogs = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
-	msrp = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
+	cogs = models.IntegerField(max_length=7, blank=True, null=True)
+	msrp = models.IntegerField(max_length=7, blank=True, null=True)
 
 	# Description
 	description = models.TextField(max_length=255, blank=True, null=True)
@@ -103,7 +103,7 @@ class Box(models.Model):
 	"""
 	name = models.CharField(max_length=255)
 	slots = models.IntegerField(max_length=2)
-	cost = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
+	cost = models.IntegerField(max_length=7, blank=True, null=True)
 	notes = models.TextField(max_length=255, blank=True, null=True)
 	month = models.IntegerField(max_length=2)
 	year = models.IntegerField(max_length=4)
