@@ -1,4 +1,4 @@
-<input type="hidden" name="last_4_digits" id="last_4_digits" value="{{ form.last_4_digits.value }}">
+<input type="hidden" name="last4" id="last4" value="{{ form.last4.value }}">
 <input type="hidden" name="stripe_token" id="stripe_token" value="{{ form.stripe_token.value }}">
 
 <noscript>
@@ -7,7 +7,7 @@
   &lt;/p&gt;
 </noscript>
 
-<div id="credit-card"{% if form.last_4_digits.value %} style="display: none"{% endif %}>
+<div id="credit-card"{% if form.last4.value %} style="display: none"{% endif %}>
   <div id="credit-card-errors" style="display:none">
     <div class="alert-message block-message error" id="stripe-error-message"></div>
   </div>

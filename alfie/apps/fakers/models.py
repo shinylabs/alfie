@@ -210,7 +210,7 @@ class FakerManager(models.Manager):
 					)
 					print 'Made a token for %s' % f.username
 					f.profile.stripe_token = response.id
-					f.profile.last_4_digits = response.card.last4
+					f.profile.last4 = response.card.last4
 					f.profile.save()
 					successcount+=1
 					print 'Saved token for %s\n' % f.username

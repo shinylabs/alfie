@@ -1,7 +1,38 @@
+"""
+// SHELL CMDS
+
+from alfie.apps.ramens.models import *
+from alfie.apps.orders.models import Menu
+"""
+
+# time
+import datetime
+import calendar
+now = datetime.datetime.now()
+
+#bigups http://stackoverflow.com/questions/4130922/how-to-increment-datetime-month-in-python
+def add_months(sourcedate, months):
+    month = sourcedate.month - 1 + months
+    year = sourcedate.year + month / 12
+    month = month % 12 + 1
+    day = min(sourcedate.day, calendar.monthrange(year,month)[1])
+    return datetime.date(year, month, day)
+
+def subtract_months(sourcedate, months):
+    month = sourcedate.month - 1 - months
+    year = sourcedate.year + month / 12
+    month = month % 12 + 1
+    day = min(sourcedate.day, calendar.monthrange(year,month)[1])
+    return datetime.date(year, month, day)
+
 from django.core.urlresolvers import reverse
 from django.db import models
+from django.db.models import Count
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
+
+# Other app models
+#from alfie.apps.orders.models import *
 
 # Where to store all the images in devmode
 MEDIA_PATH = 'alfie/media/'
@@ -87,13 +118,36 @@ class Ramen(models.Model):
 			obj_desc = obj_desc + u' from %s' % (self.brand.origin)
 		return obj_desc
 
+#tasks move Box into its own app
+class BoxManager(models.Manager):
+	def create_box(self, menu, when=now):
+		box = self.create(
+			month=when.month, 
+			year=when.year,
+			slots=menu.slots,
+			)
+		#return "Making a %s box with %s slots for %s/%s" % (menu.name, menu.slots, when.month, when.year)
+		return box
+
+	def create_boxes(self):
+		# import Menu
+		from alfie.apps.orders.models import Menu
+		# check latest box
+		from django.db.models import Max
+		max_month = Box.objects.all().aggregate(Max('month'))['month__max'] #
+		push = add_months(now, max_month-now.month+1)
+		# loop through menu and create boxes
+		for i in range(Menu.objects.count()):
+			self.create_box(Menu.objects.all()[i], push)
+
+	def this_months_boxes(self, when=now):
+		return self.filter(year=when.year).filter(month=when.month)
+
 class Box(models.Model):
 	"""
-		Req:
-
 		Create box for every menu object every month
 
-		Each box has number of ramen slots defined by Box.slots from menu object
+		Each box has number of slots from Menu.objects.slots
 
 		Each box has m2m relationship to ramens in the box
 
@@ -101,14 +155,21 @@ class Box(models.Model):
 
 		Each monthly order has a monthly box object
 	"""
-	name = models.CharField(max_length=255)
-	slots = models.IntegerField(max_length=2)
-	cost = models.IntegerField(max_length=7, blank=True, null=True)
-	notes = models.TextField(max_length=255, blank=True, null=True)
 	month = models.IntegerField(max_length=2)
 	year = models.IntegerField(max_length=4)
-	ramens = models.ManyToManyField(Ramen, related_name='ramens')	
+
+	#tasks change this to a FK to Menu
+	#menu = models.ForeignKey('alfie.apps.orders.models.Menu')
+	slots = models.IntegerField(blank=True, null=True)
+	ramens = models.ManyToManyField(Ramen, related_name='ramens', blank=True, null=True)
+	cost = models.IntegerField(max_length=7, blank=True, null=True)
+
+	# Housekeeping
 	created = models.DateTimeField(blank=True, null=True, editable=False, auto_now_add=True)
+	updated = models.DateTimeField(auto_now=True, editable=False)
+	notes = models.TextField(max_length=255, blank=True, null=True)
+
+	objects = BoxManager()
 
 	def get_absolute_url(self):
 		return reverse('box_detail', args=[self.pk])
@@ -128,7 +189,7 @@ class Box(models.Model):
 		return cost
 
 	def __unicode__(self):
-		return u'%s/%s %s' % (self.month, self.year, self.name)
+		return u'%s/%s Box with %s slots' % (self.month, self.year, self.slots)
 
 	class Meta:
 		verbose_name_plural = "boxes"

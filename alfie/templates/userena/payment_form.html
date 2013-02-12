@@ -55,10 +55,10 @@ $(document).ready(function() {
 
 {% include "userena/_nav.html" %}
 
-{% if profile.last_4_digits %}
+{% if profile.last4 %}
 <div class="panel">
     <h4>Current payment info</h4>
-    <p>Last card used: **** **** **** {{ profile.last_4_digits }}</p>
+    <p>Last card used: **** **** **** {{ profile.last4 }}</p>
 </div>
 {% endif %}
 

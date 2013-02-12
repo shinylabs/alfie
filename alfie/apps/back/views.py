@@ -47,6 +47,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.core.urlresolvers import reverse_lazy
 from django.core.paginator import Paginator
 from django.db.models import Sum
+from django.db.models import Count
 #bigups http://stackoverflow.com/questions/5757094/decimal-zero-padding
 from util import moneyfmt
 
@@ -65,16 +66,16 @@ def inventory_index(request):
 	"""
 		Manages ramens, brands, boxes
 	"""
-	china_count = Brand.objects.country_count('China')
-	usa_count = Brand.objects.country_count('USA')
+	brand_origins = Brand.objects.values('origin').annotate(num_of_ramens=Count('id')).order_by('-num_of_ramens')
+	ramen_origins = Ramen.objects.values('brand__origin').annotate(num_of_ramens=Count('id')).order_by('-num_of_ramens')
 	total_brand_count = Brand.objects.all().count()
 	total_ramen_count = Ramen.objects.all().count()
 
 	return render_to_response('back/inventory_index.html', 
 		{
+		 'brand_origins': brand_origins, 
+		 'ramen_origins': ramen_origins, 
 		 'total_brand_count': total_brand_count, 
-		 'china_count': china_count, 
-		 'usa_count': usa_count, 
 		 'total_ramen_count': total_ramen_count
 		 }, 
 		context_instance=RequestContext(request))

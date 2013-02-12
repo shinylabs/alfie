@@ -69,7 +69,7 @@ class EditMenuChoiceForm(forms.ModelForm):
 class EditPaymentForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ('last_4_digits',)
+        fields = ('last4',)
 
 class EditPrefsForm(forms.ModelForm):
     class Meta:

@@ -1,5 +1,11 @@
 """
 from alfie.apps.ramens.ramenutil import *
+
+brandslist = load_csv(brandscsv)
+ramensdict = load_csv_dict(ramenscsv)
+make_brands(brandslist)
+make_ramens(ramensdict)
+
 """
 
 import csv
@@ -87,6 +93,3 @@ def make_boxes():
 
 def make_flavors():
 	pass
-
-brandslist = load_csv(brandscsv)
-ramensdict = load_csv_dict(ramenscsv)

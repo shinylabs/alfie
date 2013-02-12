@@ -85,7 +85,7 @@ def pay_order(request):
 		order = Order(
 				choice=choice,
 				user=user,
-				last_4_digits=last4,
+				last4=last4,
 				last_payment_attempt=now
 		)
 
@@ -104,7 +104,7 @@ def pay_order(request):
 		# create_customer imported from stripeutil.py
 		profile.stripe_cust_id = create_customer(profile, stripe_token, coupon=coupon)
 		profile.stripe_token = stripe_token
-		profile.last_4_digits = last4
+		profile.last4 = last4
 		profile.save()
 
 		# Verify address

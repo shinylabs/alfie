@@ -9,14 +9,11 @@
 <h1>Backoffice / Inventory</h1>
 {% include "back/_nav.html" %}
 
-<table class="twelve">
-	<thead>
-		<tr><th></th><th>Total</th><th>China</th><th>USA</th></tr>
-	</thead>
-	<tbody>
-		<tr><td width="20%"><strong>Brands</strong></td><td>{{ total_brand_count }}</td><td>{{ china_count }}</td><td>{{ usa_count }}</td></tr>
-		<tr><td><strong>Ramens</strong></td><td>{{ total_ramen_count }}</td><td>{{ china_count }}</td><td>{{ usa_count }}</td></tr>
-	</tbody>
+<table width="100%">
+{% for i in ramen_origins %}
+	<tr><td width="10%">{{ forloop.counter }}</td><td width="50%">{{ i.brand__origin }}</td><td width="50%">{{ i.num_of_ramens }}</td></tr>
+{% endfor %}
+	<tr><td></td><td>Total</td><td>{{ total_ramen_count }}</td></tr>
 </table>
 
 {% endblock %}

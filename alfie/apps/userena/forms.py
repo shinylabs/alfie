@@ -225,8 +225,8 @@ class EditProfileForm(forms.ModelForm):
 
     class Meta:
         model = get_profile_model()
-        #exclude = ['user', 'choice', 'mugshot', 'privacy', 'cutest', 'spicy', 'allergy', 'subscribed', 'cancelled', 'killed', 'updated', 'notes', 'last_4_digits',]
-        fields = ['ship_address_1', 'ship_address_2', 'ship_city', 'ship_state', 'ship_zip_code', 'last_4_digits']
+        #exclude = ['user', 'choice', 'mugshot', 'privacy', 'cutest', 'spicy', 'allergy', 'subscribed', 'cancelled', 'killed', 'updated', 'notes', 'last4',]
+        fields = ['ship_address_1', 'ship_address_2', 'ship_city', 'ship_state', 'ship_zip_code', 'last4']
 
     def save(self, force_insert=False, force_update=False, commit=True):
         profile = super(EditProfileForm, self).save(commit=commit)
