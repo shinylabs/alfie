@@ -147,13 +147,26 @@ def finances_index(request):
 			- CRUD coupons
 			- poke deadbeats
 	"""
+	from decimal import *
 	total_count = Order.objects.count()
+	this_month_count = Order.objects.this_month().count()
 	unpaid_list = Order.objects.unpaid_list()
+	revenue = Decimal(Order.objects.this_month().aggregate(Sum('choice__price'))['choice__price__sum']) / 100
+	shipping_costs = Decimal(Order.objects.this_month().aggregate(Sum('shipping_cost'))['shipping_cost__sum']) / 100
+	product_costs = Decimal(Order.objects.this_month().aggregate(Sum('product_cost'))['product_cost__sum']) / 100
+	fees = Decimal(Order.objects.this_month().aggregate(Sum('stripe_fee'))['stripe_fee__sum']) / 100
+	profit = revenue - shipping_costs - product_costs - fees
 
 	return render_to_response('back/finances_index.html', 
 		{	
 		 'total_count': total_count, 
-		 'unpaid_list': unpaid_list
+		 'this_month_count': this_month_count,
+		 'unpaid_list': unpaid_list,
+		 'revenue': revenue,
+		 'shipping_costs': shipping_costs,
+		 'product_costs': product_costs,
+		 'fees': fees,
+		 'profit': profit
 		 }, 
 		context_instance=RequestContext(request))
 

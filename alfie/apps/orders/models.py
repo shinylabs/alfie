@@ -188,7 +188,16 @@ class Order(models.Model):
 
         if resp['data'][0]['fee']:
             self.stripe_fee = resp['data'][0]['fee'];
-            self.save()    
+            self.save()
+
+    def check_costs(self):
+        total = (self.product_cost if self.product_cost is not None else 0)
+        total += (self.prize_cost if self.prize_cost is not None else 0)
+        total += (self.prints_cost if self.prints_cost is not None else 0) 
+        total += (self.packaging_cost if self.packaging_cost is not None else 0) 
+        total += (self.shipping_cost if self.shipping_cost is not None else 0) 
+        total += (self.stripe_fee if self.stripe_fee is not None else 0)
+        return total
 
     def check_cutoff(self):
         """

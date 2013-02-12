@@ -184,7 +184,7 @@ class Box(models.Model):
 	def total_cost(self):
 		cost = 0
 		for ramen in self.ramens.all():
-			cost += ramen.msrp
+			cost += ramen.cogs
 		self.cost = cost
 		return cost
 

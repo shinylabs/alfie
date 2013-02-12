@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load humanize %}
 
 {% block css %}
 {% endblock %}
@@ -9,10 +10,21 @@
 <h1>Backoffice / Finances</h1>
 {% include "back/_nav.html" %}
 
-<p>Total: {{ total_count }}</p>
+<table class="twelve">
+	<thead><tr><th>Feb</th><th>{{ this_month_count }} orders</th></tr></thead>
+	<tbody>
+	<tr><td>Revenue</td><td>${{ revenue|floatformat:"2"|intcomma }}</td></tr>
+	<tr><td>Products</td><td><em>${{ product_costs|floatformat:"2"|intcomma }}</em></td></tr>
+	<tr><td>Shipping</td><td><em>${{ shipping_costs|floatformat:"2"|intcomma }}</em></td></tr>
+	<tr><td>Fees</td><td><em>${{ fees|floatformat:"2"|intcomma }}</em></td></tr>
+	<tr><td>Profit</td><td>${{ profit|floatformat:"2"|intcomma }}</td></tr>
+</tbody>
+</table>
 
 {% for order in unpaid_list|slice:":10" %}
 	<li>{{ order }} - ${{ order.choice.price|floatformat:2 }}</li>
 {% endfor %}
+
+<p>Total orders: {{ total_count }}</p>
 
 {% endblock %}
