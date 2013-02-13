@@ -16,10 +16,26 @@
 	<tr><td>Revenue</td><td>${{ revenue|floatformat:"2"|intcomma }}</td></tr>
 	<tr><td>Products</td><td><em>${{ product_costs|floatformat:"2"|intcomma }}</em></td></tr>
 	<tr><td>Shipping</td><td><em>${{ shipping_costs|floatformat:"2"|intcomma }}</em></td></tr>
+	<tr><td>Prizes</td><td><em>${{ testprize_costs|floatformat:"2"|intcomma }}</em></td></tr>
+	<tr><td>Packaging</td><td><em>${{ packaging_costs|floatformat:"2"|intcomma }}</em></td></tr>
+	<tr><td>Prints</td><td><em>${{ prints_cost|floatformat:"2"|intcomma }}</em></td></tr>
 	<tr><td>Fees</td><td><em>${{ fees|floatformat:"2"|intcomma }}</em></td></tr>
 	<tr><td>Profit</td><td>${{ profit|floatformat:"2"|intcomma }}</td></tr>
 </tbody>
 </table>
+
+<form action="" method="post">{% csrf_token %}
+	<input type="text" name="amt">
+	<select name="lineitem">
+		<option value="prize_cost">prizes</option>
+		<option value="prints_cost">prints</option>
+		<option value="packaging_cost">packaging</option>
+		<option value="shipping_cost">shipping</option>
+		<option value="stripe_fees">fees</option>
+		<option value="product_cost">products</option>
+	</select>
+	<input type="submit" value="Submit">
+</form>
 
 {% for order in unpaid_list|slice:":10" %}
 	<li>{{ order }} - ${{ order.choice.price|floatformat:2 }}</li>

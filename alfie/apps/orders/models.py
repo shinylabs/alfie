@@ -104,6 +104,17 @@ class OrderManager(models.Manager):
         """
         return self.filter(year=now.year).filter(month=now.month).filter(shipped__isnull=True)
 
+    def add_lineitem(self, amt, item, orders):
+        """
+            Takes in amount, lineitem, and order list
+
+            Based on lineitem, affect amount onto orders
+        """
+        amount = amt / orders.count()
+        for order in orders:
+            setattr(order, item, amount)
+            order.save()
+
 class Order(models.Model):
     """
     Creates a Order object that defines an order to be filled and shipped.
@@ -136,6 +147,7 @@ class Order(models.Model):
     last_payment_attempt = models.DateTimeField(blank=True, null=True, editable=False)
 
     # Bookkeeping
+    #tasks default these to 0
     product_cost = models.IntegerField(max_length=7, blank=True, null=True)
     prize_cost = models.IntegerField(max_length=7, blank=True, null=True)
     prints_cost = models.IntegerField(max_length=7, blank=True, null=True)

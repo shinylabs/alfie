@@ -46,6 +46,7 @@ from django.views.generic import TemplateView
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy
 from django.core.paginator import Paginator
+from django.core.context_processors import csrf
 from django.db.models import Sum
 from django.db.models import Count
 #bigups http://stackoverflow.com/questions/5757094/decimal-zero-padding
@@ -151,11 +152,22 @@ def finances_index(request):
 	total_count = Order.objects.count()
 	this_month_count = Order.objects.this_month().count()
 	unpaid_list = Order.objects.unpaid_list()
-	revenue = Decimal(Order.objects.this_month().aggregate(Sum('choice__price'))['choice__price__sum']) / 100
-	shipping_costs = Decimal(Order.objects.this_month().aggregate(Sum('shipping_cost'))['shipping_cost__sum']) / 100
-	product_costs = Decimal(Order.objects.this_month().aggregate(Sum('product_cost'))['product_cost__sum']) / 100
-	fees = Decimal(Order.objects.this_month().aggregate(Sum('stripe_fee'))['stripe_fee__sum']) / 100
-	profit = revenue - shipping_costs - product_costs - fees
+
+	revenue = Decimal((Order.objects.this_month().aggregate(Sum('choice__price'))['choice__price__sum'] if Order.objects.this_month().aggregate(Sum('choice__price'))['choice__price__sum'] is not None else 0)) / 100
+	shipping_costs = Decimal((Order.objects.this_month().aggregate(Sum('shipping_cost'))['shipping_cost__sum'] if Order.objects.this_month().aggregate(Sum('shipping_cost'))['shipping_cost__sum'] is not None else 0)) / 100
+	product_costs = Decimal((Order.objects.this_month().aggregate(Sum('product_cost'))['product_cost__sum'] if Order.objects.this_month().aggregate(Sum('product_cost'))['product_cost__sum'] is not None else 0)) / 100
+	#prize_cost = Decimal((Order.objects.this_month().aggregate(Sum('prize_cost'))['prize_cost__sum'] if Order.objects.this_month().aggregate(Sum('prize_cost')) is not None else 0)) / 100
+	prize_cost = Decimal(Order.objects.this_month().aggregate(Sum('prize_cost'))['prize_cost__sum'])
+	prints_cost = Decimal((Order.objects.this_month().aggregate(Sum('prints_cost'))['prints_cost__sum'] if Order.objects.this_month().aggregate(Sum('prints_cost')) is not None else 0)) / 100
+	packaging_cost = Decimal((Order.objects.this_month().aggregate(Sum('packaging_cost'))['packaging_cost__sum'] if Order.objects.this_month().aggregate(Sum('packaging_cost')) is not None else 0)) / 100
+	fees = Decimal((Order.objects.this_month().aggregate(Sum('stripe_fee'))['stripe_fee__sum'] if Order.objects.this_month().aggregate(Sum('stripe_fee'))['stripe_fee__sum'] is not None else 0)) / 100
+	profit = revenue - shipping_costs - product_costs - prize_cost - prints_cost - packaging_cost - fees
+
+ 	if request.method == 'POST': # If the form has been submitted...
+		amt = int(request.POST['amt']) * 100
+		item = request.POST['lineitem']
+		Order.objects.add_lineitem(amt, item, Order.objects.this_month())
+		return HttpResponseRedirect('')
 
 	return render_to_response('back/finances_index.html', 
 		{	
@@ -165,6 +177,9 @@ def finances_index(request):
 		 'revenue': revenue,
 		 'shipping_costs': shipping_costs,
 		 'product_costs': product_costs,
+		 'prints_cost': prints_cost,
+		 'prize_cost': prize_cost,
+		 'packaging_cost': packaging_cost,
 		 'fees': fees,
 		 'profit': profit
 		 }, 
