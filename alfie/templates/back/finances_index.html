@@ -14,27 +14,36 @@
 	<thead><tr><th>Feb</th><th>{{ this_month_count }} orders</th></tr></thead>
 	<tbody>
 	<tr><td>Revenue</td><td>${{ revenue|floatformat:"2"|intcomma }}</td></tr>
-	<tr><td>Products</td><td><em>${{ product_costs|floatformat:"2"|intcomma }}</em></td></tr>
-	<tr><td>Shipping</td><td><em>${{ shipping_costs|floatformat:"2"|intcomma }}</em></td></tr>
-	<tr><td>Prizes</td><td><em>${{ testprize_costs|floatformat:"2"|intcomma }}</em></td></tr>
-	<tr><td>Packaging</td><td><em>${{ packaging_costs|floatformat:"2"|intcomma }}</em></td></tr>
-	<tr><td>Prints</td><td><em>${{ prints_cost|floatformat:"2"|intcomma }}</em></td></tr>
-	<tr><td>Fees</td><td><em>${{ fees|floatformat:"2"|intcomma }}</em></td></tr>
-	<tr><td>Profit</td><td>${{ profit|floatformat:"2"|intcomma }}</td></tr>
+	<tr><td>Products</td><td><em>${{ product_costs|floatformat:"2"|intcomma }} ({% widthratio product_costs|floatformat:"2" revenue|floatformat:"2" 100 %}%)</em></td></tr>
+	<tr><td>Shipping</td><td><em>${{ shipping_costs|floatformat:"2"|intcomma }} ({% widthratio shipping_costs|floatformat:"2" revenue|floatformat:"2" 100 %}%)</em></td></tr>
+	<tr><td>Prizes</td><td><em>${{ prize_costs|floatformat:"2"|intcomma }} ({% widthratio prize_costs|floatformat:"2" revenue|floatformat:"2" 100 %}%)</em></td></tr>
+	<tr><td>Packaging</td><td><em>${{ packaging_costs|floatformat:"2"|intcomma }} ({% widthratio packaging_costs|floatformat:"2" revenue|floatformat:"2" 100 %}%)</em></td></tr>
+	<tr><td>Prints</td><td><em>${{ prints_cost|floatformat:"2"|intcomma }} ({% widthratio prints_cost|floatformat:"2" revenue|floatformat:"2" 100 %}%)</em></td></tr>
+	<tr><td>Fees</td><td><em>${{ fees|floatformat:"2"|intcomma }} ({% widthratio fees|floatformat:"2" revenue|floatformat:"2" 100 %}%)</em></td></tr>
+	<tr><td>Profit</td><td>${{ profit|floatformat:"2"|intcomma }} ({% widthratio profit|floatformat:"2" revenue|floatformat:"2" 100 %}%)</td></tr>
 </tbody>
 </table>
 
 <form action="" method="post">{% csrf_token %}
-	<input type="text" name="amt">
-	<select name="lineitem">
-		<option value="prize_cost">prizes</option>
-		<option value="prints_cost">prints</option>
-		<option value="packaging_cost">packaging</option>
-		<option value="shipping_cost">shipping</option>
-		<option value="stripe_fees">fees</option>
-		<option value="product_cost">products</option>
-	</select>
-	<input type="submit" value="Submit">
+	<table width="60%">
+		<tr>
+			<td>Add lineitem:</td>
+			<td><input type="text" name="amt" placeholder="amount"></td>
+			<td>
+				<select name="lineitem">
+					<option value="prize_cost">prizes</option>
+					<option value="prints_cost">prints</option>
+					<option value="packaging_cost">packaging</option>
+					<option value="shipping_cost">shipping</option>
+					<option value="stripe_fees">fees</option>
+					<option value="product_cost">products</option>
+				</select>
+			</td>
+			<td>
+				<input type="submit" value="Submit">
+			</td>
+		</tr>
+	</table>
 </form>
 
 {% for order in unpaid_list|slice:":10" %}

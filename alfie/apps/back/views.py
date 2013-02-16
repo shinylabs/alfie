@@ -47,8 +47,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.core.urlresolvers import reverse_lazy
 from django.core.paginator import Paginator
 from django.core.context_processors import csrf
-from django.db.models import Sum
-from django.db.models import Count
+from django.db.models import Sum, Avg, Max, Count
 #bigups http://stackoverflow.com/questions/5757094/decimal-zero-padding
 from util import moneyfmt
 
@@ -156,18 +155,19 @@ def finances_index(request):
 	revenue = Decimal((Order.objects.this_month().aggregate(Sum('choice__price'))['choice__price__sum'] if Order.objects.this_month().aggregate(Sum('choice__price'))['choice__price__sum'] is not None else 0)) / 100
 	shipping_costs = Decimal((Order.objects.this_month().aggregate(Sum('shipping_cost'))['shipping_cost__sum'] if Order.objects.this_month().aggregate(Sum('shipping_cost'))['shipping_cost__sum'] is not None else 0)) / 100
 	product_costs = Decimal((Order.objects.this_month().aggregate(Sum('product_cost'))['product_cost__sum'] if Order.objects.this_month().aggregate(Sum('product_cost'))['product_cost__sum'] is not None else 0)) / 100
-	#prize_cost = Decimal((Order.objects.this_month().aggregate(Sum('prize_cost'))['prize_cost__sum'] if Order.objects.this_month().aggregate(Sum('prize_cost')) is not None else 0)) / 100
-	prize_cost = Decimal(Order.objects.this_month().aggregate(Sum('prize_cost'))['prize_cost__sum'])
+	prize_cost = Decimal((Order.objects.this_month().aggregate(Sum('prize_cost'))['prize_cost__sum'] if Order.objects.this_month().aggregate(Sum('prize_cost')) is not None else 0)) / 100
 	prints_cost = Decimal((Order.objects.this_month().aggregate(Sum('prints_cost'))['prints_cost__sum'] if Order.objects.this_month().aggregate(Sum('prints_cost')) is not None else 0)) / 100
 	packaging_cost = Decimal((Order.objects.this_month().aggregate(Sum('packaging_cost'))['packaging_cost__sum'] if Order.objects.this_month().aggregate(Sum('packaging_cost')) is not None else 0)) / 100
 	fees = Decimal((Order.objects.this_month().aggregate(Sum('stripe_fee'))['stripe_fee__sum'] if Order.objects.this_month().aggregate(Sum('stripe_fee'))['stripe_fee__sum'] is not None else 0)) / 100
-	profit = revenue - shipping_costs - product_costs - prize_cost - prints_cost - packaging_cost - fees
+	profit = revenue - shipping_costs - product_costs - prints_cost - packaging_cost - fees
 
  	if request.method == 'POST': # If the form has been submitted...
 		amt = int(request.POST['amt']) * 100
 		item = request.POST['lineitem']
 		Order.objects.add_lineitem(amt, item, Order.objects.this_month())
 		return HttpResponseRedirect('')
+
+	#tasks debug http://stackoverflow.com/questions/3553955/refresh-template-in-django
 
 	return render_to_response('back/finances_index.html', 
 		{	
@@ -201,10 +201,33 @@ def shipping_index(request):
 	total_count = Order.objects.count()
 	unshipped_list = Order.objects.unshipped_list()
 
+	total_sum = 0
+	total_avg = 0
+
+	states = Profile.objects.values('ship_state').annotate(customers=Count('id')).order_by('-customers')
+	for i in states:
+	  state = i['ship_state']
+	  customers = i['customers']
+	  #bigups http://agiliq.com/blog/2009/08/django-aggregation-tutorial/
+	  state_avg = float(Profile.objects.filter(ship_state=state).aggregate(Avg('shipping_rate'))['shipping_rate__avg']) / 100
+	  state_sum = float(Profile.objects.filter(ship_state=state).aggregate(Sum('shipping_rate'))['shipping_rate__sum']) / 100
+	  state_max = float(Profile.objects.filter(ship_state=state).aggregate(Max('shipping_rate'))['shipping_rate__max']) / 100
+	  #print "State: %s - Customers: %s - Average: $%.2f - Max: $%.2f - Total: $%.2f" % (state, customers, state_avg, state_max, state_sum)
+	  total_sum += state_sum
+	  total_avg += state_avg
+	  i['avg'] = round(state_avg, 2)
+	  i['sum'] = round(state_sum, 2)
+	  i['max'] = round(state_max, 2)
+	#print "Total sum: $%.2f - Total avg: $%.2f" % (total_sum, (total_avg / len(states)))
+
 	return render_to_response('back/shipping_index.html', 
 		{	
-		 'total_count': total_count, 
-		 'unshipped_list': unshipped_list
+			'total_count': total_count, 
+			'unshipped_list': unshipped_list,
+			'states': states,
+			'total_count': total_count,
+			'total_sum': total_sum,
+			'total_avg': (total_avg / len(states))
 		 }, 
 		context_instance=RequestContext(request))
 
@@ -218,15 +241,46 @@ def customers_index(request):
 
 		Show service tools
 	"""
+	a_count = Profile.objects.filter(choice__id=1).count()
+	b_count = Profile.objects.filter(choice__id=2).count()
+	c_count = Profile.objects.filter(choice__id=3).count()
 	total_count = Profile.objects.count()
+
+	profits = []
+	total_profit = 0 
+	for i in range(Profile.objects.count()):
+	  customer = Profile.objects.all()[i]
+	  order = customer.user.orders.all()[0]
+	  profit = order.choice.price - order.check_costs()
+	  box_name = order.choice.name.title()
+	  #print "%s shipped to %s profit: $%.2f" % (box_name, customer.ship_state, (float(profit)/100))
+	  total_profit += profit
+
+	  dict = {}
+	  dict['user'] = customer.user.id
+	  dict['name'] = customer.user.first_name + ' ' + customer.user.last_name
+	  dict['state'] = customer.ship_state
+	  dict['box'] = box_name
+	  dict['revenue'] = "$%.2f" % (float(order.choice.price) / 100)
+	  dict['costs'] = "$%.2f" % (float(order.check_costs()) / 100)
+	  dict['profit'] = "$%.2f" % (float(profit) / 100)
+	  profits.append(dict)
+	#print "$%.2f" % (float(total_profit)/100)
+
+	#bigups http://stackoverflow.com/questions/72899/in-python-how-do-i-sort-a-list-of-dictionaries-by-values-of-the-dictionary
+	#profits_by_profit = sorted(profits, key=lambda k: k['profit'])
+	profits_by_state = sorted(profits, key=lambda k: k['state'])
+
 	return render_to_response('back/customers_index.html', 
-		{	
-		 'total_count': total_count
+		{
+			'a_count': a_count,
+			'b_count': b_count,
+			'c_count': c_count,
+			'profits_by_state': profits_by_state
 		 }, 
 		context_instance=RequestContext(request))
 
 # http://www.nerdydork.com/django-filter-model-on-date-range.html
-
 
 
 """

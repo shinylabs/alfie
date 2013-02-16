@@ -9,10 +9,28 @@
 <h1>Backoffice / Shipping</h1>
 {% include "back/_nav.html" %}
 
-<p>Total: {{ total_count }}</p>
+<h4>To pack</h4>
 
-{% for order in unshipped_list|slice:":10" %}
+<h4>Packed</h4>
+
+<h4>To ship</h4>
+<ul>
+{% for order in unshipped_list|slice:":25" %}
 	<li>{{ order }} - {{ order.user.profile.ship_state }}</li>
 {% endfor %}
+</ul>
+
+<h4>Shipped</h4>
+
+<table width="50%">
+	<thead><tr><th colspan="2">States</th><th>Customers</th><th>Avg</th><th>Max</th><th>Sum</th></tr></thead>
+	<tbody>
+	{% for i in states %}
+	<tr><td width="10%">{{ forloop.counter }}</td><td>{{ i.ship_state }}</td><td>{{ i.customers }} ({% widthratio i.customers|floatformat:"2" total_count|floatformat:"2" 100 %}%)</td><td>${{ i.avg }}</td><td>${{ i.max }}</td><td>${{ i.sum }}</td></tr>
+	{% endfor %}
+	</tbody>
+</table>
+
+<p>Total: {{ total_count }}</p>
 
 {% endblock %}

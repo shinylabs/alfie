@@ -9,6 +9,42 @@
 <h1>Backoffice / Customers</h1>
 {% include "back/_nav.html" %}
 
-<p>Total: {{ total_count }}</p>
+<table width="50%">
+	<thead><tr><th colspan="2">Choices</th></tr></thead>
+	<tbody>
+	<tr><td>Tinybox</td><td>{{ a_count }} ({% widthratio a_count|floatformat:"2" total_count|floatformat:"2" 100 %}%)</td></tr>
+	<tr><td>Bigbox</td><td>{{ b_count }} ({% widthratio b_count|floatformat:"2" total_count|floatformat:"2" 100 %}%)</td></tr>
+	<tr><td>Sumobox</td><td>{{ c_count }} ({% widthratio c_count|floatformat:"2" total_count|floatformat:"2" 100 %}%)</td></tr>
+	<tr><td>Total</td><td>{{ total_count }}</td></tr>
+	</tbody>
+</table>
+
+<table width="100%">
+	<thead><tr><th colspan="8">Profit by States</th></tr></thead>
+	<tbody>
+	<tr>
+		<td></td>
+		<td>User ID</td>
+		<td>Name</td>
+		<td>State</td>
+		<td>Box</td>
+		<td>Revenue</td>
+		<td>Costs</td>
+		<td>Profit</td>
+	</tr>
+	{% for i in profits_by_state %}
+	<tr>
+		<td>{{ forloop.counter }}</td>
+		<td>{{ i.user }}</td>
+		<td>{{ i.name }}</td>
+		<td>{{ i.state }}</td>
+		<td>{{ i.box }}</td>
+		<td>{{ i.revenue }}</td>
+		<td>{{ i.costs }}</td>
+		<td>{{ i.profit }}</td>
+	</tr>
+	{% endfor %}
+	</tbody>
+</table>
 
 {% endblock %}

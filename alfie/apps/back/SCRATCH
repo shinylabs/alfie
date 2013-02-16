@@ -1,0 +1,46 @@
+SCRATCH
+
+total_sum = 0
+total_avg = 0
+for i in states:
+  state = i['ship_state']
+  customers = i['customers']
+  #bigups http://agiliq.com/blog/2009/08/django-aggregation-tutorial/
+  avg = float(Profile.objects.filter(ship_state=state).aggregate(Avg('shipping_rate'))['shipping_rate__avg']) / 100
+  sum = float(Profile.objects.filter(ship_state=state).aggregate(Sum('shipping_rate'))['shipping_rate__sum']) / 100
+  max = float(Profile.objects.filter(ship_state=state).aggregate(Max('shipping_rate'))['shipping_rate__max']) / 100
+  print "State: %s - Customers: %s - Average: $%.2f - Max: $%.2f - Total: $%.2f" % (state, customers, avg, max, sum)
+  total_sum += sum
+  total_avg += avg
+  i['avg'] = round(avg, 2)
+  i['sum'] = round(sum, 2)
+  i['max'] = round(max, 2)
+print "Total sum: $%.2f - Total avg: $%.2f" % (total_sum, (total_avg / len(states)))
+
+
+
+profits = []
+total_profit = 0 
+for i in range(Profile.objects.count()):
+  customer = Profile.objects.all()[i]
+  order = customer.user.orders.all()[0]
+  profit = order.choice.price - order.check_costs()
+  box_name = order.choice.name.title()
+  print "%s shipped to %s profit: $%.2f" % (box_name, customer.ship_state, (float(profit)/100))
+  total_profit += profit
+
+  dict = {}
+  dict['user'] = customer.user.id
+  dict['name'] = customer.user.first_name + ' ' + customer.user.last_name
+  dict['state'] = customer.ship_state
+  dict['box'] = box_name
+  dict['revenue'] = order.choice.price
+  dict['costs'] = order.check_costs()
+  dict['profit'] = profit
+  profits.append(dict)
+
+print "$%.2f" % (float(total_profit)/100)
+
+#bigups http://stackoverflow.com/questions/72899/in-python-how-do-i-sort-a-list-of-dictionaries-by-values-of-the-dictionary
+profits_by_profit = sorted(profits, key=lambda k: k['profit'])
+profits_by_state = sorted(profits, key=lambda k: k['state'])
