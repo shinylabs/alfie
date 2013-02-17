@@ -116,6 +116,7 @@ class Ramen(models.Model):
 		obj_desc = u'%s' % (self.name)
 		if self.brand is not None:
 			obj_desc = obj_desc + u' from %s' % (self.brand.origin)
+		obj_desc = obj_desc + u' [%s]' % (self.id)
 		return obj_desc
 
 #tasks move Box into its own app
@@ -167,6 +168,8 @@ class Box(models.Model):
 	# Housekeeping
 	created = models.DateTimeField(blank=True, null=True, editable=False, auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True, editable=False)
+	#tasks migrate schema
+	#packed = models.DateTimeField()
 	notes = models.TextField(max_length=255, blank=True, null=True)
 
 	objects = BoxManager()

@@ -44,3 +44,42 @@ print "$%.2f" % (float(total_profit)/100)
 #bigups http://stackoverflow.com/questions/72899/in-python-how-do-i-sort-a-list-of-dictionaries-by-values-of-the-dictionary
 profits_by_profit = sorted(profits, key=lambda k: k['profit'])
 profits_by_state = sorted(profits, key=lambda k: k['state'])
+
+
+
+for i in Menu.objects.all():
+  orders = Menu.objects.all()[i.id - 1].order_set
+  this_month = orders.filter(year=2013).filter(month=2)
+  shipped = this_month.filter(shipped__isnull=False)
+  unshipped = this_month.filter(shipped__isnull=True)
+  to_pack = unshipped.aggregate(Sum('box__slots'))['box__slots__sum']
+  packed = shipped.aggregate(Sum('box__slots'))['box__slots__sum']
+  print "\n\n%s Details" % (i.name.title())
+  print "Shipped this month: %s" % (shipped.count())
+  print "List of shipped orders: %s" % (shipped)
+  print "Unshipped this month: %s" % (unshipped.count())
+  print "List of unshipped orders: %s" % (unshipped)
+  print "Ramens to pack: %s" % (to_pack)
+  print "Ramens packed: %s" % (packed)
+
+"""
+OUTPUT:
+  # of box a
+  list of ramen, # of each ramen
+  # of box b
+  list of ramen, # of each ramen
+  # of box c
+  list of ramen, # of each ramen
+"""
+
+for box in Box.objects.this_months_boxes():
+  orders = box.order_set
+  unpacked = orders.filter(shipped__isnull=True)
+  packed = orders.filter(shipped__isnull=False)
+  total_ramens = orders.aggregate(Sum('box__slots'))['box__slots__sum']
+  print "\n" + str(box)
+  for i in range(box.ramens.count()):
+    ramen = box.ramens.all()[i]
+    cogs = float(ramen.cogs) / 100
+    print "%s - $%.2f - %s - (%s/%s)" % (i+1, cogs, ramen, packed.count(), unpacked.count())
+  print "Cost of goods: $%.2f - Total COGS: $%.2f - Total ramens: %s" % ((float(box.cost) / 100), (float(box.cost * orders.count()) / 100), total_ramens)

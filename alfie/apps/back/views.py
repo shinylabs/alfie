@@ -198,8 +198,15 @@ def shipping_index(request):
 			Users without admin permissions can only see/interact with this view
 
 	"""
+	for i in Menu.objects.all():
+		pass
+
+	a_count = Profile.objects.filter(choice__id=1).count()
+	b_count = Profile.objects.filter(choice__id=2).count()
+	c_count = Profile.objects.filter(choice__id=3).count()
+	#total_count = Profile.objects.count()
 	total_count = Order.objects.count()
-	unshipped_list = Order.objects.unshipped_list()
+	#unshipped_list = Order.objects.unshipped_list()
 
 	total_sum = 0
 	total_avg = 0
@@ -223,7 +230,6 @@ def shipping_index(request):
 	return render_to_response('back/shipping_index.html', 
 		{	
 			'total_count': total_count, 
-			'unshipped_list': unshipped_list,
 			'states': states,
 			'total_count': total_count,
 			'total_sum': total_sum,
@@ -241,11 +247,6 @@ def customers_index(request):
 
 		Show service tools
 	"""
-	a_count = Profile.objects.filter(choice__id=1).count()
-	b_count = Profile.objects.filter(choice__id=2).count()
-	c_count = Profile.objects.filter(choice__id=3).count()
-	total_count = Profile.objects.count()
-
 	profits = []
 	total_profit = 0 
 	for i in range(Profile.objects.count()):
@@ -273,9 +274,6 @@ def customers_index(request):
 
 	return render_to_response('back/customers_index.html', 
 		{
-			'a_count': a_count,
-			'b_count': b_count,
-			'c_count': c_count,
 			'profits_by_state': profits_by_state
 		 }, 
 		context_instance=RequestContext(request))

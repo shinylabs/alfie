@@ -11,6 +11,16 @@
 
 <h4>To pack</h4>
 
+<table width="50%">
+	<thead><tr><th colspan="2">Choices</th></tr></thead>
+	<tbody>
+	<tr><td>Tinybox</td><td>{{ a_count }} ({% widthratio a_count|floatformat:"2" total_count|floatformat:"2" 100 %}%)</td></tr>
+	<tr><td>Bigbox</td><td>{{ b_count }} ({% widthratio b_count|floatformat:"2" total_count|floatformat:"2" 100 %}%)</td></tr>
+	<tr><td>Sumobox</td><td>{{ c_count }} ({% widthratio c_count|floatformat:"2" total_count|floatformat:"2" 100 %}%)</td></tr>
+	<tr><td>Total</td><td>{{ total_count }}</td></tr>
+	</tbody>
+</table>
+
 <h4>Packed</h4>
 
 <h4>To ship</h4>
