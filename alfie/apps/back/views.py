@@ -198,19 +198,31 @@ def shipping_index(request):
 			Users without admin permissions can only see/interact with this view
 
 	"""
-	for i in Menu.objects.all():
-		pass
 
-	a_count = Profile.objects.filter(choice__id=1).count()
-	b_count = Profile.objects.filter(choice__id=2).count()
-	c_count = Profile.objects.filter(choice__id=3).count()
-	#total_count = Profile.objects.count()
-	total_count = Order.objects.count()
-	#unshipped_list = Order.objects.unshipped_list()
+	boxes_this_month = Box.objects.this_months_boxes()
+
+ 	if request.method == 'POST': 	# If the form has been submitted...
+ 		amt = int(request.POST['amt'])
+
+ 		if '1' in request.POST:
+ 			if boxes_this_month[0].orders.this_month_to_pack().count() > 0:
+ 				for order in boxes_this_month[0].orders.this_month_to_pack()[0:amt]:
+ 					order.got_packed()
+ 					order.save()
+		if '2' in request.POST:
+ 			if boxes_this_month[1].orders.this_month_to_pack().count() > 0:
+ 				for order in boxes_this_month[1].orders.this_month_to_pack()[0:amt]:
+ 					order.got_packed()
+ 					order.save()
+		if '3' in request.POST:
+ 			if boxes_this_month[2].orders.this_month_to_pack().count() > 0:
+ 				for order in boxes_this_month[2].orders.this_month_to_pack()[0:amt]:
+ 					order.got_packed()
+ 					order.save()
+		return HttpResponseRedirect('')
 
 	total_sum = 0
 	total_avg = 0
-
 	states = Profile.objects.values('ship_state').annotate(customers=Count('id')).order_by('-customers')
 	for i in states:
 	  state = i['ship_state']
@@ -227,19 +239,11 @@ def shipping_index(request):
 	  i['max'] = round(state_max, 2)
 	#print "Total sum: $%.2f - Total avg: $%.2f" % (total_sum, (total_avg / len(states)))
 
-	boxes_this_month = Box.objects.this_months_boxes()
-	packed = 
-	shipped = 
-
 	return render_to_response('back/shipping_index.html', 
 		{	
 			'states': states,
-			'total_count': total_count,
 			'total_sum': total_sum,
 			'total_avg': (total_avg / len(states)),
-			'a_count': a_count,
-			'b_count': b_count,
-			'c_count': c_count,
 			'boxes_this_month': boxes_this_month
 		 }, 
 		context_instance=RequestContext(request))

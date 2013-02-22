@@ -76,18 +76,15 @@ class OrderManager(models.Manager):
         return count
 
     # FINANCES
+    def this_month_unpaid(self, now=now):
+        return self.filter(paid__isnull=True)
+
     def this_month_paid(self, now=now):
-        return self.filter(year=now.year).filter(month=now.month).exclude(gotpaid__isnull=True)
+        return self.filter(paid__isnull=False)
 
     def prev_month_paid(self, now=now):
         now = subtract_months(now, 1)
-        return self.filter(year=now.year).filter(month=now.month).exclude(gotpaid__isnull=True)
-
-    def unpaid_list(self, now=now):
-        """
-            Return orders that need to be paid
-        """
-        return self.filter(year=now.year).filter(month=now.month).filter(gotpaid__isnull=True)
+        return self.filter(year=now.year).filter(month=now.month).filter(paid__isnull=False)
 
     def add_lineitem(self, amt, item, orders):
         """
@@ -101,30 +98,26 @@ class OrderManager(models.Manager):
             order.save()
 
     # HANDLING
+    def this_month_to_pack(self, now=now):
+        return self.filter(packed__isnull=True)
+
     def this_month_packed(self, now=now):
-        return self.filter(year=now.year).filter(month=now.month).exclude(packed__isnull=True)
+        return self.filter(packed__isnull=False)
 
     def prev_month_packed(self, now=now):
         now = subtract_months(now, 1)
-        return self.filter(year=now.year).filter(month=now.month).exclude(packed__isnull=True)
+        return self.filter(year=now.year).filter(month=now.month).filter(packed__isnull=False)
 
     # SHIPPING
+    def this_month_to_ship(self, now=now):
+        return self.filter(shipped__isnull=True)
+
     def this_month_shipped(self, now=now):
-        return self.filter(year=now.year).filter(month=now.month).exclude(shipped__isnull=True)
+        return self.filter(shipped__isnull=False)
 
     def prev_month_shipped(self, now=now):
         now = subtract_months(now, 1)
-        return self.filter(year=now.year).filter(month=now.month).exclude(shipped__isnull=True)
-
-    def unshipped_list(self, now=now):
-        """
-            Return of orders that need to be shipped
-
-            Ship queue pulls box fk to see what inventory needs to be pullled
-
-            Ship queue is removed when confirmed as shipped 
-        """
-        return self.filter(year=now.year).filter(month=now.month).filter(shipped__isnull=True)
+        return self.filter(year=now.year).filter(month=now.month).filter(shipped__isnull=False)
 
 class Order(models.Model):
     """
@@ -138,9 +131,9 @@ class Order(models.Model):
         4           1           48          12              2012
         5           2           102         01              2013
     """
-    user = models.ForeignKey(User, related_name='orders')
+    user = models.ForeignKey(User, related_name='users')
     choice = models.ForeignKey(Menu, blank=True, null=True)
-    box = models.ForeignKey(Box, blank=True, null=True)
+    box = models.ForeignKey(Box, related_name='orders', blank=True, null=True)
     coupon = models.CharField(max_length=25, blank=True, null=True)
     month = models.IntegerField(max_length=2, blank=True, null=True)
     year = models.IntegerField(max_length=4, blank=True, null=True)
@@ -196,7 +189,7 @@ class Order(models.Model):
         resp = stripe.Charge.all(customer=cust_id)
 
         if resp['data'][0]['paid'] is True:
-            self.gotpaid = now;
+            self.paid = now;
             self.save()
 
     def check_stripe_fee(self):
@@ -242,15 +235,17 @@ class Order(models.Model):
         """
             Calling this sets self.packed datetimestamp
         """
-        self.packed = now
-        self.save()
+        if self.paid:
+            self.packed = now
+            self.save()
 
     def got_shipped(self):
         """
             Calling this sets self.shipped datetimestamp
         """
-        self.shipped = now
-        self.save()
+        if self.packed:
+            self.shipped = now
+            self.save()
 
     def save(self, *args, **kwargs):
         super(Order, self).save(*args, **kwargs)
