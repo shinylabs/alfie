@@ -72,6 +72,7 @@ OUTPUT:
   list of ramen, # of each ramen
 """
 
+boxes = []
 for box in Box.objects.this_months_boxes():
   orders = box.order_set
   unpacked = orders.filter(shipped__isnull=True)
@@ -83,3 +84,21 @@ for box in Box.objects.this_months_boxes():
     cogs = float(ramen.cogs) / 100
     print "%s - $%.2f - %s - (%s/%s)" % (i+1, cogs, ramen, packed.count(), unpacked.count())
   print "Cost of goods: $%.2f - Total COGS: $%.2f - Total ramens: %s" % ((float(box.cost) / 100), (float(box.cost * orders.count()) / 100), total_ramens)
+
+ramen_dict = {
+  id: box_id
+  slots: box_slots
+  month: box_month
+  year: box_year
+  ramens: [
+    {
+      id: ramen_id
+      name: ramen_name
+      cogs: ramen_cogs
+      weight: ramen_weight
+    }, 
+  ]
+  total_count: ramens.count
+  total_weight: ramens.weight
+  total_cost: ramens.cost
+}

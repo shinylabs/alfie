@@ -80,28 +80,29 @@ class Ramen(models.Model):
 	msrp = models.IntegerField(max_length=7, blank=True, null=True)
 
 	# Description
-	description = models.TextField(max_length=255, blank=True, null=True)
-	directions = models.TextField(max_length=255, blank=True, null=True)
+	description = models.TextField(max_length=255, blank=True, null=True) # 100 words
+	directions = models.TextField(max_length=255, blank=True, null=True) # list
 
 	# Packing
-	weight = models.CharField(max_length=128, blank=True, null=True)
-	dimensions = models.CharField(max_length=128, blank=True, null=True)
-	packaging = models.CharField(max_length=128, blank=True, null=True)
+	weight = models.CharField(max_length=128, blank=True, null=True) # weight in grams
+	dimensions = models.CharField(max_length=128, blank=True, null=True) # x by y by z in mm
+	packaging = models.CharField(max_length=128, blank=True, null=True) # packaging type: bowl, packs, cup
+	boxing = models.CharField(max_length=128, blank=True, null=True) # how many units in a box: 1/12
 
 	# Image
 	image_url = models.URLField(blank=True, null=True)
 	saved_image = models.ImageField(upload_to=RAMEN_FILE_PATH, blank=True)
 
     # Metadata
-	nutrition = models.TextField(max_length=255, blank=True, null=True)
-	ingredients = models.TextField(max_length=255, blank=True, null=True)
-	flavors = models.ManyToManyField(Flavor, blank=True, null=True)
+	nutrition = models.TextField(max_length=255, blank=True, null=True) # nutrition facts, serving size, calories, fat calories
+	ingredients = models.TextField(max_length=255, blank=True, null=True) # list
+	flavors = models.ManyToManyField(Flavor, blank=True, null=True) # list
 	ratings = models.DecimalField(max_digits=5, decimal_places=1, blank=True, null=True, editable=False)
 
 	# Housekeeping
 	created = models.DateTimeField(blank=True, null=True, editable=False, auto_now_add=True)
+	shipped = models.DateTimeField(blank=True, null=True, editable=False)
 	notes = models.TextField(max_length=255, blank=True, null=True)
-	boxed = models.DateTimeField(blank=True, null=True, editable=False)
 
 	objects = RamenManager()
 
@@ -160,16 +161,15 @@ class Box(models.Model):
 	year = models.IntegerField(max_length=4)
 
 	#tasks change this to a FK to Menu
-	#menu = models.ForeignKey('alfie.apps.orders.models.Menu')
+	#menu_choice = models.ForeignKey('alfie.apps.orders.models.Menu')
 	slots = models.IntegerField(blank=True, null=True)
 	ramens = models.ManyToManyField(Ramen, related_name='ramens', blank=True, null=True)
 	cost = models.IntegerField(max_length=7, blank=True, null=True)
+	weight = models.IntegerField(max_length=7, blank=True, null=True)
 
 	# Housekeeping
 	created = models.DateTimeField(blank=True, null=True, editable=False, auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True, editable=False)
-	#tasks migrate schema
-	#packed = models.DateTimeField()
 	notes = models.TextField(max_length=255, blank=True, null=True)
 
 	objects = BoxManager()
@@ -184,12 +184,19 @@ class Box(models.Model):
 	def whats_inside(self):
 		return self.ramens.all()
 
+	def total_weight(self):
+		weight = 0
+		for ramen in self.ramens.all():
+			weight += int(0 if ramen.weight is None else ramen.weight)
+		self.weight = weight
+		return "Box weights %sg" % (weight)
+
 	def total_cost(self):
 		cost = 0
 		for ramen in self.ramens.all():
-			cost += ramen.cogs
+			cost += int(0 if ramen.cogs is None else ramen.cogs)
 		self.cost = cost
-		return cost
+		return "Box costs $%.2f" % (float(cost) / 100)
 
 	def __unicode__(self):
 		return u'%s/%s Box with %s slots' % (self.month, self.year, self.slots)

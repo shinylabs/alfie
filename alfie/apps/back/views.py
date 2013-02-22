@@ -227,13 +227,20 @@ def shipping_index(request):
 	  i['max'] = round(state_max, 2)
 	#print "Total sum: $%.2f - Total avg: $%.2f" % (total_sum, (total_avg / len(states)))
 
+	boxes_this_month = Box.objects.this_months_boxes()
+	packed = 
+	shipped = 
+
 	return render_to_response('back/shipping_index.html', 
 		{	
-			'total_count': total_count, 
 			'states': states,
 			'total_count': total_count,
 			'total_sum': total_sum,
-			'total_avg': (total_avg / len(states))
+			'total_avg': (total_avg / len(states)),
+			'a_count': a_count,
+			'b_count': b_count,
+			'c_count': c_count,
+			'boxes_this_month': boxes_this_month
 		 }, 
 		context_instance=RequestContext(request))
 

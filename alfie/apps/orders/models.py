@@ -51,6 +51,7 @@ class Menu(models.Model):
         return u'%s' % (self.name)
 
 class OrderManager(models.Manager):
+    # SELECTORS
     def this_month(self, now=now):
         """
         Orders are only valid if:
@@ -74,6 +75,7 @@ class OrderManager(models.Manager):
             count = count + self.filter(year=time.year).filter(month=time.month)
         return count
 
+    # FINANCES
     def this_month_paid(self, now=now):
         return self.filter(year=now.year).filter(month=now.month).exclude(gotpaid__isnull=True)
 
@@ -87,6 +89,26 @@ class OrderManager(models.Manager):
         """
         return self.filter(year=now.year).filter(month=now.month).filter(gotpaid__isnull=True)
 
+    def add_lineitem(self, amt, item, orders):
+        """
+            Takes in amount, lineitem, and order list
+
+            Based on lineitem, affect amount onto orders
+        """
+        amount = amt / orders.count()
+        for order in orders:
+            setattr(order, item, amount)
+            order.save()
+
+    # HANDLING
+    def this_month_packed(self, now=now):
+        return self.filter(year=now.year).filter(month=now.month).exclude(packed__isnull=True)
+
+    def prev_month_packed(self, now=now):
+        now = subtract_months(now, 1)
+        return self.filter(year=now.year).filter(month=now.month).exclude(packed__isnull=True)
+
+    # SHIPPING
     def this_month_shipped(self, now=now):
         return self.filter(year=now.year).filter(month=now.month).exclude(shipped__isnull=True)
 
@@ -103,17 +125,6 @@ class OrderManager(models.Manager):
             Ship queue is removed when confirmed as shipped 
         """
         return self.filter(year=now.year).filter(month=now.month).filter(shipped__isnull=True)
-
-    def add_lineitem(self, amt, item, orders):
-        """
-            Takes in amount, lineitem, and order list
-
-            Based on lineitem, affect amount onto orders
-        """
-        amount = amt / orders.count()
-        for order in orders:
-            setattr(order, item, amount)
-            order.save()
 
 class Order(models.Model):
     """
@@ -136,7 +147,8 @@ class Order(models.Model):
 
     # Housekeeping
     created = models.DateTimeField(auto_now_add=True, editable=False)
-    gotpaid = models.DateTimeField(blank=True, null=True)
+    paid = models.DateTimeField(blank=True, null=True)
+    packed = models.DateTimeField(blank=True, null=True)
     shipped = models.DateTimeField(blank=True, null=True)
     updated = models.DateTimeField(auto_now=True, editable=False)
     notes = models.CharField(max_length=255, blank=True, null=True)
@@ -225,6 +237,20 @@ class Order(models.Model):
             self.year, self.month = self.created.year, self.created.month + 1
         else:
             self.year, self.month = self.created.year, self.created.month
+
+    def got_packed(self):
+        """
+            Calling this sets self.packed datetimestamp
+        """
+        self.packed = now
+        self.save()
+
+    def got_shipped(self):
+        """
+            Calling this sets self.shipped datetimestamp
+        """
+        self.shipped = now
+        self.save()
 
     def save(self, *args, **kwargs):
         super(Order, self).save(*args, **kwargs)
