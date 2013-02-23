@@ -199,7 +199,7 @@ def shipping_index(request):
 
 	"""
 
-	boxes_this_month = Box.objects.this_months_boxes()
+	boxes_this_month = Box.objects.this_month()
 
  	if request.method == 'POST': 	# If the form has been submitted...
  		amt = int(request.POST['amt'])
@@ -220,6 +220,8 @@ def shipping_index(request):
  					order.got_packed()
  					order.save()
 		return HttpResponseRedirect('')
+
+	manifest_this_month = Order.objects.this_month_manifest()
 
 	total_sum = 0
 	total_avg = 0
@@ -244,7 +246,8 @@ def shipping_index(request):
 			'states': states,
 			'total_sum': total_sum,
 			'total_avg': (total_avg / len(states)),
-			'boxes_this_month': boxes_this_month
+			'boxes_this_month': boxes_this_month,
+			'manifest_this_month': manifest_this_month
 		 }, 
 		context_instance=RequestContext(request))
 

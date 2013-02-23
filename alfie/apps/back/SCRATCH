@@ -102,3 +102,13 @@ ramen_dict = {
   total_weight: ramens.weight
   total_cost: ramens.cost
 }
+
+
+
+manifest = []
+for i in range(len(zones)):
+  dict = {}
+  dict['zone'] = i
+  dict['orders'] = packed.filter(priority=i).count()
+  manifest.append(dict)
+

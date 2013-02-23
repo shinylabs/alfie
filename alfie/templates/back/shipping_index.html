@@ -56,6 +56,18 @@
 
 <div class="panel">
 <h4>Packed</h4>
+
+	<table width="100%">
+		<thead><tr><th>Zone</th><th>Orders</th></tr></thead>
+		<tbody>
+			{% for manifest in manifest_this_month %}
+			<tr>
+				<td>{{ manifest.zone }}</td>
+				<td>{{ manifest.orders }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 </div>
 
 <div class="panel">

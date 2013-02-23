@@ -142,7 +142,7 @@ class BoxManager(models.Manager):
 		for i in range(Menu.objects.count()):
 			self.create_box(Menu.objects.all()[i], push)
 
-	def this_months_boxes(self, when=now):
+	def this_month(self, when=now):
 		return self.filter(year=when.year).filter(month=when.month)
 
 class Box(models.Model):

@@ -28,8 +28,11 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 
-# Import other models
+# Import other data models
 from alfie.apps.ramens.models import Box
+
+# Import utilities
+from alfie.apps.back.shipping.easypostutil import *
 
 class Menu(models.Model):
     """
@@ -41,7 +44,6 @@ class Menu(models.Model):
         bigbox      8           22.00       For the ramen fanatic
         sumobox     14          32.00       If you just want to mainline
     """
-
     name = models.CharField(max_length=128, blank=True, null=True)
     slots = models.CharField(max_length=128, blank=True, null=True)
     price = models.IntegerField(max_length=7) # price in pennies
@@ -77,10 +79,10 @@ class OrderManager(models.Manager):
 
     # FINANCES
     def this_month_unpaid(self, now=now):
-        return self.filter(paid__isnull=True)
+        return self.filter(year=now.year).filter(month=now.month).filter(paid__isnull=True)
 
     def this_month_paid(self, now=now):
-        return self.filter(paid__isnull=False)
+        return self.filter(year=now.year).filter(month=now.month).filter(paid__isnull=False)
 
     def prev_month_paid(self, now=now):
         now = subtract_months(now, 1)
@@ -94,26 +96,35 @@ class OrderManager(models.Manager):
         """
         amount = amt / orders.count()
         for order in orders:
+
             setattr(order, item, amount)
             order.save()
 
     # HANDLING
     def this_month_to_pack(self, now=now):
-        return self.filter(packed__isnull=True)
-
+        return self.filter(year=now.year).filter(month=now.month).filter(packed__isnull=True)
     def this_month_packed(self, now=now):
-        return self.filter(packed__isnull=False)
+        return self.filter(year=now.year).filter(month=now.month).filter(packed__isnull=False)
 
     def prev_month_packed(self, now=now):
         now = subtract_months(now, 1)
         return self.filter(year=now.year).filter(month=now.month).filter(packed__isnull=False)
 
     # SHIPPING
+    def this_month_manifest(self, now=now):
+        list = []
+        for i in range(len(zones)):
+            dict = {}
+            dict['zone'] = i
+            dict['orders'] = self.filter(year=now.year).filter(month=now.month).filter(priority=i).count()
+            list.append(dict)
+        return list
+
     def this_month_to_ship(self, now=now):
-        return self.filter(shipped__isnull=True)
+        return self.filter(year=now.year).filter(month=now.month).filter(shipped__isnull=True)
 
     def this_month_shipped(self, now=now):
-        return self.filter(shipped__isnull=False)
+        return self.filter(year=now.year).filter(month=now.month).filter(shipped__isnull=False)
 
     def prev_month_shipped(self, now=now):
         now = subtract_months(now, 1)
@@ -145,6 +156,7 @@ class Order(models.Model):
     shipped = models.DateTimeField(blank=True, null=True)
     updated = models.DateTimeField(auto_now=True, editable=False)
     notes = models.CharField(max_length=255, blank=True, null=True)
+    priority = models.IntegerField(blank=True, null=True)
 
     # Payment info
     last4 = models.IntegerField(max_length=4, blank=True, null=True)
@@ -236,6 +248,10 @@ class Order(models.Model):
             Calling this sets self.packed datetimestamp
         """
         if self.paid:
+            # set priority
+            self.priority = int(verify_zone(str(self.user.profile.ship_state), zones))
+
+            # set packed datetimestamp
             self.packed = now
             self.save()
 
@@ -244,6 +260,9 @@ class Order(models.Model):
             Calling this sets self.shipped datetimestamp
         """
         if self.packed:
+            # buy postage
+
+            # set shipped datetimestamp
             self.shipped = now
             self.save()
 

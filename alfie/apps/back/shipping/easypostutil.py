@@ -4,31 +4,48 @@
 from alfie.apps.back.shipping.easypostutil import *
 """
 
+# import models
+from alfie.apps.profiles.models import *
+
+import sys # to print
+
+# import app
 from easypost import EasyPost, Address, Postage
-"""
-Imports in:
-	class EasyPost(object):
-	  def api_url(cls, ttype='', action=''):
-	  def post(cls, url, params):
-	  def encode_dict(cls, stk, key, dictvalue):
-	  def _encode_inner(cls, d):
-	  def _utf8(cls, value):
-	  def encode(cls, d):
 
-	class Address(object):
-	  def verify(cls, **address):
+# USPS Zones and Transit
+# http://www.survivalsuppliers.com/images/zone_map.gif
+# N-CA zip codes http://info.kaiserpermanente.org/steps/zipcodes_nocal.html
+# S-CA zip codes http://info.kaiserpermanente.org/steps/zipcodes_socal.html
+# W-NV zip codes http://www.mongabay.com/igapo/zip_codes/counties/alpha/Nevada%20County-California1.html
+# W-PA zip codes
+# E-PA zip codes
 
-	class Postage(object):
-	  def rates(cls, **data):
-	  def compare(cls, **data):
-	  def buy(cls, **data):
-	  def get(cls, filename):
-	  def list(cls):
-"""
+zone0 = ['CA', 'NV'] # 1 day
+zone1 = ['CA', 'WA', 'OR', 'ID', 'NV', 'UT'] # 2 days
+zone2 = ['MT', 'WY', 'CO', 'AZ', 'NM'] # 3 days
+zone3 = ['ND', 'NE', 'KS', 'OK', 'TX', 'IA', 'MO', 'AR', 'WI', 'IL', 'IN', 'MI'] # 4 days
+zone4 = ['SD', 'MN', 'OH', 'KY', 'TN', 'MS', 'LA', 'WV', 'PA', 'NY'] # 5 days
+zone5 = ['ME', 'VT', 'NH', 'MA', 'CT', 'RI', 'NJ', 'MD', 'DE', 'DC', 'VA', 'NC', 'SC', 'GA', 'AL', 'FL'] # 6 days
+zone6 = ['AL', 'HI'] # 7 days
 
-import sys
+zones = [{'zone': '0', 'states': zone0, 'transit': '1 day'}, 
+		 {'zone': '1', 'states': zone1, 'transit': '2 days'},
+		 {'zone': '2', 'states': zone2, 'transit': '3 days'},
+		 {'zone': '3', 'states': zone3, 'transit': '4 days'},
+		 {'zone': '4', 'states': zone4, 'transit': '5 days'},
+		 {'zone': '5', 'states': zone5, 'transit': '6 days'},
+		 {'zone': '6', 'states': zone6, 'transit': '7 days'}]
 
-from alfie.apps.profiles.models import Profile
+def verify_zone(state, zones):
+	"""
+		Inputs state to check and zones dictionary
+		Loop through zones list and find state
+		Returns zone list
+	"""
+	for region in zones:
+		if state in region['states']:
+			return region['zone']
+			break
 
 def verify_addr(profile):
 	payload = {
@@ -49,7 +66,6 @@ def verify_addr(profile):
 	except:
 		print >>sys.stderr, 'Something broke :('
 		return False
-
 
 def set_rate(profile, price):
 	try:
@@ -109,5 +125,14 @@ def check_rates():
 	avg_ship_price = float(sum(sumopricelist))/len(sumopricelist) if len(sumopricelist) > 0 else float('nan')
 	print 'Average cost for sumobox is $%.2f' % (avg_ship_price)
 
-# Testing calls
-#check_rates()
+def buy_postage():
+	"""
+		Docs: https://www.geteasypost.com/docs/python#postage-buying
+
+		Inputs in order
+		Calls check_rate to verify rate
+		Buys postage
+		Saves rate, label_img, label_url, tracking_code
+		Returns success message
+	"""
+	pass
