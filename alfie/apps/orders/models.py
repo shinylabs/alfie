@@ -31,8 +31,13 @@ from django.utils.translation import ugettext as _
 # Import other data models
 from alfie.apps.ramens.models import Box
 
-# Import utilities
-from alfie.apps.back.shipping.easypostutil import *
+# Import EasyPost
+import easypost.easypost
+easypost.easypost.api_key = '8xc2JMjUQp9PwQMDsjXBy62sp-uzUC4g'
+
+# Where to store postage files
+MEDIA_PATH = 'alfie/media/'
+POSTAGE_FILE_PATH = 'assets/postage/'
 
 class Menu(models.Model):
     """
@@ -40,9 +45,9 @@ class Menu(models.Model):
 
     Initial data:
         _name_      _slots_     _price_     _notes_
-        tinybox     4           12.00       For people that want to try
-        bigbox      8           22.00       For the ramen fanatic
-        sumobox     14          32.00       If you just want to mainline
+        tinybox     4           1200        For people that want to try
+        bigbox      8           2200        For the ramen fanatic
+        sumobox     14          3200        If you just want to mainline
     """
     name = models.CharField(max_length=128, blank=True, null=True)
     slots = models.CharField(max_length=128, blank=True, null=True)
@@ -142,35 +147,40 @@ class Order(models.Model):
         4           1           48          12              2012
         5           2           102         01              2013
     """
-    user = models.ForeignKey(User, related_name='users')
+    user = models.ForeignKey(User, related_name='orders')
     choice = models.ForeignKey(Menu, blank=True, null=True)
     box = models.ForeignKey(Box, related_name='orders', blank=True, null=True)
     coupon = models.CharField(max_length=25, blank=True, null=True)
     month = models.IntegerField(max_length=2, blank=True, null=True)
     year = models.IntegerField(max_length=4, blank=True, null=True)
 
-    # Housekeeping
-    created = models.DateTimeField(auto_now_add=True, editable=False)
-    paid = models.DateTimeField(blank=True, null=True)
+    # Shipping/Handling
     packed = models.DateTimeField(blank=True, null=True)
     shipped = models.DateTimeField(blank=True, null=True)
-    updated = models.DateTimeField(auto_now=True, editable=False)
-    notes = models.CharField(max_length=255, blank=True, null=True)
     priority = models.IntegerField(blank=True, null=True)
+    tracker = models.CharField(max_length=50, blank=True, null=True)
+    label_url = models.URLField(blank=True, null=True)
+    label_file = models.ImageField(upload_to=POSTAGE_FILE_PATH, blank=True, null=True)
 
     # Payment info
     last4 = models.IntegerField(max_length=4, blank=True, null=True)
-    payment_attempts = models.IntegerField(blank=True, null=True)
+    paid = models.DateTimeField(blank=True, null=True)
     last_payment_attempt = models.DateTimeField(blank=True, null=True, editable=False)
+    payment_attempts = models.IntegerField(blank=True, null=True)
 
     # Bookkeeping
     #tasks default these to 0
-    product_cost = models.IntegerField(max_length=7, blank=True, null=True)
-    prize_cost = models.IntegerField(max_length=7, blank=True, null=True)
-    prints_cost = models.IntegerField(max_length=7, blank=True, null=True)
-    packaging_cost = models.IntegerField(max_length=7, blank=True, null=True)
-    shipping_cost = models.IntegerField(max_length=7, blank=True, null=True)
-    stripe_fee = models.IntegerField(max_length=7, blank=True, null=True)
+    product_cost = models.IntegerField(max_length=7, blank=True, null=True, default=0)
+    prize_cost = models.IntegerField(max_length=7, blank=True, null=True, default=0)
+    prints_cost = models.IntegerField(max_length=7, blank=True, null=True, default=0)
+    packaging_cost = models.IntegerField(max_length=7, blank=True, null=True, default=0)
+    shipping_cost = models.IntegerField(max_length=7, blank=True, null=True, default=0)
+    stripe_fee = models.IntegerField(max_length=7, blank=True, null=True, default=0)
+
+    # Housekeeping
+    created = models.DateTimeField(auto_now_add=True, editable=False)
+    updated = models.DateTimeField(auto_now=True, editable=False)
+    notes = models.CharField(max_length=255, blank=True, null=True)
 
     objects = OrderManager()
 
@@ -242,6 +252,52 @@ class Order(models.Model):
             self.year, self.month = self.created.year, self.created.month + 1
         else:
             self.year, self.month = self.created.year, self.created.month
+
+    def create_shipment(self):
+        homebase = {'name': 'LuckyRamenCat', 'street1': '7150 Rainbow Drive', 'state': 'CA', 'zip': '95129', 'city': 'San Jose'}
+        from_address = easypost.easypost.Address(**homebase)
+        #todo check address_verified
+        to_address = self.user.profile.create_address()
+        package = self.box.create_package()
+        return easypost.easypost.Shipment(to_address, from_address, package)
+
+    def check_rates(self):
+        shipment = self.create_shipment()
+        rates = shipment.rates()
+        #todo add transit time data
+        for rate in rates:
+            print rate.carrier, rate.service, rate.price
+        return rates
+
+    def set_shipping_cost(self, preferred_service='ParcelSelect'):
+        try:
+            rates = self.check_rates()
+            for rate in rates:
+                if rate.service == preferred_service:
+                    self.shipping_cost = int(float(rate.price) * 100)
+                    self.user.profile.shipping_rate = int(float(rate.price) * 100)
+                    self.save()
+        except:
+            print 'ERROR'
+
+    def create_postage(self, preferred_service='ParcelSelect'):
+        shipment = self.create_shipment()
+        rates = self.check_rates()
+        for preferred_rate in rates:
+            if preferred_rate.service == preferred_service:
+                rate = preferred_rate
+        return easypost.easypost.Postage(shipment, rate)
+
+    def buy_postage(self):
+        try:
+            postage = self.create_postage()
+            postage.buy()
+            self.tracker = postage.tracking_code
+            self.label_url = postage.label_url
+            #self.label_file = postage.label_file_name
+            self.save()
+        except:
+            print 'ERROR'
 
     def got_packed(self):
         """

@@ -34,6 +34,10 @@ from django.utils.translation import ugettext as _
 # Other app models
 #from alfie.apps.orders.models import *
 
+# Import EasyPost
+import easypost.easypost
+easypost.easypost.api_key = '8xc2JMjUQp9PwQMDsjXBy62sp-uzUC4g'
+
 # Where to store all the images in devmode
 MEDIA_PATH = 'alfie/media/'
 RAMEN_FILE_PATH = 'img/ramen/'
@@ -197,6 +201,17 @@ class Box(models.Model):
 			cost += int(0 if ramen.cogs is None else ramen.cogs)
 		self.cost = cost
 		return "Box costs $%.2f" % (float(cost) / 100)
+
+	def create_package(self):
+		#todo call self.total_weight() and convert to oz
+		if self.slots is 4:
+			package = {"height": 7, "width": 7, "length": 7, "weight": 16}
+		if self.slots is 8:
+			package = {"height": 10, "width": 10, "length": 10, "weight": 48}
+		if self.slots is 12:
+			package = {"height": 13, "width": 13, "length": 13, "weight": 80}
+
+		return easypost.easypost.Package(**package)
 
 	def __unicode__(self):
 		return u'%s/%s Box with %s slots' % (self.month, self.year, self.slots)

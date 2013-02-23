@@ -13,6 +13,10 @@ from django.contrib.localflavor.us.models import USStateField
 from userena.models import UserenaBaseProfile
 from alfie.apps.orders.models import Menu
 
+# Import EasyPost
+import easypost.easypost
+easypost.easypost.api_key = '8xc2JMjUQp9PwQMDsjXBy62sp-uzUC4g'
+
 class Profile(UserenaBaseProfile):
     """
     Creates a Profile object keyed to a User object that defines user profile information.
@@ -33,7 +37,7 @@ class Profile(UserenaBaseProfile):
     ship_city = models.CharField(_("City"), max_length=64, blank=True, null=True)
     ship_state = USStateField(_("State"), blank=True, null=True)
     ship_zip_code = models.CharField(_("Zip code"), max_length=5, blank=True, null=True)
-    address_verified = models.BooleanField(default=False)
+    address_verified = models.NullBooleanField()
     shipping_rate = models.IntegerField(max_length=7, blank=True, null=True)
 
     # Preferences
@@ -94,15 +98,25 @@ class Profile(UserenaBaseProfile):
     last4 = models.IntegerField(max_length=4, blank=True, null=True)
     overdue = models.BooleanField(default=False)
 
-    def check_shipping_rate(self):
-        from alfie.apps.back.shipping.easypostutil import *
-        check_rate(self)
-
     def get_addr_values(self):
         return [self.ship_address_1, self.ship_address_2, self.ship_city, self.ship_state, self.ship_zip_code]
 
     def get_addr(self):
-        return {"street1": self.ship_address_1, "street2": self.ship_address_2, "city": self.ship_city, "state": self.ship_state, "zip": self.ship_zip_code}
+        if self.ship_address_2 is None:
+            addr = {"street1": self.ship_address_1, "city": self.ship_city, "state": self.ship_state, "zip": self.ship_zip_code}
+        else:
+            addr = {"street1": self.ship_address_1, "street2": self.ship_address_2, "city": self.ship_city, "state": self.ship_state, "zip": self.ship_zip_code}
+        return addr
 
     def get_pref(self):
-        return [self.cutest, self.spicy, self.allergy]
+        return {"cutest": self.cutest, "spicy": self.spicy, "allergy": self.allergy}
+
+    def create_address(self):
+        return easypost.easypost.Address(self.user.first_name + ' ' + self.user.last_name, **self.get_addr())
+
+    def verify_address(self):
+        try:
+            self.create_address().verify()
+            self.address_verified = True
+        except:
+            self.address_verified = False

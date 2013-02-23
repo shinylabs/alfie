@@ -42,6 +42,8 @@ class SignupFormExtra(SignupForm):
         user_profile.ship_state = self.cleaned_data['ship_state']
         user_profile.ship_zip_code = self.cleaned_data['ship_zip_code']
 
+        user_profile.verify_address()
+
         user_profile.save()
 
         # Userena expects to get the new user from this form, so return the new
