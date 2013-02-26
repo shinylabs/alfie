@@ -167,6 +167,7 @@ class Order(models.Model):
     paid = models.DateTimeField(blank=True, null=True)
     last_payment_attempt = models.DateTimeField(blank=True, null=True, editable=False)
     payment_attempts = models.IntegerField(blank=True, null=True)
+    refunded = models.DateTimeField(blank=True, null=True)
 
     # Bookkeeping
     #tasks default these to 0
@@ -181,6 +182,7 @@ class Order(models.Model):
     created = models.DateTimeField(auto_now_add=True, editable=False)
     updated = models.DateTimeField(auto_now=True, editable=False)
     notes = models.CharField(max_length=255, blank=True, null=True)
+    killed = models.DateTimeField(blank=True, null=True)
 
     objects = OrderManager()
 

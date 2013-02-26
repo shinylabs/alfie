@@ -210,6 +210,7 @@ LOCAL_APPS = (
     'alfie.apps.ramens',
     'alfie.apps.fakers',
     'alfie.apps.back',
+    'alfie.apps.services',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
