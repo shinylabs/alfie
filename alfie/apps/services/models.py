@@ -70,6 +70,8 @@ class Service(models.Model):
     resolved = models.DateTimeField(blank=True, null=True)
     closed = models.DateTimeField(blank=True, null=True)
 
+    objects = ServiceManager()
+
     def __unicode__(self):
         """
         Service for user.name - Order - Issue - issue.name - Status - ongoing|resolved (timedelta)

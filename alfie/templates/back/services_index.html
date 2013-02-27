@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+
+<h1>Backoffice / Services</h1>
+{% include "back/_nav.html" %}
+
+<table width="100%">
+	<thead><tr><th colspan="8">Service Requests</th></tr></thead>
+	<tbody>
+	<tr>
+		<td width="10%">#</td>
+		<td width="30%">Customer</td>
+		<td width="30%">Issue</td>
+		<td width="30%">Status</td>
+	</tr>
+	{% for order in service_orders %}
+	<tr>
+		<td>{{ forloop.counter }}</td>
+		<td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
+		<td>{{ order.get_issue_display }} </td>
+		{% if order.order.closed %}
+			<td>Closed ({{ order.closed }})</td>
+		{% elif order.resolved %}
+			<td>Resolved ({{ order.resolved }})</td>
+		{% else %}
+			<td>Open</td>
+		{% endif %}
+	</tr>
+	{% endfor %}
+	</tbody>
+</table>
+
+{% endblock %}

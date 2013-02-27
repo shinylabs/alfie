@@ -55,6 +55,7 @@ from util import moneyfmt
 from alfie.apps.profiles.models import Profile
 from alfie.apps.orders.models import Order, Menu
 from alfie.apps.ramens.models import Brand, Flavor, Ramen, Box
+from alfie.apps.services.models import Service
 
 # stripe tools
 from alfie.apps.back.finance.stripeutil import *
@@ -71,14 +72,12 @@ def inventory_index(request):
 	total_brand_count = Brand.objects.all().count()
 	total_ramen_count = Ramen.objects.all().count()
 
-	return render_to_response('back/inventory_index.html', 
-		{
-		 'brand_origins': brand_origins, 
-		 'ramen_origins': ramen_origins, 
-		 'total_brand_count': total_brand_count, 
-		 'total_ramen_count': total_ramen_count
-		 }, 
-		context_instance=RequestContext(request))
+	return render_to_response('back/inventory_index.html', {
+			'brand_origins': brand_origins, 
+			'ramen_origins': ramen_origins, 
+			'total_brand_count': total_brand_count, 
+			'total_ramen_count': total_ramen_count
+		}, context_instance=RequestContext(request))
 
 def orders_index(request):
 	"""
@@ -122,20 +121,18 @@ def orders_index(request):
 	shipped_count = Order.objects.this_month_shipped().count()
 	next_shipped_count = Order.objects.this_month_shipped(add_months(now, 1)).count()
 
-	return render_to_response('back/orders_index.html', 
-		{	
-		 'total_count': total_count, 
-		 'prev_month_count': prev_month_count, 
-		 'this_month_count': this_month_count, 
-		 'next_month_count': next_month_count,
-		 'prev_paid_count': prev_paid_count,
-		 'paid_count': paid_count, 
-		 'next_paid_count': next_paid_count,
-		 'prev_shipped_count': prev_shipped_count,
-		 'shipped_count': shipped_count,
-		 'next_shipped_count': next_shipped_count
-		 }, 
-		context_instance=RequestContext(request))
+	return render_to_response('back/orders_index.html', {	
+			'total_count': total_count, 
+			'prev_month_count': prev_month_count, 
+			'this_month_count': this_month_count, 
+			'next_month_count': next_month_count,
+			'prev_paid_count': prev_paid_count,
+			'paid_count': paid_count, 
+			'next_paid_count': next_paid_count,
+			'prev_shipped_count': prev_shipped_count,
+			'shipped_count': shipped_count,
+			'next_shipped_count': next_shipped_count
+		}, context_instance=RequestContext(request))
 
 def finances_index(request):
 	"""
@@ -169,21 +166,19 @@ def finances_index(request):
 
 	#tasks debug http://stackoverflow.com/questions/3553955/refresh-template-in-django
 
-	return render_to_response('back/finances_index.html', 
-		{	
-		 'total_count': total_count, 
-		 'this_month_count': this_month_count,
-		 'unpaid_list': unpaid_list,
-		 'revenue': revenue,
-		 'shipping_costs': shipping_costs,
-		 'product_costs': product_costs,
-		 'prints_cost': prints_cost,
-		 'prize_cost': prize_cost,
-		 'packaging_cost': packaging_cost,
-		 'fees': fees,
-		 'profit': profit
-		 }, 
-		context_instance=RequestContext(request))
+	return render_to_response('back/finances_index.html', {	
+			'total_count': total_count, 
+			'this_month_count': this_month_count,
+			'unpaid_list': unpaid_list,
+			'revenue': revenue,
+			'shipping_costs': shipping_costs,
+			'product_costs': product_costs,
+			'prints_cost': prints_cost,
+			'prize_cost': prize_cost,
+			'packaging_cost': packaging_cost,
+			'fees': fees,
+			'profit': profit
+		}, context_instance=RequestContext(request))
 
 
 def shipping_index(request):
@@ -241,15 +236,13 @@ def shipping_index(request):
 	  i['max'] = round(state_max, 2)
 	#print "Total sum: $%.2f - Total avg: $%.2f" % (total_sum, (total_avg / len(states)))
 
-	return render_to_response('back/shipping_index.html', 
-		{	
+	return render_to_response('back/shipping_index.html', {	
 			'states': states,
 			'total_sum': total_sum,
 			'total_avg': (total_avg / len(states)),
 			'boxes_this_month': boxes_this_month,
 			'manifest_this_month': manifest_this_month
-		 }, 
-		context_instance=RequestContext(request))
+		}, context_instance=RequestContext(request))
 
 def customers_index(request):
 	"""
@@ -286,13 +279,18 @@ def customers_index(request):
 	#profits_by_profit = sorted(profits, key=lambda k: k['profit'])
 	profits_by_state = sorted(profits, key=lambda k: k['state'])
 
-	return render_to_response('back/customers_index.html', 
-		{
+	return render_to_response('back/customers_index.html', {
 			'profits_by_state': profits_by_state
-		 }, 
-		context_instance=RequestContext(request))
+		}, context_instance=RequestContext(request))
 
 # http://www.nerdydork.com/django-filter-model-on-date-range.html
+
+def services_index(request):
+	service_orders = Service.objects.all()
+	return render_to_response('back/services_index.html', {
+			'service_orders': service_orders
+		}, context_instance=RequestContext(request))
+
 
 
 """

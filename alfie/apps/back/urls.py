@@ -8,12 +8,12 @@ urlpatterns = patterns('alfie.apps.back.views',
    	url(r'^back/finances/$', 'finances_index', name="finances"),
    	url(r'^back/shipping/$', 'shipping_index', name="shipping"),
    	url(r'^back/customers/$', 'customers_index', name="customers"),
+    url(r'^back/services/$', 'services_index', name="services"),
 
    	#url(r'^back/tools/finance/$', 'finance_tools', name="finance_tools"),
    	#url(r'^back/tools/finance/coupon/$', 'finance_coupon', name="finance_coupon"),
    	#url(r'^back/tools/logistics/$', 'logistics_tools', name="logistics_tools"),
 )
-
 
 """
 
