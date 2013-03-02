@@ -5,9 +5,10 @@
 {% endblock %}
 
 {% block content %}
+{% include "back/_nav.html" %}
 
 <h1>Backoffice / Inventory</h1>
-{% include "back/_nav.html" %}
+<div class="panel">This shows inventory of ramens, boxes, and collections.</div>
 
 <table width="100%">
 {% for i in ramen_origins %}

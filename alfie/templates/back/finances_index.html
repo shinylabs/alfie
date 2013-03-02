@@ -6,9 +6,10 @@
 {% endblock %}
 
 {% block content %}
+{% include "back/_nav.html" %}
 
 <h1>Backoffice / Finances</h1>
-{% include "back/_nav.html" %}
+<div class="panel">This shows finance information about orders.</div>
 
 <table class="twelve">
 	<thead><tr><th>Feb</th><th>{{ this_month_count }} orders</th></tr></thead>
@@ -46,7 +47,7 @@
 	</table>
 </form>
 
-{% for order in unpaid_list|slice:":10" %}
+{% for order in unpaid|slice:":10" %}
 	<li>{{ order }} - ${{ order.choice.price|floatformat:2 }}</li>
 {% endfor %}
 

@@ -39,6 +39,30 @@ easypost.easypost.api_key = '8xc2JMjUQp9PwQMDsjXBy62sp-uzUC4g'
 MEDIA_PATH = 'alfie/media/'
 POSTAGE_FILE_PATH = 'assets/postage/'
 
+# USPS Zones and Transit
+# http://www.survivalsuppliers.com/images/zone_map.gif
+# N-CA zip codes http://info.kaiserpermanente.org/steps/zipcodes_nocal.html
+# S-CA zip codes http://info.kaiserpermanente.org/steps/zipcodes_socal.html
+# W-NV zip codes http://www.mongabay.com/igapo/zip_codes/counties/alpha/Nevada%20County-California1.html
+# W-PA zip codes
+# E-PA zip codes
+
+zone0 = ['CA', 'NV'] # 1 day
+zone1 = ['CA', 'WA', 'OR', 'ID', 'NV', 'UT'] # 2 days
+zone2 = ['MT', 'WY', 'CO', 'AZ', 'NM'] # 3 days
+zone3 = ['ND', 'NE', 'KS', 'OK', 'TX', 'IA', 'MO', 'AR', 'WI', 'IL', 'IN', 'MI'] # 4 days
+zone4 = ['SD', 'MN', 'OH', 'KY', 'TN', 'MS', 'LA', 'WV', 'PA', 'NY'] # 5 days
+zone5 = ['ME', 'VT', 'NH', 'MA', 'CT', 'RI', 'NJ', 'MD', 'DE', 'DC', 'VA', 'NC', 'SC', 'GA', 'AL', 'FL'] # 6 days
+zone6 = ['AL', 'HI'] # 7 days
+
+zones = [{'zone': '0', 'states': zone0, 'transit': '1 day'}, 
+         {'zone': '1', 'states': zone1, 'transit': '2 days'},
+         {'zone': '2', 'states': zone2, 'transit': '3 days'},
+         {'zone': '3', 'states': zone3, 'transit': '4 days'},
+         {'zone': '4', 'states': zone4, 'transit': '5 days'},
+         {'zone': '5', 'states': zone5, 'transit': '6 days'},
+         {'zone': '6', 'states': zone6, 'transit': '7 days'}]
+
 class Menu(models.Model):
     """
     Creates a Menu object that defines LuckyRamenCat menu options.

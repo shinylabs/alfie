@@ -147,15 +147,15 @@ def finances_index(request):
 	from decimal import *
 	total_count = Order.objects.count()
 	this_month_count = Order.objects.this_month().count()
-	unpaid_list = Order.objects.unpaid_list()
+	unpaid = Order.objects.this_month_unpaid()
 
-	revenue = Decimal((Order.objects.this_month().aggregate(Sum('choice__price'))['choice__price__sum'] if Order.objects.this_month().aggregate(Sum('choice__price'))['choice__price__sum'] is not None else 0)) / 100
-	shipping_costs = Decimal((Order.objects.this_month().aggregate(Sum('shipping_cost'))['shipping_cost__sum'] if Order.objects.this_month().aggregate(Sum('shipping_cost'))['shipping_cost__sum'] is not None else 0)) / 100
-	product_costs = Decimal((Order.objects.this_month().aggregate(Sum('product_cost'))['product_cost__sum'] if Order.objects.this_month().aggregate(Sum('product_cost'))['product_cost__sum'] is not None else 0)) / 100
-	prize_cost = Decimal((Order.objects.this_month().aggregate(Sum('prize_cost'))['prize_cost__sum'] if Order.objects.this_month().aggregate(Sum('prize_cost')) is not None else 0)) / 100
-	prints_cost = Decimal((Order.objects.this_month().aggregate(Sum('prints_cost'))['prints_cost__sum'] if Order.objects.this_month().aggregate(Sum('prints_cost')) is not None else 0)) / 100
-	packaging_cost = Decimal((Order.objects.this_month().aggregate(Sum('packaging_cost'))['packaging_cost__sum'] if Order.objects.this_month().aggregate(Sum('packaging_cost')) is not None else 0)) / 100
-	fees = Decimal((Order.objects.this_month().aggregate(Sum('stripe_fee'))['stripe_fee__sum'] if Order.objects.this_month().aggregate(Sum('stripe_fee'))['stripe_fee__sum'] is not None else 0)) / 100
+	revenue 		= Decimal((Order.objects.this_month().aggregate(Sum('choice__price'))['choice__price__sum'] if Order.objects.this_month().aggregate(Sum('choice__price'))['choice__price__sum'] is not None else 0)) / 100
+	shipping_costs 	= Decimal((Order.objects.this_month().aggregate(Sum('shipping_cost'))['shipping_cost__sum'] if Order.objects.this_month().aggregate(Sum('shipping_cost'))['shipping_cost__sum'] is not None else 0)) / 100
+	product_costs 	= Decimal((Order.objects.this_month().aggregate(Sum('product_cost'))['product_cost__sum'] if Order.objects.this_month().aggregate(Sum('product_cost'))['product_cost__sum'] is not None else 0)) / 100
+	prize_cost 		= Decimal((Order.objects.this_month().aggregate(Sum('prize_cost'))['prize_cost__sum'] if Order.objects.this_month().aggregate(Sum('prize_cost'))['prize_cost__sum'] is not None else 0)) / 100
+	prints_cost 	= Decimal((Order.objects.this_month().aggregate(Sum('prints_cost'))['prints_cost__sum'] if Order.objects.this_month().aggregate(Sum('prints_cost'))['prints_cost__sum'] is not None else 0)) / 100
+	packaging_cost 	= Decimal((Order.objects.this_month().aggregate(Sum('packaging_cost'))['packaging_cost__sum'] if Order.objects.this_month().aggregate(Sum('packaging_cost'))['packaging_cost__sum'] is not None else 0)) / 100
+	fees 			= Decimal((Order.objects.this_month().aggregate(Sum('stripe_fee'))['stripe_fee__sum'] if Order.objects.this_month().aggregate(Sum('stripe_fee'))['stripe_fee__sum'] is not None else 0)) / 100
 	profit = revenue - shipping_costs - product_costs - prints_cost - packaging_cost - fees
 
  	if request.method == 'POST': # If the form has been submitted...
@@ -169,7 +169,7 @@ def finances_index(request):
 	return render_to_response('back/finances_index.html', {	
 			'total_count': total_count, 
 			'this_month_count': this_month_count,
-			'unpaid_list': unpaid_list,
+			'unpaid': unpaid,
 			'revenue': revenue,
 			'shipping_costs': shipping_costs,
 			'product_costs': product_costs,
