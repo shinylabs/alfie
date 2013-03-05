@@ -52,9 +52,6 @@ import stripe
 from django.conf import settings
 stripe.api_key = settings.TEST_STRIPE_API_KEY
 
-from alfie.apps.back.shipping.easypost import *
-from alfie.apps.back.shipping.easypostutil import verify_addr, check_rate
-
 import sys
 
 class FakerManager(models.Manager):
