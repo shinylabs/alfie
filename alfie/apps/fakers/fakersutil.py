@@ -10,15 +10,13 @@ from alfie.apps.ramens.models import Ramen
 
 from alfie.apps.fakers.csvutil import *
 """
-Imports in:
+Imports in: 
 	load_csv_dict(csvfile)
 	load_csv(csvfile)
 	write_csv(data, step=500)
 """
 
-csvfile = 'alfie/apps/fakers/fakedata/names500.csv'
-csvfile2 = 'alfie/apps/fakers/fakedata/names1000.csv'
-csvfile3 = 'alfie/apps/fakers/fakedata/names1500.csv'
+csvfile = 'alfie/apps/fakers/fakedata/names.csv'
 
 def salt_hash(password):
 	#bigups http://stackoverflow.com/questions/9594125/salt-and-hash-a-password-in-python
@@ -38,15 +36,30 @@ def make_profile(f, user_info):
 	p.save()
 
 def make_fakers(user_info):
-	for i in range(len(user_info)):
-		f = Faker()
-		f.username = user_info[i]['Username']
-		f.first_name = user_info[i]['GivenName']
-		f.last_name = user_info[i]['Surname']
-		f.email = user_info[i]['EmailAddress']
-		f.password = salt_hash(user_info[i]['Password'])
-		f.save()
-		make_profile(f, user_info[i])
+	fakers_count = Faker.objects.count()
+
+	if fakers_count is 0:
+		print 'There are no fakers'
+		make_count = raw_input('How many fakers do you want to make? ')
+		print 'Making', make_count
+
+		"""
+		for i in range(len(user_info)):
+			f = Faker()
+			f.username = user_info[i]['Username']
+			f.first_name = user_info[i]['GivenName']
+			f.last_name = user_info[i]['Surname']
+			f.email = user_info[i]['EmailAddress']
+			f.password = salt_hash(user_info[i]['Password'])
+			f.save()
+			make_profile(f, user_info[i])
+		"""
+	else:
+		confirm_making = raw_input('There are ' + str(fakers_count) + ' fakers already. Do you want to make more? (y/n) ')
+		if confirm_making is 'y':
+			print confirm_making
+		else:
+			print confirm_making
 
 def make_orders():
 	for i in range(2, Faker.objects.count()):

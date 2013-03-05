@@ -55,15 +55,18 @@ stripe.api_key = settings.TEST_STRIPE_API_KEY
 from alfie.apps.back.shipping.easypost import *
 from alfie.apps.back.shipping.easypostutil import verify_addr, check_rate
 
+import sys
+
 class FakerManager(models.Manager):
 	"""
 		This object manager does:
-			salt/hash passwords
 			create fakers
 			create fake profiles
+			salt/hash passwords
 			create fake orders
 			verify fake address
-			rate fake address
+			create fake payments
+			rate fake address costs
 	"""
 	@staticmethod	#bigups http://stackoverflow.com/questions/4909585/interesting-takes-exactly-1-argument-2-given-python-error
 	def salt_hash(password):
@@ -74,7 +77,7 @@ class FakerManager(models.Manager):
 		return hashed_password
 
 	@staticmethod
-	def create_profile(f, user_info):
+	def create_profile(f, data):
 		import random
 		# cc from csv don't pass stripe security test
 		goodcards = ['4242424242424242', '4012888888881881', '5555555555554444', '5105105105105100', '378282246310005', '371449635398431', '6011111111111117', '6011000990139424']
@@ -83,46 +86,114 @@ class FakerManager(models.Manager):
 		p.user = f
 		p.choice = random.choice(Menu.objects.all())
 
-		p.ship_address_1 = user_info['StreetAddress']
-		p.ship_city = user_info['City']
-		p.ship_state = user_info['State']
-		p.ship_zip_code = user_info['ZipCode']
+		p.ship_address_1 = data['StreetAddress']
+		p.ship_city = data['City']
+		p.ship_state = data['State']
+		p.ship_zip_code = data['ZipCode']
 
 		p.cutest = random.choice(p.CUTE_CHOICES)[0]
 		p.spicy = random.choice(p.SPICY_LEVEL_CHOICES)[0]
 		p.allergy = random.choice(p.ALLERGY_TYPE_CHOICES)[0]
 
-		p.ccnumber = random.choice(goodcards) # user_info['CCNumber']
-		p.cvv = user_info['CVV2']
-		p.exp_month = user_info['CCExpires'].split('/')[0]
-		p.exp_year = user_info['CCExpires'].split('/')[1]
+		p.ccnumber = random.choice(goodcards) # data['CCNumber']
+		p.cvv = data['CVV2']
+		p.exp_month = data['CCExpires'].split('/')[0]
+		p.exp_year = data['CCExpires'].split('/')[1]
 		p.save()
 
-	def create_fakers(self, user_info):
+	@staticmethod
+	def create_faker(data):
+		f = Faker(
+			username=data['Username'],
+			first_name = data['GivenName'],
+			last_name = data['Surname'],
+			email = data['EmailAddress'],
+			#password = self.salt_hash(data['Password'])
+			password = data['Password']
+		)
+		try:
+			f.save()
+			return f
+		except:
+			print sys.exc_info()
+			return False
+
+	def create_fakers(self):
 		successcount = 0
 		failcount = 0
 		badlist = []
-		for i in range(len(user_info)):
-			f = Faker(
-				username=user_info[i]['Username'],
-				first_name = user_info[i]['GivenName'],
-				last_name = user_info[i]['Surname'],
-				email = user_info[i]['EmailAddress'],
-				#password = self.salt_hash(user_info[i]['Password'])
-				password = user_info[i]['Password']
-			)
-			try:
-				f.save()
-				print '\nSaved %s' % f.username
-				self.create_profile(f, user_info[i])
-				print 'Made a profile for %s' % f.username
-				successcount+=1
-			except:
-				badlist.append(user_info[i]['Username'])
-				print '\nSomething about %s failed :(' % f.username
-				failcount+=1
-				pass
-		print '\nStarted with %s users and added %s users ' % (len(user_info), successcount)
+
+		data = []
+		fakers_count = Faker.objects.count()
+
+		if fakers_count is 0:
+			# Notify
+			print 'There are no fakers'
+			
+			# Make how many
+			make_count = raw_input('How many fakers do you want to make? ')
+			print 'Making %s fakers' % make_count
+			
+			# Create filenames
+			filelist = create_filename(int(make_count))
+			print filelist
+
+			# Continue?
+			confirm = raw_input('Continue? ')
+			if confirm is 'y':
+				# Create the data
+				for f in filelist:
+					data += load_csv_dict(f)
+
+				# Create fakers
+				for i in range(int(make_count)):
+					f = self.create_faker(data[i])
+					if f is not False:
+						print '\nSaved %s' % f.username
+						self.create_profile(f, data[i])
+						print 'Made a profile for %s' % f.username
+						successcount+=1
+					else:
+						badlist.append(data[i]['Username'])
+						print '\nSomething about %s failed :(' % data[i]['Username']
+						failcount+=1
+						pass
+		else:
+			# Confirm
+			confirm_making = raw_input('There are ' + str(fakers_count) + ' fakers already. Do you want to make more? (y/n) ')
+			if confirm_making is 'y':
+				# Make how many
+				make_count = raw_input('How many fakers do you want to make? ')
+				print 'Making %s fakers' % make_count
+				
+				# Create filenames
+				filelist = create_filename(int(make_count))
+				print filelist
+
+				# Continue?
+				confirm = raw_input('Continue? ')
+				if confirm is 'y':
+					# Create the data
+					for f in filelist:
+						data += load_csv_dict(f)
+
+					# Create fakers
+					for i in range(int(make_count)):
+						f = self.create_faker(data[i])
+						if f is not False:
+							print '\nSaved %s' % f.username
+							self.create_profile(f, data[i])
+							print 'Made a profile for %s' % f.username
+							successcount+=1
+						else:
+							badlist.append(data[i]['Username'])
+							print '\nSomething about %s failed :(' % data[i]['Username']
+							failcount+=1
+							pass
+			else:
+				print "Next time"
+
+		print '\nStarted with %s users and added %s users ' % (int(make_count), successcount)
 		stat = Stat(key='fakers', value=successcount).save()
 		if failcount > 0: print 'Failed to add %s.\nThese failed: %s' % (failcount, badlist)
 
@@ -242,9 +313,9 @@ class FakerManager(models.Manager):
 		badlist = []
 		for i in range(2,self.count()+2):
 			f = self.get(pk=i)
-			if f.profile.stripe_cust_id is None or f.profile.stripe_cust_id == '':
-				token = f.profile.stripe_token
+			if f.profile.stripe_cust_id is None or f.profile.stripe_cust_id is '':
 				try:
+					token = f.profile.stripe_token
 					response = stripe.Customer.create(
 						card = token,
 						email = f.email,
@@ -256,6 +327,13 @@ class FakerManager(models.Manager):
 					f.profile.save()
 					successcount+=1
 					print 'Saved %s as a customer\n' % f.username
+				except:
+					print '\nSomething about %s failed :(\n' % f.username
+
+					badlist.append(f.username)
+					failcount+=1
+					pass
+				"""
 				except stripe.CardError, e:
 					body = e.json_body
 					err  = body['error']
@@ -270,6 +348,7 @@ class FakerManager(models.Manager):
 					badlist.append(f.username)
 					failcount+=1
 					pass
+				"""
 		print '\nStarted with %s users and created %s customers ' % (self.count(), successcount)
 		if failcount > 0: print 'Failed to create %s customers.\nThese failed: %s' % (failcount, badlist)
 
@@ -280,9 +359,21 @@ class FakerManager(models.Manager):
 		successcount = 0
 		failcount = 0
 		badlist = []
+
 		for i in range(2,self.count()+2):
 			f = self.get(pk=i)
-			if f.profile.address_verified is False:
+			if f.profile.address_verified is None:
+				try:
+					f.profile.verify_address()
+					f.profile.save()
+					successcount+=1
+					print '%s/%s - %s address verified' % (i, self.count()+2, f.username)
+				except:
+					badlist.append(f.username)
+					print '\n%s/%s/ - %s failed :(\n' % (i, self.count()+2, f.username)
+					failcount+=1
+					pass
+				"""
 				try:
 					f.profile.address_verified = verify_addr(f.profile)
 					f.profile.save()
@@ -293,6 +384,7 @@ class FakerManager(models.Manager):
 					print '\nSomething about %s failed :(' % f.username
 					failcount+=1
 					pass
+				"""
 		print '\nStarted with %s users and verified %s customers ' % (self.count(), successcount)
 		if failcount > 0: print 'Failed to verify %s customers.\nThese failed: %s' % (failcount, badlist)
 

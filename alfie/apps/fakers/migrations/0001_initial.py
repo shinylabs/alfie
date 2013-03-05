@@ -14,19 +14,34 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('fakers', ['Faker'])
 
-        # Adding model 'FakeProfile'
-        db.create_table('fakers_fakeprofile', (
+        # Adding model 'Fakep'
+        db.create_table('fakers_fakep', (
             ('profile_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['profiles.Profile'], unique=True, primary_key=True)),
+            ('ccnumber', self.gf('django.db.models.fields.CharField')(max_length=16, null=True, blank=True)),
+            ('cvv', self.gf('django.db.models.fields.CharField')(max_length=3, null=True, blank=True)),
+            ('exp_month', self.gf('django.db.models.fields.CharField')(max_length=2, null=True, blank=True)),
+            ('exp_year', self.gf('django.db.models.fields.CharField')(max_length=4, null=True, blank=True)),
         ))
-        db.send_create_signal('fakers', ['FakeProfile'])
+        db.send_create_signal('fakers', ['Fakep'])
+
+        # Adding model 'Stat'
+        db.create_table('fakers_stat', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('key', self.gf('django.db.models.fields.CharField')(max_length=128, null=True, blank=True)),
+            ('value', self.gf('django.db.models.fields.CharField')(max_length=128, null=True, blank=True)),
+        ))
+        db.send_create_signal('fakers', ['Stat'])
 
 
     def backwards(self, orm):
         # Deleting model 'Faker'
         db.delete_table('fakers_faker')
 
-        # Deleting model 'FakeProfile'
-        db.delete_table('fakers_fakeprofile')
+        # Deleting model 'Fakep'
+        db.delete_table('fakers_fakep')
+
+        # Deleting model 'Stat'
+        db.delete_table('fakers_stat')
 
 
     models = {
@@ -66,24 +81,35 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
-        'fakers.fakeprofile': {
-            'Meta': {'object_name': 'FakeProfile', '_ormbases': ['profiles.Profile']},
+        'fakers.fakep': {
+            'Meta': {'object_name': 'Fakep', '_ormbases': ['profiles.Profile']},
+            'ccnumber': ('django.db.models.fields.CharField', [], {'max_length': '16', 'null': 'True', 'blank': 'True'}),
+            'cvv': ('django.db.models.fields.CharField', [], {'max_length': '3', 'null': 'True', 'blank': 'True'}),
+            'exp_month': ('django.db.models.fields.CharField', [], {'max_length': '2', 'null': 'True', 'blank': 'True'}),
+            'exp_year': ('django.db.models.fields.CharField', [], {'max_length': '4', 'null': 'True', 'blank': 'True'}),
             'profile_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['profiles.Profile']", 'unique': 'True', 'primary_key': 'True'})
         },
         'fakers.faker': {
             'Meta': {'object_name': 'Faker', '_ormbases': ['auth.User']},
             'user_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True', 'primary_key': 'True'})
         },
+        'fakers.stat': {
+            'Meta': {'object_name': 'Stat'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'key': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'}),
+            'value': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'})
+        },
         'orders.menu': {
             'Meta': {'object_name': 'Menu'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'}),
             'notes': ('django.db.models.fields.TextField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'price': ('django.db.models.fields.DecimalField', [], {'max_digits': '7', 'decimal_places': '2'}),
-            'size': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'})
+            'price': ('django.db.models.fields.IntegerField', [], {'max_length': '7'}),
+            'slots': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'})
         },
         'profiles.profile': {
             'Meta': {'object_name': 'Profile'},
+            'address_verified': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
             'allergy': ('django.db.models.fields.CharField', [], {'max_length': '2', 'null': 'True', 'blank': 'True'}),
             'cancelled': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'choice': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['orders.Menu']", 'null': 'True', 'blank': 'True'}),
@@ -91,18 +117,20 @@ class Migration(SchemaMigration):
             'cutest': ('django.db.models.fields.CharField', [], {'max_length': '1', 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'killed': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'last_4_digits': ('django.db.models.fields.CharField', [], {'max_length': '4', 'null': 'True', 'blank': 'True'}),
-            'last_payment_attempt': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            'last4': ('django.db.models.fields.IntegerField', [], {'max_length': '4', 'null': 'True', 'blank': 'True'}),
             'mugshot': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'blank': 'True'}),
             'notes': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
-            'payment_attempts': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'overdue': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'privacy': ('django.db.models.fields.CharField', [], {'default': "'closed'", 'max_length': '15'}),
             'ship_address_1': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'}),
             'ship_address_2': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'}),
             'ship_city': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True', 'blank': 'True'}),
             'ship_state': ('django.contrib.localflavor.us.models.USStateField', [], {'max_length': '2', 'null': 'True', 'blank': 'True'}),
             'ship_zip_code': ('django.db.models.fields.CharField', [], {'max_length': '5', 'null': 'True', 'blank': 'True'}),
+            'shipping_rate': ('django.db.models.fields.IntegerField', [], {'max_length': '7', 'null': 'True', 'blank': 'True'}),
             'spicy': ('django.db.models.fields.CharField', [], {'max_length': '2', 'null': 'True', 'blank': 'True'}),
+            'stripe_cust_id': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'stripe_token': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'subscribed': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})

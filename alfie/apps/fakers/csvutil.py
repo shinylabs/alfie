@@ -1,8 +1,22 @@
 import csv
 
-csvfile = 'alfie/apps/fakers/fakedata/names500.csv'
-csvfile2 = 'alfie/apps/fakers/fakedata/names1000.csv'
-csvfile3 = 'alfie/apps/fakers/fakedata/names1500.csv'
+def create_filename(count, step=500, skipcount=0, csvfile='alfie/apps/fakers/fakedata/names'):
+	"""
+		Takes count, if under 500, then name it 500, else make it 1000, return file list
+	"""
+	steps = count / step
+	mods = count % step
+	if mods > 0:
+		steps = steps + 1
+	loop = 1
+	filelist = []
+	skip = skipcount * step
+	while (loop <= steps):
+		step = step * loop
+		filename = csvfile + str(step + skip) + '.csv'
+		filelist.append(filename)
+		loop = loop + 1
+	return filelist
 
 def load_csv_dict(csvfile):
 	"""
@@ -14,7 +28,7 @@ def load_csv_dict(csvfile):
 		datarows.append(row)
 	return datarows
 
-def load_csv(csvfile='fakedata/biglist10k.csv'):
+def load_csv(csvfile):
 	"""
 	Returns list of header row and data rows
 	"""

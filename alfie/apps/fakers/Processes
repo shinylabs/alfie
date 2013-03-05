@@ -27,3 +27,27 @@ FINANCES
 CUSTOMERS
 1. LTV
 2. Churn-rate
+
+
+
+
+
+1. Create fakers
+from alfie.apps.fakers.models import *
+Faker.objects.create_fakers()
+
+2. Create profiles
+Faker.objects.create_profile()
+
+3. Create stripe plans
+from alfie.apps.back.finance.stripeutil import *
+create_plans()
+
+4. Create ramen box
+
+5. Create stripe tokens
+Faker.objects.create_fake_tokens()
+
+6. Create stripe customers
+Faker.objects.create_fake_customers()
+

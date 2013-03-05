@@ -5,7 +5,7 @@
 	"fields": {
 		"name": "tinybox",
 		"slots": "4",
-		"price": "12",
+		"price": "1200",
 		"notes": "For people that want to try"
 	}
 },
@@ -15,7 +15,7 @@
 	"fields": {
 		"name": "bigbox",
 		"slots": "8",
-		"price": "22",
+		"price": "2200",
 		"notes": "For the ramen fanatic"
 	}
 },
@@ -25,7 +25,7 @@
 	"fields": {
 		"name": "sumobox",
 		"slots": "12",
-		"price": "32",
+		"price": "3200",
 		"notes": "If you just want to mainline"
 	}
 }

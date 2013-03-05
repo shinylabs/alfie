@@ -24,6 +24,8 @@ stripe.api_key = settings.TEST_STRIPE_API_KEY
 # profile = p.profile_ptr
 # fakeprofile = p
 
+from alfie.apps.orders.models import Menu
+
 def create_plans():
 	"""
 		Create and map Stripe plan objects out of Menu objects
@@ -40,7 +42,15 @@ def create_plans():
 			- id 			-> Menu.name.lower()
 			- livemode	 	-> true
 	"""
-	pass
+	for menu in Menu.objects.all():
+		response = stripe.Plan.create(
+			id = menu.name.lower(),
+			amount = menu.price,
+			currency = 'usd',
+			interval = 'month',
+			name = menu.name
+		)
+		print response
 
 def fake_numbers():
 	"""
