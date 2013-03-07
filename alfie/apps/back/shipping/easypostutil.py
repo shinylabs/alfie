@@ -10,7 +10,7 @@ from alfie.apps.profiles.models import *
 import sys # to print
 
 # import app
-from easypost import EasyPost, Address, Postage
+#from easypost import EasyPost, Address, Postage
 
 # USPS Zones and Transit
 # http://www.survivalsuppliers.com/images/zone_map.gif

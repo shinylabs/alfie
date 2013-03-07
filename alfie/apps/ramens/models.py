@@ -1,42 +1,25 @@
-"""
-// SHELL CMDS
-
-from alfie.apps.ramens.models import *
-from alfie.apps.orders.models import Menu
-"""
-
-# time
-import datetime
-import calendar
-now = datetime.datetime.now()
-
-#bigups http://stackoverflow.com/questions/4130922/how-to-increment-datetime-month-in-python
-def add_months(sourcedate, months):
-    month = sourcedate.month - 1 + months
-    year = sourcedate.year + month / 12
-    month = month % 12 + 1
-    day = min(sourcedate.day, calendar.monthrange(year,month)[1])
-    return datetime.date(year, month, day)
-
-def subtract_months(sourcedate, months):
-    month = sourcedate.month - 1 - months
-    year = sourcedate.year + month / 12
-    month = month % 12 + 1
-    day = min(sourcedate.day, calendar.monthrange(year,month)[1])
-    return datetime.date(year, month, day)
-
-from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Count
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
 
 # Other app models
 #from alfie.apps.orders.models import *
 
+# time helpers
+from alfie.apps.back.timehelpers import *
+"""
+	Imports in:
+	datetime
+	add_months()
+	subtract_months()
+"""
+
 # Import EasyPost
 import easypost.easypost
-easypost.easypost.api_key = '8xc2JMjUQp9PwQMDsjXBy62sp-uzUC4g'
+from django.conf import settings
+easypost.easypost.api_key = settings.TEST_EASYPOST_API_KEY
 
 # Where to store all the images in devmode
 MEDIA_PATH = 'alfie/media/'

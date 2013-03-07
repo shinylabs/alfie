@@ -13,32 +13,21 @@ Faker.objects.verify_fake_addr()
 Faker.objects.rate_fake_addr()
 """
 
-# time
-import datetime
-import calendar
-now = datetime.datetime.now()
-
-#bigups http://stackoverflow.com/questions/4130922/how-to-increment-datetime-month-in-python
-def add_months(sourcedate, months):
-	month = sourcedate.month - 1 + months
-	year = sourcedate.year + month / 12
-	month = month % 12 + 1
-	day = min(sourcedate.day, calendar.monthrange(year,month)[1])
-	return datetime.date(year, month, day)
-
-def subtract_months(sourcedate, months):
-	month = sourcedate.month - 1 - months
-	year = sourcedate.year + month / 12
-	month = month % 12 + 1
-	day = min(sourcedate.day, calendar.monthrange(year,month)[1])
-	return datetime.date(year, month, day)
-
 from django.db import models
 from django.contrib.auth.models import User
 from alfie.apps.profiles.models import Profile
 from alfie.apps.orders.models import Menu, Order
 
-# util
+# time helpers
+from alfie.apps.back.timehelpers import *
+"""
+	Imports in:
+	datetime
+	add_months()
+	subtract_months()
+"""
+
+# csv helpers
 from alfie.apps.fakers.csvutil import *
 """
 	Imports in:
@@ -47,11 +36,12 @@ from alfie.apps.fakers.csvutil import *
 	write_csv(data, step=500)
 """
 
+# stripe
 import stripe
-# set api key
 from django.conf import settings
 stripe.api_key = settings.TEST_STRIPE_API_KEY
 
+# terminal printing
 import sys
 
 class FakerManager(models.Manager):

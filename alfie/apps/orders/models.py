@@ -1,29 +1,3 @@
-"""
-// SHELL CMDS
-
-from alfie.apps.orders.models import *
-"""
-
-# time
-import datetime
-import calendar
-now = datetime.datetime.now()
-
-#bigups http://stackoverflow.com/questions/4130922/how-to-increment-datetime-month-in-python
-def add_months(sourcedate, months):
-    month = sourcedate.month - 1 + months
-    year = sourcedate.year + month / 12
-    month = month % 12 + 1
-    day = min(sourcedate.day, calendar.monthrange(year,month)[1])
-    return datetime.date(year, month, day)
-
-def subtract_months(sourcedate, months):
-    month = sourcedate.month - 1 - months
-    year = sourcedate.year + month / 12
-    month = month % 12 + 1
-    day = min(sourcedate.day, calendar.monthrange(year,month)[1])
-    return datetime.date(year, month, day)
-
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
@@ -31,9 +5,24 @@ from django.utils.translation import ugettext as _
 # Import other data models
 from alfie.apps.ramens.models import Box
 
+# time helpers
+from alfie.apps.back.timehelpers import *
+"""
+    Imports in:
+    datetime
+    add_months()
+    subtract_months()
+"""
+
+# stripe
+import stripe
+from django.conf import settings
+stripe.api_key = settings.TEST_STRIPE_API_KEY
+
 # Import EasyPost
 import easypost.easypost
-easypost.easypost.api_key = '8xc2JMjUQp9PwQMDsjXBy62sp-uzUC4g'
+from django.conf import settings
+easypost.easypost.api_key = settings.TEST_EASYPOST_API_KEY
 
 # Where to store postage files
 MEDIA_PATH = 'alfie/media/'
@@ -214,10 +203,6 @@ class Order(models.Model):
         """
             Call up Stripe API and save last4
         """
-        import stripe
-        from django.conf import settings
-        stripe.api_key = settings.TEST_STRIPE_API_KEY
-
         cust_id = self.user.profile.stripe_cust_id
         resp = stripe.Charge.all(customer=cust_id)
 
@@ -229,10 +214,6 @@ class Order(models.Model):
         """
             Call up Stripe API and verify if order has been paid, else charge order, then update Order object
         """
-        import stripe
-        from django.conf import settings
-        stripe.api_key = settings.TEST_STRIPE_API_KEY
-
         cust_id = self.user.profile.stripe_cust_id
         resp = stripe.Charge.all(customer=cust_id)
 
@@ -244,10 +225,6 @@ class Order(models.Model):
         """
             Call up Stripe API and save last4
         """
-        import stripe
-        from django.conf import settings
-        stripe.api_key = settings.TEST_STRIPE_API_KEY
-
         cust_id = self.user.profile.stripe_cust_id
         resp = stripe.Charge.all(customer=cust_id)
 
@@ -355,13 +332,3 @@ class Order(models.Model):
 
     def __unicode__(self):
         return u'Order %s for %s' % (self.id, self.user.first_name)
-
-"""
-
-#todo
-
-1. check if order is paid with stripe
-2. calc bookkeeping fields
-
-
-"""
