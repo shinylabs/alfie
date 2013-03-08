@@ -18,6 +18,8 @@ from alfie.apps.back.timehelpers import *
 import stripe
 from django.conf import settings
 stripe.api_key = settings.TEST_STRIPE_API_KEY
+# stripe helpers
+from alfie.apps.back.finance.stripeutil import *
 
 # Import EasyPost
 import easypost.easypost
@@ -96,6 +98,14 @@ class OrderManager(models.Manager):
         return count
 
     # FINANCES
+    def check_last4(self, now=now):
+        for order in self.filter(year=now.year).filter(month=now.month):
+            order.check_last4()
+
+    def check_paid(self, now=now):
+        for order in self.filter(year=now.year).filter(month=now.month):
+            order.check_paid()
+
     def this_month_unpaid(self, now=now):
         return self.filter(year=now.year).filter(month=now.month).filter(paid__isnull=True)
 
@@ -120,9 +130,9 @@ class OrderManager(models.Manager):
 
     # HANDLING
     def this_month_to_pack(self, now=now):
-        return self.filter(year=now.year).filter(month=now.month).filter(packed__isnull=True)
+        return self.filter(year=now.year).filter(month=now.month).filter(paid__isnull=False).filter(packed__isnull=True)
     def this_month_packed(self, now=now):
-        return self.filter(year=now.year).filter(month=now.month).filter(packed__isnull=False)
+        return self.filter(year=now.year).filter(month=now.month).filter(paid__isnull=False).filter(packed__isnull=False)
 
     def prev_month_packed(self, now=now):
         now = subtract_months(now, 1)
@@ -139,10 +149,10 @@ class OrderManager(models.Manager):
         return list
 
     def this_month_to_ship(self, now=now):
-        return self.filter(year=now.year).filter(month=now.month).filter(shipped__isnull=True)
+        return self.filter(year=now.year).filter(month=now.month).filter(packed__isnull=False).filter(shipped__isnull=True)
 
     def this_month_shipped(self, now=now):
-        return self.filter(year=now.year).filter(month=now.month).filter(shipped__isnull=False)
+        return self.filter(year=now.year).filter(month=now.month).filter(packed__isnull=False).filter(shipped__isnull=False)
 
     def prev_month_shipped(self, now=now):
         now = subtract_months(now, 1)
@@ -203,43 +213,51 @@ class Order(models.Model):
         """
             Call up Stripe API and save last4
         """
-        cust_id = self.user.profile.stripe_cust_id
-        resp = stripe.Charge.all(customer=cust_id)
+        if not self.user.profile.stripe_cust_id:
+            if create_customer(self.user, self.user.profile):
+                self.check_card()
+            else: print 'Not a stripe customer'
+        else:
+            resp = stripe.Charge.all(customer=self.user.profile.stripe_cust_id)
 
-        if resp['data'][0]['card']['last4']:
-            self.last4 = resp['data'][0]['card']['last4'];
-            self.save()        
+            if resp['data'][-1]['card']['last4']:
+                self.last4 = resp['data'][0]['card']['last4']
+                self.save()     
 
     def check_paid(self):
         """
             Call up Stripe API and verify if order has been paid, else charge order, then update Order object
         """
-        cust_id = self.user.profile.stripe_cust_id
-        resp = stripe.Charge.all(customer=cust_id)
+        if not self.user.profile.stripe_cust_id:
+            if create_customer(self.user, self.user.profile):
+                self.check_paid()
+            else: print 'Not a stripe customer'
+        else:
+            resp = stripe.Charge.all(customer=self.user.profile.stripe_cust_id)
 
-        if resp['data'][0]['paid'] is True:
-            self.paid = now;
-            self.save()
+            if resp['data'][-1]['paid']:
+                self.paid = now
+                self.stripe_fee = resp['data'][-1]['fee']
+                self.save()
+            else:
+                self.last_payment_attempt = now
+                check_overdue(self.user.profile)
+                self.save()
 
     def check_stripe_fee(self):
         """
             Call up Stripe API and save last4
         """
-        cust_id = self.user.profile.stripe_cust_id
-        resp = stripe.Charge.all(customer=cust_id)
+        if not self.user.profile.stripe_cust_id:
+            if create_customer(self.user, self.user.profile):
+                self.check_stripe_fee()
+            else: print 'Not a stripe customer'
+        else:
+            resp = stripe.Charge.all(customer=self.user.profile.stripe_cust_id)
 
-        if resp['data'][0]['fee']:
-            self.stripe_fee = resp['data'][0]['fee'];
-            self.save()
-
-    def check_costs(self):
-        total = (self.product_cost if self.product_cost is not None else 0)
-        total += (self.prize_cost if self.prize_cost is not None else 0)
-        total += (self.prints_cost if self.prints_cost is not None else 0) 
-        total += (self.packaging_cost if self.packaging_cost is not None else 0) 
-        total += (self.shipping_cost if self.shipping_cost is not None else 0) 
-        total += (self.stripe_fee if self.stripe_fee is not None else 0)
-        return total
+            if resp['data'][-1]['fee']:
+                self.stripe_fee = resp['data'][-1]['fee']
+                self.save()
 
     def check_cutoff(self):
         """
@@ -324,6 +342,15 @@ class Order(models.Model):
             # set shipped datetimestamp
             self.shipped = now
             self.save()
+
+    def tally_costs(self):
+        total = (self.product_cost if self.product_cost is not None else 0)
+        total += (self.prize_cost if self.prize_cost is not None else 0)
+        total += (self.prints_cost if self.prints_cost is not None else 0) 
+        total += (self.packaging_cost if self.packaging_cost is not None else 0) 
+        total += (self.shipping_cost if self.shipping_cost is not None else 0) 
+        total += (self.stripe_fee if self.stripe_fee is not None else 0)
+        return total
 
     def save(self, *args, **kwargs):
         super(Order, self).save(*args, **kwargs)

@@ -148,3 +148,6 @@ class Profile(UserenaBaseProfile):
                     self.save()
         except:
             print 'ERROR'
+
+    def __unicode__(self):
+        return u'%s %s (%s)' % (self.user.first_name, self.user.last_name, self.user.username)
