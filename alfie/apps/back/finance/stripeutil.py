@@ -7,13 +7,9 @@ create_token()
 create_customer()
 """
 import sys
-
-# time
+import random
 import datetime
 now = datetime.datetime.now()
-
-# random
-import random
 
 import stripe
 # set api key

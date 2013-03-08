@@ -65,7 +65,7 @@ class Menu(models.Model):
         sumobox     14          3200        If you just want to mainline
     """
     name = models.CharField(max_length=128, blank=True, null=True)
-    slots = models.CharField(max_length=128, blank=True, null=True)
+    slots = models.IntegerField(max_length=128, blank=True, null=True)
     price = models.IntegerField(max_length=7) # price in pennies
     notes = models.TextField(max_length=255, blank=True, null=True)
 
@@ -298,8 +298,9 @@ class Order(models.Model):
                     self.shipping_cost = int(float(rate.price) * 100)
                     self.user.profile.shipping_rate = int(float(rate.price) * 100)
                     self.save()
-        except:
-            print 'ERROR'
+        except Exception, e:
+                print str(e)
+                return False
 
     def create_postage(self, preferred_service='ParcelSelect'):
         shipment = self.create_shipment()
@@ -317,8 +318,9 @@ class Order(models.Model):
             self.label_url = postage.label_url
             #self.label_file = postage.label_file_name
             self.save()
-        except:
-            print 'ERROR'
+        except Exception, e:
+                print str(e)
+                return False
 
     def got_packed(self):
         """

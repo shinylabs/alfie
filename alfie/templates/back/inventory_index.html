@@ -10,11 +10,13 @@
 <h1>Backoffice / Inventory</h1>
 <div class="panel">This shows inventory of ramens, boxes, and collections.</div>
 
+{% if ramen_origins %}
 <table width="100%">
 {% for i in ramen_origins %}
 	<tr><td width="10%">{{ forloop.counter }}</td><td width="50%">{{ i.brand__origin }}</td><td width="50%">{{ i.num_of_ramens }}</td></tr>
 {% endfor %}
 	<tr><td></td><td>Total</td><td>{{ total_ramen_count }}</td></tr>
 </table>
+{% endif %}
 
 {% endblock %}

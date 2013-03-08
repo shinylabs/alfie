@@ -11,6 +11,7 @@
 <h1>Backoffice / Finances</h1>
 <div class="panel">This shows finance information about orders.</div>
 
+{% if this_month_count %}
 <table class="twelve">
 	<thead><tr><th>Feb</th><th>{{ this_month_count }} orders</th></tr></thead>
 	<tbody>
@@ -46,11 +47,14 @@
 		</tr>
 	</table>
 </form>
+{% endif %}
 
+{% if unpaid %}
 {% for order in unpaid|slice:":10" %}
 	<li>{{ order }} - ${{ order.choice.price|floatformat:2 }}</li>
 {% endfor %}
 
 <p>Total orders: {{ total_count }}</p>
+{% endif %}
 
 {% endblock %}
