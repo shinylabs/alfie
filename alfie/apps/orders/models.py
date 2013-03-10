@@ -203,6 +203,7 @@ class Order(models.Model):
     packaging_cost = models.IntegerField(max_length=7, blank=True, null=True, default=0)
     shipping_cost = models.IntegerField(max_length=7, blank=True, null=True, default=0)
     stripe_fee = models.IntegerField(max_length=7, blank=True, null=True, default=0)
+    profit = models.IntegerField(max_length=7, blank=True, null=True, default=0)
 
     # Housekeeping
     created = models.DateTimeField(auto_now_add=True, editable=False)
@@ -361,6 +362,13 @@ class Order(models.Model):
         # return a list of field/values
         #bigups http://www.djangofoo.com/80/get-list-model-fields
         return [field.name for field in Order._meta.fields if field.name.endswith('cost') or field.name.endswith('fee')]
+
+    def set_profits(self):
+        total_cost = 0
+        for cost in self.get_costs_fields():
+            total_cost += getattr(self, cost)
+        self.profit = self.choice.price - total_cost
+        self.save()
 
     def save(self, *args, **kwargs):
         super(Order, self).save(*args, **kwargs)

@@ -149,5 +149,20 @@ class Profile(UserenaBaseProfile):
         except:
             print 'ERROR'
 
+    def get_total_revenue(self):
+        total_revenue = 0
+        for order in self.user.orders.all():
+            total_revenue += order.choice.price
+        return float(total_revenue) / 100
+
+    def get_total_costs(self):
+        pass
+
+    def get_total_profits(self):
+        total_profits = 0
+        for order in self.user.orders.all():
+            total_profits += order.profit
+        return float(total_profits) / 100
+
     def __unicode__(self):
         return u'%s %s (%s)' % (self.user.first_name, self.user.last_name, self.user.username)
