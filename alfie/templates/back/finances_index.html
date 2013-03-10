@@ -11,19 +11,20 @@
 <h1>Backoffice / Finances</h1>
 <div class="panel">This shows finance information about orders.</div>
 
-{% if this_month_count %}
 <table class="twelve">
-	<thead><tr><th>Feb</th><th>{{ this_month_count }} orders</th></tr></thead>
+	<thead>
+		<tr><th>Mar</th><th>{{ this_months_book.this_month_count }} orders</th></tr>
+	</thead>
 	<tbody>
-	<tr><td>Revenue</td><td>${{ revenue|floatformat:"2"|intcomma }}</td></tr>
-	<tr><td>Products</td><td><em>${{ product_costs|floatformat:"2"|intcomma }} ({% widthratio product_costs|floatformat:"2" revenue|floatformat:"2" 100 %}%)</em></td></tr>
-	<tr><td>Shipping</td><td><em>${{ shipping_costs|floatformat:"2"|intcomma }} ({% widthratio shipping_costs|floatformat:"2" revenue|floatformat:"2" 100 %}%)</em></td></tr>
-	<tr><td>Prizes</td><td><em>${{ prize_costs|floatformat:"2"|intcomma }} ({% widthratio prize_costs|floatformat:"2" revenue|floatformat:"2" 100 %}%)</em></td></tr>
-	<tr><td>Packaging</td><td><em>${{ packaging_costs|floatformat:"2"|intcomma }} ({% widthratio packaging_costs|floatformat:"2" revenue|floatformat:"2" 100 %}%)</em></td></tr>
-	<tr><td>Prints</td><td><em>${{ prints_cost|floatformat:"2"|intcomma }} ({% widthratio prints_cost|floatformat:"2" revenue|floatformat:"2" 100 %}%)</em></td></tr>
-	<tr><td>Fees</td><td><em>${{ fees|floatformat:"2"|intcomma }} ({% widthratio fees|floatformat:"2" revenue|floatformat:"2" 100 %}%)</em></td></tr>
-	<tr><td>Profit</td><td>${{ profit|floatformat:"2"|intcomma }} ({% widthratio profit|floatformat:"2" revenue|floatformat:"2" 100 %}%)</td></tr>
-</tbody>
+		<tr><td>Revenue</td><td>${{ this_months_book.revenue|floatformat:"2"|intcomma }}</td></tr>
+		<tr><td>Products</td><td><em>${{ this_months_book.product_cost|floatformat:"2"|intcomma }} ({% widthratio this_months_book.product_cost|floatformat:"2" this_months_book.revenue|floatformat:"2" 100 %}%)</em></td></tr>
+		<tr><td>Shipping</td><td><em>${{ this_months_book.shipping_cost|floatformat:"2"|intcomma }} ({% widthratio this_months_book.shipping_cost|floatformat:"2" this_months_book.revenue|floatformat:"2" 100 %}%)</em></td></tr>
+		<tr><td>Prizes</td><td><em>${{ this_months_book.prize_cost|floatformat:"2"|intcomma }} ({% widthratio this_months_book.prize_cost|floatformat:"2" this_months_book.revenue|floatformat:"2" 100 %}%)</em></td></tr>
+		<tr><td>Packaging</td><td><em>${{ this_months_book.packaging_cost|floatformat:"2"|intcomma }} ({% widthratio this_months_book.packaging_cost|floatformat:"2" this_months_book.revenue|floatformat:"2" 100 %}%)</em></td></tr>
+		<tr><td>Prints</td><td><em>${{ this_months_book.prints_cost|floatformat:"2"|intcomma }} ({% widthratio this_months_book.prints_cost|floatformat:"2" this_months_book.revenue|floatformat:"2" 100 %}%)</em></td></tr>
+		<tr><td>Fees</td><td><em>${{ this_months_book.stripe_fee|floatformat:"2"|intcomma }} ({% widthratio this_months_book.stripe_fee|floatformat:"2" this_months_book.revenue|floatformat:"2" 100 %}%)</em></td></tr>
+		<tr><td>Profit</td><td>${{ this_months_book.profit|floatformat:"2"|intcomma }} ({% widthratio this_months_book.profit|floatformat:"2" this_months_book.revenue|floatformat:"2" 100 %}%)</td></tr>
+	</tbody>
 </table>
 
 <form action="" method="post">{% csrf_token %}
@@ -47,7 +48,6 @@
 		</tr>
 	</table>
 </form>
-{% endif %}
 
 {% if unpaid %}
 {% for order in unpaid|slice:":10" %}

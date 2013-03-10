@@ -144,40 +144,40 @@ def finances_index(request):
 			- CRUD coupons
 			- poke deadbeats
 	"""
-	from decimal import *
-	total_count = Order.objects.count()
-	this_month_count = Order.objects.this_month().count()
-	unpaid = Order.objects.this_month_unpaid()
+	this_month = Order.objects.this_month()
+	this_months_book = dict()
 
-	revenue 		= Decimal((Order.objects.this_month().aggregate(Sum('choice__price'))['choice__price__sum'] if Order.objects.this_month().aggregate(Sum('choice__price'))['choice__price__sum'] is not None else 0)) / 100
-	shipping_costs 	= Decimal((Order.objects.this_month().aggregate(Sum('shipping_cost'))['shipping_cost__sum'] if Order.objects.this_month().aggregate(Sum('shipping_cost'))['shipping_cost__sum'] is not None else 0)) / 100
-	product_costs 	= Decimal((Order.objects.this_month().aggregate(Sum('product_cost'))['product_cost__sum'] if Order.objects.this_month().aggregate(Sum('product_cost'))['product_cost__sum'] is not None else 0)) / 100
-	prize_cost 		= Decimal((Order.objects.this_month().aggregate(Sum('prize_cost'))['prize_cost__sum'] if Order.objects.this_month().aggregate(Sum('prize_cost'))['prize_cost__sum'] is not None else 0)) / 100
-	prints_cost 	= Decimal((Order.objects.this_month().aggregate(Sum('prints_cost'))['prints_cost__sum'] if Order.objects.this_month().aggregate(Sum('prints_cost'))['prints_cost__sum'] is not None else 0)) / 100
-	packaging_cost 	= Decimal((Order.objects.this_month().aggregate(Sum('packaging_cost'))['packaging_cost__sum'] if Order.objects.this_month().aggregate(Sum('packaging_cost'))['packaging_cost__sum'] is not None else 0)) / 100
-	fees 			= Decimal((Order.objects.this_month().aggregate(Sum('stripe_fee'))['stripe_fee__sum'] if Order.objects.this_month().aggregate(Sum('stripe_fee'))['stripe_fee__sum'] is not None else 0)) / 100
-	profit = revenue - shipping_costs - product_costs - prints_cost - packaging_cost - fees
+	# Revenue
+	this_months_book['revenue'] = float((this_month.aggregate(Sum('choice__price'))['choice__price__sum'])) / 100
+
+	# Costs
+	total_cost = 0
+	for cost in [field.name for field in Order._meta.fields if field.name.endswith('cost') or field.name.endswith('fee')]:
+		this_months_book[cost] = float((this_month.aggregate(Sum(cost))[cost+'__sum'])) / 100
+		total_cost += this_months_book[cost]
+
+	# Profit
+	this_months_book['profit'] = this_months_book['revenue'] - total_cost
+
+	# This month
+	this_months_book['this_month_count'] = this_month.count()
+
+	# Total
+	this_months_book['total_count'] = Order.objects.count()
 
  	if request.method == 'POST': # If the form has been submitted...
 		amt = int(request.POST['amt']) * 100
 		item = request.POST['lineitem']
-		Order.objects.add_lineitem(amt, item, Order.objects.this_month())
+		Order.objects.add_lineitem(amt, item, this_month)
 		return HttpResponseRedirect('')
 
 	#tasks debug http://stackoverflow.com/questions/3553955/refresh-template-in-django
 
+	unpaid = Order.objects.this_month_unpaid()
+
 	return render_to_response('back/finances_index.html', {	
-			'total_count': total_count, 
-			'this_month_count': this_month_count,
-			'unpaid': unpaid,
-			'revenue': revenue,
-			'shipping_costs': shipping_costs,
-			'product_costs': product_costs,
-			'prints_cost': prints_cost,
-			'prize_cost': prize_cost,
-			'packaging_cost': packaging_cost,
-			'fees': fees,
-			'profit': profit
+			'this_months_book': this_months_book,
+			'unpaid': unpaid
 		}, context_instance=RequestContext(request))
 
 

@@ -73,6 +73,10 @@ class Menu(models.Model):
         return u'%s' % (self.name)
 
 class OrderManager(models.Manager):
+    # Helpers
+    def get_costs_fields(self):
+        return [field.name for field in self._meta.fields if field.name.endswith('cost') or field.name.endswith('fee')]
+
     # SELECTORS
     def this_month(self, now=now):
         """
@@ -193,7 +197,6 @@ class Order(models.Model):
     refunded = models.DateTimeField(blank=True, null=True)
 
     # Bookkeeping
-    #tasks default these to 0
     product_cost = models.IntegerField(max_length=7, blank=True, null=True, default=0)
     prize_cost = models.IntegerField(max_length=7, blank=True, null=True, default=0)
     prints_cost = models.IntegerField(max_length=7, blank=True, null=True, default=0)
@@ -244,7 +247,7 @@ class Order(models.Model):
                 check_overdue(self.user.profile)
                 self.save()
 
-    def check_stripe_fee(self):
+    def set_stripe_fee(self):
         """
             Call up Stripe API and save last4
         """
@@ -258,6 +261,14 @@ class Order(models.Model):
             if resp['data'][-1]['fee']:
                 self.stripe_fee = resp['data'][-1]['fee']
                 self.save()
+
+    def set_product_cost(self):
+        """
+            Save order.box.cost
+        """
+        if self.box.cost:
+            self.product_cost = self.box.cost
+            self.save()
 
     def check_cutoff(self):
         """
@@ -286,6 +297,7 @@ class Order(models.Model):
         shipment = self.create_shipment()
         rates = shipment.rates()
         #todo add transit time data
+        print '\nShipping to %s' % (self.user.profile.ship_state)
         for rate in rates:
             print rate.carrier, rate.service, rate.price
         return rates
@@ -299,8 +311,8 @@ class Order(models.Model):
                     self.user.profile.shipping_rate = int(float(rate.price) * 100)
                     self.save()
         except Exception, e:
-                print str(e)
-                return False
+            print str(e)
+            return False
 
     def create_postage(self, preferred_service='ParcelSelect'):
         shipment = self.create_shipment()
@@ -319,8 +331,8 @@ class Order(models.Model):
             #self.label_file = postage.label_file_name
             self.save()
         except Exception, e:
-                print str(e)
-                return False
+            print str(e)
+            return False
 
     def got_packed(self):
         """
@@ -345,14 +357,10 @@ class Order(models.Model):
             self.shipped = now
             self.save()
 
-    def tally_costs(self):
-        total = (self.product_cost if self.product_cost is not None else 0)
-        total += (self.prize_cost if self.prize_cost is not None else 0)
-        total += (self.prints_cost if self.prints_cost is not None else 0) 
-        total += (self.packaging_cost if self.packaging_cost is not None else 0) 
-        total += (self.shipping_cost if self.shipping_cost is not None else 0) 
-        total += (self.stripe_fee if self.stripe_fee is not None else 0)
-        return total
+    def get_costs_fields(self):
+        # return a list of field/values
+        #bigups http://www.djangofoo.com/80/get-list-model-fields
+        return [field.name for field in Order._meta.fields if field.name.endswith('cost') or field.name.endswith('fee')]
 
     def save(self, *args, **kwargs):
         super(Order, self).save(*args, **kwargs)
