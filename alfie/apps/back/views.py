@@ -5,39 +5,6 @@ FAT MODELS, SKINNY CONTROLLERS
 
 """
 
-
-"""
-// SHELL CMDS
-
-from alfie.apps.orders.models import *
-"""
-
-#### time utilities ####
-#todo - move these to a separate module or util file
-import datetime
-import calendar
-now = datetime.datetime.now()
-
-#bigups http://blog.e-shell.org/94
-months_choices = []
-for i in range(1,13): months_choices.append((i, datetime.date(now.year, i, 1).strftime('%B')))
-
-#bigups http://stackoverflow.com/questions/4130922/how-to-increment-datetime-month-in-python
-def add_months(sourcedate, months):
-	month = sourcedate.month - 1 + months
-	year = sourcedate.year + month / 12
-	month = month % 12 + 1
-	day = min(sourcedate.day, calendar.monthrange(year,month)[1])
-	return datetime.date(year, month, day)
-
-def subtract_months(sourcedate, months):
-	month = sourcedate.month - 1 - months
-	year = sourcedate.year + month / 12
-	month = month % 12 + 1
-	day = min(sourcedate.day, calendar.monthrange(year,month)[1])
-	return datetime.date(year, month, day)
-#########################
-
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.shortcuts import get_object_or_404
@@ -57,7 +24,19 @@ from alfie.apps.orders.models import Order, Menu
 from alfie.apps.ramens.models import Brand, Flavor, Ramen, Box
 from alfie.apps.services.models import Service
 
-# stripe tools
+# time helpers
+from alfie.apps.back.timehelpers import *
+"""
+	Imports in:
+	datetime
+	add_months()
+	subtract_months()
+"""
+#bigups http://blog.e-shell.org/94
+#months_choices = []
+#for i in range(1,13): months_choices.append((i, datetime.date(now.year, i, 1).strftime('%B')))
+
+# stripe helpers
 from alfie.apps.back.finance.stripeutil import *
 
 def backoffice(request):

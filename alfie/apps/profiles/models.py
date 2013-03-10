@@ -119,35 +119,11 @@ class Profile(UserenaBaseProfile):
         try:
             self.create_address().verify()
             self.address_verified = True
-        except:
+            return True
+        except Exception, e:
             self.address_verified = False
-
-    def create_shipment(self):
-        homebase = {'name': 'LuckyRamenCat', 'street1': '7150 Rainbow Drive', 'state': 'CA', 'zip': '95129', 'city': 'San Jose'}
-        from_address = easypost.easypost.Address(**homebase)
-        #todo check address_verified
-        to_address = self.user.profile.create_address()
-        package = self.choice.box.create_package()
-        return easypost.easypost.Shipment(to_address, from_address, package)
-
-    def check_rates(self):
-        shipment = self.create_shipment()
-        rates = shipment.rates()
-        #todo add transit time data
-        for rate in rates:
-            print rate.carrier, rate.service, rate.price
-        return rates
-
-    def set_shipping_cost(self, preferred_service='ParcelSelect'):
-        try:
-            rates = self.check_rates()
-            for rate in rates:
-                if rate.service == preferred_service:
-                    self.shipping_cost = int(float(rate.price) * 100)
-                    self.user.profile.shipping_rate = int(float(rate.price) * 100)
-                    self.save()
-        except:
-            print 'ERROR'
+            print str(e)
+            return False
 
     def get_total_revenue(self):
         total_revenue = 0

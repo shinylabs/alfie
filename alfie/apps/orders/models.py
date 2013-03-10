@@ -73,10 +73,6 @@ class Menu(models.Model):
         return u'%s' % (self.name)
 
 class OrderManager(models.Manager):
-    # Helpers
-    def get_costs_fields(self):
-        return [field.name for field in self._meta.fields if field.name.endswith('cost') or field.name.endswith('fee')]
-
     # SELECTORS
     def this_month(self, now=now):
         """
@@ -309,8 +305,9 @@ class Order(models.Model):
             for rate in rates:
                 if rate.service == preferred_service:
                     self.shipping_cost = int(float(rate.price) * 100)
-                    self.user.profile.shipping_rate = int(float(rate.price) * 100)
                     self.save()
+                    self.user.profile.shipping_rate = int(float(rate.price) * 100)
+                    self.user.profile.save()
         except Exception, e:
             print str(e)
             return False
@@ -341,7 +338,7 @@ class Order(models.Model):
         """
         if self.paid:
             # set priority
-            self.priority = int(verify_zone(str(self.user.profile.ship_state), zones))
+            #self.priority = int(verify_zone(str(self.user.profile.ship_state), zones))
 
             # set packed datetimestamp
             self.packed = now
