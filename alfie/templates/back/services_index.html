@@ -10,6 +10,7 @@
 <h1>Backoffice / Services</h1>
 <div class="panel">This shows service requests and tools.</div>
 
+{% if service_orders %}
 <table width="100%">
 	<thead><tr><th colspan="8">Service Requests</th></tr></thead>
 	<tbody>
@@ -35,5 +36,6 @@
 	{% endfor %}
 	</tbody>
 </table>
+{% endif %}
 
 {% endblock %}

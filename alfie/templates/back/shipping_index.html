@@ -27,17 +27,17 @@
 
 {% for box in boxes_this_month %}
 	<table width="100%">
-		<thead><tr><th colspan="3">{{ box }}</th><th>{{ box.orders.this_month_to_pack.count }} | {{ box.orders.this_month_packed.count }} / {{ box.orders.count }}</th></tr></thead>
+		<thead><tr><th colspan="3">{{ box }}</th><th>{{ box.orders.this_month_packed.count }} / {{ box.orders.this_month_to_pack.count }} | {{ box.orders.this_month_paid.count }} / {{ box.orders.count }}</th></tr></thead>
 		<tbody>
 			{% for ramen in box.ramens.all %}
 			<tr>
 				<td>{{ forloop.counter }}</td>
 				<td><a href="{% url ramen_detail ramen.id %}">{{ ramen }}</a></td>
 				<td>{{ ramen.weight }}</td>
-				<td>${{ ramen.cogs }}</td>
+				<td>${% widthratio ramen.msrp 100 1 %}</td>
 			</tr>
 			{% endfor %}
-			<tr><td></td><td></td><td>Total cost:</td><td>{{ box.cost }}</td></tr>
+			<tr><td></td><td></td><td>Total cost:</td><td>${% widthratio box.cost 100 1 %}</td></tr>
 			<tr><td></td><td></td><td>Total weight:</td><td>{{ box.weight }}</td></tr>
 		</tbody>
 	</table>

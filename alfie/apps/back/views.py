@@ -5,39 +5,6 @@ FAT MODELS, SKINNY CONTROLLERS
 
 """
 
-
-"""
-// SHELL CMDS
-
-from alfie.apps.orders.models import *
-"""
-
-#### time utilities ####
-#todo - move these to a separate module or util file
-import datetime
-import calendar
-now = datetime.datetime.now()
-
-#bigups http://blog.e-shell.org/94
-months_choices = []
-for i in range(1,13): months_choices.append((i, datetime.date(now.year, i, 1).strftime('%B')))
-
-#bigups http://stackoverflow.com/questions/4130922/how-to-increment-datetime-month-in-python
-def add_months(sourcedate, months):
-	month = sourcedate.month - 1 + months
-	year = sourcedate.year + month / 12
-	month = month % 12 + 1
-	day = min(sourcedate.day, calendar.monthrange(year,month)[1])
-	return datetime.date(year, month, day)
-
-def subtract_months(sourcedate, months):
-	month = sourcedate.month - 1 - months
-	year = sourcedate.year + month / 12
-	month = month % 12 + 1
-	day = min(sourcedate.day, calendar.monthrange(year,month)[1])
-	return datetime.date(year, month, day)
-#########################
-
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.shortcuts import get_object_or_404
@@ -57,7 +24,19 @@ from alfie.apps.orders.models import Order, Menu
 from alfie.apps.ramens.models import Brand, Flavor, Ramen, Box
 from alfie.apps.services.models import Service
 
-# stripe tools
+# time helpers
+from alfie.apps.back.timehelpers import *
+"""
+	Imports in:
+	datetime
+	add_months()
+	subtract_months()
+"""
+#bigups http://blog.e-shell.org/94
+#months_choices = []
+#for i in range(1,13): months_choices.append((i, datetime.date(now.year, i, 1).strftime('%B')))
+
+# stripe helpers
 from alfie.apps.back.finance.stripeutil import *
 
 def backoffice(request):
@@ -144,40 +123,41 @@ def finances_index(request):
 			- CRUD coupons
 			- poke deadbeats
 	"""
-	from decimal import *
-	total_count = Order.objects.count()
-	this_month_count = Order.objects.this_month().count()
-	unpaid = Order.objects.this_month_unpaid()
+	this_month = Order.objects.this_month()
+	this_months_book = dict()
 
-	revenue 		= Decimal((Order.objects.this_month().aggregate(Sum('choice__price'))['choice__price__sum'] if Order.objects.this_month().aggregate(Sum('choice__price'))['choice__price__sum'] is not None else 0)) / 100
-	shipping_costs 	= Decimal((Order.objects.this_month().aggregate(Sum('shipping_cost'))['shipping_cost__sum'] if Order.objects.this_month().aggregate(Sum('shipping_cost'))['shipping_cost__sum'] is not None else 0)) / 100
-	product_costs 	= Decimal((Order.objects.this_month().aggregate(Sum('product_cost'))['product_cost__sum'] if Order.objects.this_month().aggregate(Sum('product_cost'))['product_cost__sum'] is not None else 0)) / 100
-	prize_cost 		= Decimal((Order.objects.this_month().aggregate(Sum('prize_cost'))['prize_cost__sum'] if Order.objects.this_month().aggregate(Sum('prize_cost'))['prize_cost__sum'] is not None else 0)) / 100
-	prints_cost 	= Decimal((Order.objects.this_month().aggregate(Sum('prints_cost'))['prints_cost__sum'] if Order.objects.this_month().aggregate(Sum('prints_cost'))['prints_cost__sum'] is not None else 0)) / 100
-	packaging_cost 	= Decimal((Order.objects.this_month().aggregate(Sum('packaging_cost'))['packaging_cost__sum'] if Order.objects.this_month().aggregate(Sum('packaging_cost'))['packaging_cost__sum'] is not None else 0)) / 100
-	fees 			= Decimal((Order.objects.this_month().aggregate(Sum('stripe_fee'))['stripe_fee__sum'] if Order.objects.this_month().aggregate(Sum('stripe_fee'))['stripe_fee__sum'] is not None else 0)) / 100
-	profit = revenue - shipping_costs - product_costs - prints_cost - packaging_cost - fees
+	# Revenue
+	this_months_book['revenue'] = float((this_month.aggregate(Sum('choice__price'))['choice__price__sum'])) / 100
 
+	# Costs
+	total_cost = 0
+	for cost in [field.name for field in Order._meta.fields if field.name.endswith('cost') or field.name.endswith('fee')]:
+		this_months_book[cost] = float((this_month.aggregate(Sum(cost))[cost+'__sum'])) / 100
+		total_cost += this_months_book[cost]
+
+	# Profit
+	this_months_book['profit'] = this_months_book['revenue'] - total_cost
+
+	# This month
+	this_months_book['this_month_count'] = this_month.count()
+
+	# Total
+	this_months_book['total_count'] = Order.objects.count()
+
+	# Add line items
  	if request.method == 'POST': # If the form has been submitted...
 		amt = int(request.POST['amt']) * 100
 		item = request.POST['lineitem']
-		Order.objects.add_lineitem(amt, item, Order.objects.this_month())
+		Order.objects.add_lineitem(amt, item, this_month)
 		return HttpResponseRedirect('')
 
 	#tasks debug http://stackoverflow.com/questions/3553955/refresh-template-in-django
 
+	unpaid = Order.objects.this_month_unpaid()
+
 	return render_to_response('back/finances_index.html', {	
-			'total_count': total_count, 
-			'this_month_count': this_month_count,
-			'unpaid': unpaid,
-			'revenue': revenue,
-			'shipping_costs': shipping_costs,
-			'product_costs': product_costs,
-			'prints_cost': prints_cost,
-			'prize_cost': prize_cost,
-			'packaging_cost': packaging_cost,
-			'fees': fees,
-			'profit': profit
+			'this_months_book': this_months_book,
+			'unpaid': unpaid
 		}, context_instance=RequestContext(request))
 
 
@@ -254,33 +234,14 @@ def customers_index(request):
 
 		Show service tools
 	"""
-	profits = []
-	total_profit = 0 
-	for i in range(Profile.objects.count()):
-	  customer = Profile.objects.all()[i]
-	  order = customer.user.orders.all()[0]
-	  profit = order.choice.price - order.check_costs()
-	  box_name = order.choice.name.title()
-	  #print "%s shipped to %s profit: $%.2f" % (box_name, customer.ship_state, (float(profit)/100))
-	  total_profit += profit
-
-	  dict = {}
-	  dict['user'] = customer.user.id
-	  dict['name'] = customer.user.first_name + ' ' + customer.user.last_name
-	  dict['state'] = customer.ship_state
-	  dict['box'] = box_name
-	  dict['revenue'] = "$%.2f" % (float(order.choice.price) / 100)
-	  dict['costs'] = "$%.2f" % (float(order.check_costs()) / 100)
-	  dict['profit'] = "$%.2f" % (float(profit) / 100)
-	  profits.append(dict)
-	#print "$%.2f" % (float(total_profit)/100)
 
 	#bigups http://stackoverflow.com/questions/72899/in-python-how-do-i-sort-a-list-of-dictionaries-by-values-of-the-dictionary
 	#profits_by_profit = sorted(profits, key=lambda k: k['profit'])
-	profits_by_state = sorted(profits, key=lambda k: k['state'])
+
+	customers = Profile.objects.all()
 
 	return render_to_response('back/customers_index.html', {
-			'profits_by_state': profits_by_state
+			'customers': customers
 		}, context_instance=RequestContext(request))
 
 # http://www.nerdydork.com/django-filter-model-on-date-range.html

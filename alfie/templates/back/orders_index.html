@@ -10,6 +10,7 @@
 <h1>Backoffice / Orders</h1>
 <div class="panel">This shows orders every month.</div>
 
+{% if total_count %}
 <table class="twelve">
 	<thead>
 		<tr><th>Month</th><th>Current</th><th>Paid</th><th>Shipped</th></tr>
@@ -25,5 +26,6 @@
 		<tr><td width="20%"><strong>Total count:</strong></td><td colspan="3">{{ total_count }}</td></tr>
 	</tbody>
 </table>
+{% endif %}
 
 {% endblock %}

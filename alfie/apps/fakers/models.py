@@ -27,6 +27,15 @@ from alfie.apps.back.timehelpers import *
 	subtract_months()
 """
 
+# faker helpers
+from alfie.apps.fakers.fakersutil import *
+"""
+	Imports in:
+	salt_hash()
+	pick_menu()
+	set_price()
+"""
+
 # csv helpers
 from alfie.apps.fakers.csvutil import *
 """
@@ -55,15 +64,7 @@ class FakerManager(models.Manager):
 			create fake payments
 			rate fake address costs
 	"""
-	@staticmethod	#bigups http://stackoverflow.com/questions/4909585/interesting-takes-exactly-1-argument-2-given-python-error
-	def salt_hash(password):
-		#bigups http://stackoverflow.com/questions/9594125/salt-and-hash-a-password-in-python
-		import hashlib, uuid
-		salt = uuid.uuid4().hex
-		hashed_password = hashlib.sha512(password + salt).hexdigest()
-		return hashed_password
-
-	@staticmethod
+	@staticmethod		#bigups http://stackoverflow.com/questions/4909585/interesting-takes-exactly-1-argument-2-given-python-error
 	def create_profile(f, data):
 		import random
 		# cc from csv don't pass stripe security test
@@ -71,7 +72,6 @@ class FakerManager(models.Manager):
 
 		p = Fakep()
 		p.user = f
-		p.choice = random.choice(Menu.objects.all())
 
 		p.ship_address_1 = data['StreetAddress']
 		p.ship_city = data['City']
@@ -179,6 +179,8 @@ class FakerManager(models.Manager):
 							pass
 			else:
 				print "Next time"
+
+		pick_menu(a_odds=.35, b_odds=.5, c_odds=.15)
 
 		print '\nStarted with %s users and added %s users ' % (int(make_count), successcount)
 		stat = Stat(key='fakers', value=successcount).save()
@@ -401,30 +403,7 @@ class FakerManager(models.Manager):
 		"""
 			Loop through and delete fake orders, filter based on datetime
 		"""
-		successcount = 0
-		failcount = 0
-		badlist = []
-		for i in range(2, self.count()+2): # +2 for admin profiles
-			f = self.get(pk=i)
-			o = Order()
-			o.user = f
-			o.choice = f.profile.choice
-			try:
-				o.save()
-				# hack around auto_now_add
-				o.created = when
-				o.save()
-				print '\nCreated an order for %s' % f.username
-				successcount+=1
-			except:
-				badlist.append(f.username)
-				print '\nSomething about %s failed :(' % f.username
-				failcount+=1
-				pass
-		print '\nStarted with %s users and added %s orders in %s/%s' % (self.count(), successcount, when.month, when.year)
-		stat = Stat(key='orders', value=successcount).save()
-		if failcount > 0: print 'Failed to add %s.\nThese failed: %s' % (failcount, badlist)
-
+		pass
 
 	def delete_fakers(self):
 		"""

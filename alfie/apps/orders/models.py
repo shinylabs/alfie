@@ -18,6 +18,8 @@ from alfie.apps.back.timehelpers import *
 import stripe
 from django.conf import settings
 stripe.api_key = settings.TEST_STRIPE_API_KEY
+# stripe helpers
+from alfie.apps.back.finance.stripeutil import *
 
 # Import EasyPost
 import easypost.easypost
@@ -63,7 +65,7 @@ class Menu(models.Model):
         sumobox     14          3200        If you just want to mainline
     """
     name = models.CharField(max_length=128, blank=True, null=True)
-    slots = models.CharField(max_length=128, blank=True, null=True)
+    slots = models.IntegerField(max_length=128, blank=True, null=True)
     price = models.IntegerField(max_length=7) # price in pennies
     notes = models.TextField(max_length=255, blank=True, null=True)
 
@@ -96,6 +98,14 @@ class OrderManager(models.Manager):
         return count
 
     # FINANCES
+    def check_last4(self, now=now):
+        for order in self.filter(year=now.year).filter(month=now.month):
+            order.check_last4()
+
+    def check_paid(self, now=now):
+        for order in self.filter(year=now.year).filter(month=now.month):
+            order.check_paid()
+
     def this_month_unpaid(self, now=now):
         return self.filter(year=now.year).filter(month=now.month).filter(paid__isnull=True)
 
@@ -120,9 +130,9 @@ class OrderManager(models.Manager):
 
     # HANDLING
     def this_month_to_pack(self, now=now):
-        return self.filter(year=now.year).filter(month=now.month).filter(packed__isnull=True)
+        return self.filter(year=now.year).filter(month=now.month).filter(paid__isnull=False).filter(packed__isnull=True)
     def this_month_packed(self, now=now):
-        return self.filter(year=now.year).filter(month=now.month).filter(packed__isnull=False)
+        return self.filter(year=now.year).filter(month=now.month).filter(paid__isnull=False).filter(packed__isnull=False)
 
     def prev_month_packed(self, now=now):
         now = subtract_months(now, 1)
@@ -139,10 +149,10 @@ class OrderManager(models.Manager):
         return list
 
     def this_month_to_ship(self, now=now):
-        return self.filter(year=now.year).filter(month=now.month).filter(shipped__isnull=True)
+        return self.filter(year=now.year).filter(month=now.month).filter(packed__isnull=False).filter(shipped__isnull=True)
 
     def this_month_shipped(self, now=now):
-        return self.filter(year=now.year).filter(month=now.month).filter(shipped__isnull=False)
+        return self.filter(year=now.year).filter(month=now.month).filter(packed__isnull=False).filter(shipped__isnull=False)
 
     def prev_month_shipped(self, now=now):
         now = subtract_months(now, 1)
@@ -183,13 +193,13 @@ class Order(models.Model):
     refunded = models.DateTimeField(blank=True, null=True)
 
     # Bookkeeping
-    #tasks default these to 0
     product_cost = models.IntegerField(max_length=7, blank=True, null=True, default=0)
     prize_cost = models.IntegerField(max_length=7, blank=True, null=True, default=0)
     prints_cost = models.IntegerField(max_length=7, blank=True, null=True, default=0)
     packaging_cost = models.IntegerField(max_length=7, blank=True, null=True, default=0)
     shipping_cost = models.IntegerField(max_length=7, blank=True, null=True, default=0)
     stripe_fee = models.IntegerField(max_length=7, blank=True, null=True, default=0)
+    profit = models.IntegerField(max_length=7, blank=True, null=True, default=0)
 
     # Housekeeping
     created = models.DateTimeField(auto_now_add=True, editable=False)
@@ -203,43 +213,59 @@ class Order(models.Model):
         """
             Call up Stripe API and save last4
         """
-        cust_id = self.user.profile.stripe_cust_id
-        resp = stripe.Charge.all(customer=cust_id)
+        if not self.user.profile.stripe_cust_id:
+            if create_customer(self.user, self.user.profile):
+                self.check_card()
+            else: print 'Not a stripe customer'
+        else:
+            resp = stripe.Charge.all(customer=self.user.profile.stripe_cust_id)
 
-        if resp['data'][0]['card']['last4']:
-            self.last4 = resp['data'][0]['card']['last4'];
-            self.save()        
+            if resp['data'][-1]['card']['last4']:
+                self.last4 = resp['data'][0]['card']['last4']
+                self.save()     
 
     def check_paid(self):
         """
             Call up Stripe API and verify if order has been paid, else charge order, then update Order object
         """
-        cust_id = self.user.profile.stripe_cust_id
-        resp = stripe.Charge.all(customer=cust_id)
+        if not self.user.profile.stripe_cust_id:
+            if create_customer(self.user, self.user.profile):
+                self.check_paid()
+            else: print 'Not a stripe customer'
+        else:
+            resp = stripe.Charge.all(customer=self.user.profile.stripe_cust_id)
 
-        if resp['data'][0]['paid'] is True:
-            self.paid = now;
-            self.save()
+            if resp['data'][-1]['paid']:
+                self.paid = now
+                self.stripe_fee = resp['data'][-1]['fee']
+                self.save()
+            else:
+                self.last_payment_attempt = now
+                check_overdue(self.user.profile)
+                self.save()
 
-    def check_stripe_fee(self):
+    def set_stripe_fee(self):
         """
             Call up Stripe API and save last4
         """
-        cust_id = self.user.profile.stripe_cust_id
-        resp = stripe.Charge.all(customer=cust_id)
+        if not self.user.profile.stripe_cust_id:
+            if create_customer(self.user, self.user.profile):
+                self.check_stripe_fee()
+            else: print 'Not a stripe customer'
+        else:
+            resp = stripe.Charge.all(customer=self.user.profile.stripe_cust_id)
 
-        if resp['data'][0]['fee']:
-            self.stripe_fee = resp['data'][0]['fee'];
+            if resp['data'][-1]['fee']:
+                self.stripe_fee = resp['data'][-1]['fee']
+                self.save()
+
+    def set_product_cost(self):
+        """
+            Save order.box.cost
+        """
+        if self.box.cost:
+            self.product_cost = self.box.cost
             self.save()
-
-    def check_costs(self):
-        total = (self.product_cost if self.product_cost is not None else 0)
-        total += (self.prize_cost if self.prize_cost is not None else 0)
-        total += (self.prints_cost if self.prints_cost is not None else 0) 
-        total += (self.packaging_cost if self.packaging_cost is not None else 0) 
-        total += (self.shipping_cost if self.shipping_cost is not None else 0) 
-        total += (self.stripe_fee if self.stripe_fee is not None else 0)
-        return total
 
     def check_cutoff(self):
         """
@@ -268,6 +294,7 @@ class Order(models.Model):
         shipment = self.create_shipment()
         rates = shipment.rates()
         #todo add transit time data
+        print '\nShipping to %s' % (self.user.profile.ship_state)
         for rate in rates:
             print rate.carrier, rate.service, rate.price
         return rates
@@ -278,10 +305,12 @@ class Order(models.Model):
             for rate in rates:
                 if rate.service == preferred_service:
                     self.shipping_cost = int(float(rate.price) * 100)
-                    self.user.profile.shipping_rate = int(float(rate.price) * 100)
                     self.save()
-        except:
-            print 'ERROR'
+                    self.user.profile.shipping_rate = int(float(rate.price) * 100)
+                    self.user.profile.save()
+        except Exception, e:
+            print str(e)
+            return False
 
     def create_postage(self, preferred_service='ParcelSelect'):
         shipment = self.create_shipment()
@@ -299,8 +328,9 @@ class Order(models.Model):
             self.label_url = postage.label_url
             #self.label_file = postage.label_file_name
             self.save()
-        except:
-            print 'ERROR'
+        except Exception, e:
+            print str(e)
+            return False
 
     def got_packed(self):
         """
@@ -308,7 +338,7 @@ class Order(models.Model):
         """
         if self.paid:
             # set priority
-            self.priority = int(verify_zone(str(self.user.profile.ship_state), zones))
+            #self.priority = int(verify_zone(str(self.user.profile.ship_state), zones))
 
             # set packed datetimestamp
             self.packed = now
@@ -324,6 +354,18 @@ class Order(models.Model):
             # set shipped datetimestamp
             self.shipped = now
             self.save()
+
+    def get_costs_fields(self):
+        # return a list of field/values
+        #bigups http://www.djangofoo.com/80/get-list-model-fields
+        return [field.name for field in Order._meta.fields if field.name.endswith('cost') or field.name.endswith('fee')]
+
+    def set_profits(self):
+        total_cost = 0
+        for cost in self.get_costs_fields():
+            total_cost += getattr(self, cost)
+        self.profit = self.choice.price - total_cost
+        self.save()
 
     def save(self, *args, **kwargs):
         super(Order, self).save(*args, **kwargs)

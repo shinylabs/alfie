@@ -51,3 +51,26 @@ Faker.objects.create_fake_tokens()
 6. Create stripe customers
 Faker.objects.create_fake_customers()
 
+7. Create fake orders
+Faker.objects.create_fake_orders()
+
+8. Verify address
+Faker.objects.verify_fake_addr()
+
+9. Save last4 in orders
+Order.objects.check_last4()
+
+10. Check paid
+Order.objects.check_paid()
+
+11. Tally costs
+Order.objects.check_stripe_fee()
+Order.objects.set_shipping_cost()
+Order.objects.tally_costs()
+
+12. Pack orders
+Order.objects.pack_all_boxes()
+
+13. Ship orders
+Order.objects.ship_all_boxes()
+

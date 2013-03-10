@@ -7,13 +7,9 @@ create_token()
 create_customer()
 """
 import sys
-
-# time
+import random
 import datetime
 now = datetime.datetime.now()
-
-# random
-import random
 
 import stripe
 # set api key
@@ -23,8 +19,6 @@ stripe.api_key = settings.TEST_STRIPE_API_KEY
 # p = FakeProfile.objects.get(id)
 # profile = p.profile_ptr
 # fakeprofile = p
-
-from alfie.apps.orders.models import Menu
 
 def create_plans():
 	"""
@@ -42,6 +36,7 @@ def create_plans():
 			- id 			-> Menu.name.lower()
 			- livemode	 	-> true
 	"""
+	from alfie.apps.orders.models import Menu
 	for menu in Menu.objects.all():
 		response = stripe.Plan.create(
 			id = menu.name.lower(),
@@ -95,53 +90,100 @@ def fake_numbers():
 	print 'Made %s test cards too' % (newsuccesscount)
 	if failcount > 0: print 'Failed to update %s cards.\nThese failed: %s' % (failcount, badlist)
 
-def create_customer(profile, stripe_token, **kwargs):
+def create_token(user, profile):
+	card = {
+		'number': profile.ccnumber,
+		'exp_month': profile.exp_month,
+		'exp_year': profile.exp_year,
+		'cvc': profile.cvv,
+		'name':  user.first_name + ' ' + user.last_name
+	}
+	print 'Made a card for %s, details: %s' % (user.username, card)
+
+	try:
+		response = stripe.Token.create(
+			card = card,
+		)
+		print 'Made a token for %s' % user.username
+		user.profile.stripe_token = response.id
+		user.profile.last4 = response.card.last4
+		user.profile.save()
+		print 'Saved token for %s' % user.username
+		return True
+	except Exception,e: 
+		print str(e)
+		return False
+
+def create_customer(user, profile, coupon=None):
 	"""
 		Takes in profile, stripe_token, create and return a stripe customer object
 	"""
-	try:
-		response = stripe.Customer.create(
-			card = stripe_token,
-			email = profile.user.email,
-			plan = profile.choice.name,
-			coupon = kwargs['coupon'],
-		)
-		return response.id
-	except:
-		pass
+	if not user.profile.stripe_token:
+		if create_token(user, profile.fakep):
+			create_customer(user, profile)
+		else: return False
+	else: 
+		try:
+			response = stripe.Customer.create(
+				card = profile.stripe_token,
+				email = profile.user.email,
+				plan = profile.choice.name,
+				coupon = coupon
+			)
+			print 'Made a customer for %s' % user.username
+			user.profile.stripe_cust_id = response.id
+			user.profile.subscribed = now
+			user.profile.save()
+			print 'Saved customer for %s' % user.username
+			return True
+		except Exception, e:
+			print str(e)
+			return False
 
-def update_customer(profile, **kwargs):
+def check_overdue(profile):
 	"""
-		Updates customer payment info
+		See if customer delinquent flag is true
 	"""
-	cu = stripe.Customer.retrieve(profile.stripe_cust_id)
-	if stripe_token:
-		cu.card = stripe_token
-		cu.save()
-		profile.stripe_token = stripe_token
+	try:
+		cu = stripe.Customer.retrieve(profile.stripe_cust_id)
+		if cu['delinquent']:
+			profile.overdue = True
+			profile.save()
+			print '%s is overdue' % profile.user.first_name
+			return True
+	except Exception, e:
+		print str(e)
+		return False
+
+def update_sub(profile, new_choice, token=None, coupon=None, prorate=False):
+	"""
+		Update subscription with new choice
+	"""
+	try:
+		cu = stripe.Customer.retrieve(profile.stripe_cust_id)
+		if token:
+			cu.update_subscription(token=token, coupon=coupon, prorate=prorate)
+		else:
+			cu.update_subscription(plan=new_choice, coupon=coupon, prorate=prorate)
+		profile.subscribed = now
 		profile.save()
-	return True
-
-def delete_customer(profile):
-	"""
-		Deletes a customer
-	"""
-	cu = stripe.Customer.retrieve(profile.stripe_cust_id)
-	try:
-		cu.cancel_subscription()
-	except:
-		pass
-
-def update_subscription(profile, choice, prorate="False"):
-	"""
-		Retrieve customer id then update parameters
-	"""
-	cu = stripe.Customer.retrieve(profile.stripe_cust_id)
-	try:
-		cu.update_subscription(plan=choice, prorate=prorate)
 		return True
-	except:
-		pass
+	except Exception, e:
+		print str(e)
+		return False
+
+def cancel_sub(profile):
+	"""
+		Cancel a subscription
+	"""
+	try:
+		cu = stripe.Customer.retrieve(profile.stripe_cust_id)
+		cu.cancel_subscription()
+		profile.subscribed = None
+		profile.save()
+		return True
+	except Exception, e:
+		print str(e)
 		return False
 
 def coupon_list():

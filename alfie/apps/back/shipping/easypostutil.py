@@ -3,11 +3,11 @@
 
 from alfie.apps.back.shipping.easypostutil import *
 """
+import sys
+import random
 
 # import models
 from alfie.apps.profiles.models import *
-
-import sys # to print
 
 # import app
 #from easypost import EasyPost, Address, Postage

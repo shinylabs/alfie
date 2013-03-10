@@ -4,9 +4,6 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 
-# Other app models
-#from alfie.apps.orders.models import *
-
 # time helpers
 from alfie.apps.back.timehelpers import *
 """
@@ -109,25 +106,28 @@ class Ramen(models.Model):
 
 #tasks move Box into its own app
 class BoxManager(models.Manager):
-	def create_box(self, menu, when=now):
+	def create_empty_box(self, menu_option, when=now):
 		box = self.create(
 			month=when.month, 
 			year=when.year,
-			slots=menu.slots,
+			menu=menu_option
 			)
-		#return "Making a %s box with %s slots for %s/%s" % (menu.name, menu.slots, when.month, when.year)
-		return box
+		box.save()
+		return True
 
 	def create_boxes(self):
 		# import Menu
 		from alfie.apps.orders.models import Menu
 		# check latest box
 		from django.db.models import Max
-		max_month = Box.objects.all().aggregate(Max('month'))['month__max'] #
-		push = add_months(now, max_month-now.month+1)
+		max_month = Box.objects.all().aggregate(Max('month'))['month__max']
+		if not max_month:
+			push = now
+		else: 
+			push = add_months(now, max_month-now.month+1)
 		# loop through menu and create boxes
-		for i in range(Menu.objects.count()):
-			self.create_box(Menu.objects.all()[i], push)
+		for option in Menu.objects.all():
+			self.create_empty_box(option, push)
 
 	def this_month(self, when=now):
 		return self.filter(year=when.year).filter(month=when.month)
@@ -146,13 +146,11 @@ class Box(models.Model):
 	"""
 	month = models.IntegerField(max_length=2)
 	year = models.IntegerField(max_length=4)
-
-	#tasks change this to a FK to Menu
-	#menu_choice = models.ForeignKey('alfie.apps.orders.models.Menu')
-	slots = models.IntegerField(blank=True, null=True)
+	menu = models.ForeignKey('orders.Menu', related_name='boxes', blank=True, null=True)
 	ramens = models.ManyToManyField(Ramen, related_name='ramens', blank=True, null=True)
 	cost = models.IntegerField(max_length=7, blank=True, null=True)
 	weight = models.IntegerField(max_length=7, blank=True, null=True)
+	profit = models.IntegerField(max_length=7, blank=True, null=True)
 
 	# Housekeeping
 	created = models.DateTimeField(blank=True, null=True, editable=False, auto_now_add=True)
@@ -176,28 +174,34 @@ class Box(models.Model):
 		for ramen in self.ramens.all():
 			weight += int(0 if ramen.weight is None else ramen.weight)
 		self.weight = weight
-		return "Box weights %sg" % (weight)
+		self.save()
+		return "Box weighs %sg" % (weight)
 
 	def total_cost(self):
 		cost = 0
 		for ramen in self.ramens.all():
-			cost += int(0 if ramen.cogs is None else ramen.cogs)
+			cost += int(0 if ramen.msrp is None else ramen.msrp)
 		self.cost = cost
+		self.save()
 		return "Box costs $%.2f" % (float(cost) / 100)
 
 	def create_package(self):
 		#todo call self.total_weight() and convert to oz
-		if self.slots is 4:
+		if self.menu.slots is 4:
 			package = {"height": 7, "width": 7, "length": 7, "weight": 16}
-		if self.slots is 8:
+		if self.menu.slots is 8:
 			package = {"height": 10, "width": 10, "length": 10, "weight": 48}
-		if self.slots is 12:
+		if self.menu.slots is 12:
 			package = {"height": 13, "width": 13, "length": 13, "weight": 80}
 
 		return easypost.easypost.Package(**package)
 
 	def __unicode__(self):
-		return u'%s/%s Box with %s slots' % (self.month, self.year, self.slots)
+		if not self.ramens.all():
+			status = 'empty'
+		else:
+			status = 'full'
+		return u'%s - %s/%s - %s with %s slots - %s' % (self.id, self.month, self.year, self.menu.name.capitalize(), self.menu.slots, status.upper())
 
 	class Meta:
 		verbose_name_plural = "boxes"
